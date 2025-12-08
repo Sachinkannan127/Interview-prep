@@ -7,16 +7,33 @@ load_dotenv()
 
 class GeminiService:
     def __init__(self):
-        genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-        self.flash_model = genai.GenerativeModel('gemini-1.5-flash')
-        self.pro_model = genai.GenerativeModel('gemini-1.5-pro')
+        api_key = os.getenv('GEMINI_API_KEY')
+        if api_key and api_key != 'your_gemini_api_key_here':
+            genai.configure(api_key=api_key)
+            self.flash_model = genai.GenerativeModel('gemini-1.5-flash')
+            self.pro_model = genai.GenerativeModel('gemini-1.5-pro')
+            self.initialized = True
+        else:
+            print("Warning: Gemini API key not configured")
+            print("Backend will run without AI functionality")
+            self.flash_model = None
+            self.pro_model = None
+            self.initialized = False
     
     def generate_first_question(self, config: dict, user_profile: dict = None):
+        if not self.initialized:
+            return "What is your experience with software development?"
         prompt = self._build_first_question_prompt(config, user_profile)
         response = self.flash_model.generate_content(prompt)
         return self._extract_question(response.text)
     
     def evaluate_and_generate_next(self, config: dict, qa_history: list, current_answer: str):
+        if not self.initialized:
+            return {
+                "evaluation": "Thank you for your response.",
+                "nextQuestion": None,
+                "feedback": "AI evaluation not available"
+            }
         prompt = self._build_evaluation_prompt(config, qa_history, current_answer)
         response = self.pro_model.generate_content(prompt)
         return self._parse_evaluation_response(response.text)

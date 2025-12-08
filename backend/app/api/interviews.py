@@ -153,3 +153,52 @@ async def get_interview(interview_id: str, user: dict = Depends(get_current_user
 async def get_user_interviews(user: dict = Depends(get_current_user)):
     interviews = firebase_service.get_user_interviews(user['uid'])
     return interviews
+
+@router.get("/{interview_id}/ai-feedback")
+async def get_ai_feedback(interview_id: str, user: dict = Depends(get_current_user)):
+    """Get comprehensive AI feedback on the entire interview"""
+    try:
+        interview = firebase_service.get_interview(interview_id)
+        if not interview:
+            raise HTTPException(status_code=404, detail="Interview not found")
+        
+        if interview['userId'] != user['uid']:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Generate comprehensive feedback
+        qa_history = interview.get('qa', [])
+        if not qa_history:
+            return {"feedback": "No answers submitted yet"}
+        
+        # Calculate aggregate metrics
+        scores = [qa.get('aiScore', 0) for qa in qa_history if qa.get('aiScore')]
+        avg_score = sum(scores) / len(scores) if scores else 0
+        
+        # Collect all feedback
+        feedback_summary = {
+            "overallScore": round(avg_score, 1),
+            "totalQuestions": len(qa_history),
+            "answeredQuestions": len([qa for qa in qa_history if qa.get('answerText')]),
+            "averageScore": round(avg_score, 1),
+            "strengths": [],
+            "improvements": [],
+            "detailedFeedback": []
+        }
+        
+        # Aggregate strengths and improvements
+        all_strengths = []
+        all_improvements = []
+        
+        for qa in qa_history:
+            if qa.get('aiFeedback'):
+                feedback_summary["detailedFeedback"].append({
+                    "question": qa.get('questionText'),
+                    "answer": qa.get('answerText'),
+                    "score": qa.get('aiScore'),
+                    "feedback": qa.get('aiFeedback'),
+                    "modelAnswer": qa.get('modelAnswer')
+                })
+        
+        return feedback_summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get AI feedback: {str(e)}")
