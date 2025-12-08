@@ -27,14 +27,14 @@ export class SpeechService {
 
     if (this.isListening) return;
 
-    this.recognition.onresult = (event) => {
+    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
       const results = event.results;
       const lastResult = results[results.length - 1];
       const transcript = lastResult[0].transcript;
       onResult(transcript, lastResult.isFinal);
     };
 
-    this.recognition.onerror = (event) => {
+    this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
       if (onError) onError(event.error);
     };

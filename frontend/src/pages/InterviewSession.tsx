@@ -4,7 +4,7 @@ import { interviewAPI } from '../services/api';
 import { speechService } from '../services/speech';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
-import { Mic, MicOff, Send, Volume2, VolumeX, Clock } from 'lucide-react';
+import { Mic, MicOff, Send, Volume2, VolumeX } from 'lucide-react';
 
 export default function InterviewSession() {
   const { id } = useParams();
@@ -16,7 +16,6 @@ export default function InterviewSession() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
@@ -78,14 +77,14 @@ export default function InterviewSession() {
         }
         updateMetrics(answer + ' ' + newTranscript);
       },
-      (error) => {
+      (_error) => {
         toast.error('Speech recognition error');
         setIsListening(false);
       }
     );
 
     timerRef.current = setInterval(() => {
-      setElapsedTime((Date.now() - (startTime || Date.now())) / 1000);
+      // Timer for tracking response time
     }, 1000);
   };
 
@@ -124,7 +123,6 @@ export default function InterviewSession() {
         setAnswer('');
         setTranscript('');
         setStartTime(null);
-        setElapsedTime(0);
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
         
         if (interview?.config?.voiceEnabled) {
