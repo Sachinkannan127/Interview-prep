@@ -11,9 +11,9 @@ class GeminiService:
         if api_key and api_key != 'your_gemini_api_key_here':
             try:
                 genai.configure(api_key=api_key)
-                # Use the stable Gemini models - updated model names
-                self.flash_model = genai.GenerativeModel('gemini-1.5-flash-latest')
-                self.pro_model = genai.GenerativeModel('gemini-1.5-pro-latest')
+                # Use the stable Gemini models - correct model names for API v1
+                self.flash_model = genai.GenerativeModel('gemini-1.5-flash')
+                self.pro_model = genai.GenerativeModel('gemini-1.5-pro')
                 self.initialized = True
                 print("Success: Gemini AI initialized successfully")
             except Exception as e:
