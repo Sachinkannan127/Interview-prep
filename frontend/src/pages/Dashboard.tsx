@@ -70,78 +70,101 @@ export default function Dashboard() {
         <meta name="description" content="Track your interview progress, view practice sessions, and monitor your performance with detailed analytics." />
         <meta name="keywords" content="dashboard, analytics, interview history, progress tracking" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
-      <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-2 text-2xl font-bold text-primary-500">
-          <Brain className="w-8 h-8" />
-          <span>InterviewAI</span>
+      <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <nav className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 flex justify-between items-center relative z-10">
+        <div className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-bold">
+          <div className="relative">
+            <Brain className="w-8 sm:w-10 h-8 sm:h-10 text-indigo-400 animate-pulse" />
+            <div className="absolute inset-0 w-8 sm:w-10 h-8 sm:h-10 bg-indigo-500/30 rounded-full blur-xl" />
+          </div>
+          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold hidden sm:inline">InterviewAI</span>
+          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold sm:hidden">AI</span>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => navigate('/practice')} className="btn-secondary">
-            Practice
+        <div className="flex gap-2 sm:gap-4">
+          <button onClick={() => navigate('/practice')} className="btn-secondary text-sm sm:text-base">
+            <span className="hidden sm:inline">🎯 Practice</span>
+            <span className="sm:hidden">🎯</span>
           </button>
-          <button onClick={handleLogout} className="btn-secondary flex items-center gap-2">
-            <LogOut className="w-4 h-4" />
-            Logout
+          <button onClick={handleLogout} className="btn-secondary flex items-center gap-2 text-sm sm:text-base">
+            <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
       </nav>
 
-      <main className="container mx-auto px-6 py-12">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-dark-800 mb-4">Welcome back!</h1>
-          <p className="text-dark-600">Ready to practice your interview skills?</p>
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 sm:mb-4">
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Welcome back!</span>
+          </h1>
+          <p className="text-slate-300 text-base sm:text-lg">Ready to level up your interview skills? 🚀</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 fade-in">
-          <div className="card slide-up">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 fade-in">
+          <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-dark-600 text-sm">Total Interviews</p>
-                <p className="text-3xl font-bold text-dark-800">{interviews.length}</p>
+                <p className="text-slate-400 text-sm font-medium mb-2">Total Interviews</p>
+                <p className="text-4xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{interviews.length}</p>
               </div>
-              <TrendingUp className="w-12 h-12 text-primary-500" />
+              <div className="relative">
+                <TrendingUp className="w-12 h-12 text-cyan-400 relative z-10" />
+                <div className="absolute inset-0 bg-cyan-500/30 rounded-full blur-xl group-hover:blur-2xl transition-all" />
+              </div>
             </div>
           </div>
 
-          <div className="card slide-up">
+          <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-dark-600 text-sm">Interview Avg Score</p>
-                <p className="text-3xl font-bold text-dark-800">
+                <p className="text-slate-400 text-sm font-medium mb-2">Avg Score</p>
+                <p className="text-4xl font-extrabold bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
                   {interviews.length > 0
                     ? Math.round(interviews.reduce((acc, i) => acc + (i.overallScore || 0), 0) / interviews.length)
                     : 0}
                 </p>
               </div>
-              <Brain className="w-12 h-12 text-primary-500" />
+              <div className="relative">
+                <Brain className="w-12 h-12 text-emerald-400 relative z-10" />
+                <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-xl group-hover:blur-2xl transition-all" />
+              </div>
             </div>
           </div>
 
-          <div className="card slide-up">
+          <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-dark-600 text-sm">Practice Sessions</p>
-                <p className="text-3xl font-bold text-dark-800">{practiceSessions.length}</p>
+                <p className="text-slate-400 text-sm font-medium mb-2">Practice Sessions</p>
+                <p className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">{practiceSessions.length}</p>
               </div>
-              <Target className="w-12 h-12 text-green-500" />
+              <div className="relative">
+                <Target className="w-12 h-12 text-purple-400 relative z-10" />
+                <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-xl group-hover:blur-2xl transition-all" />
+              </div>
             </div>
           </div>
 
-          <div className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white cursor-pointer hover:scale-105 transition-transform slide-up" onClick={() => navigate('/interview/setup')}>
-            <div className="flex items-center justify-between">
+          <div className="card group cursor-pointer hover:scale-105 relative overflow-hidden" onClick={() => navigate('/interview/setup')}>
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 opacity-90" />
+            <div className="relative z-10 flex items-center justify-between">
               <div>
-                <p className="text-white/80 text-sm">Start New</p>
-                <p className="text-2xl font-bold">Interview</p>
+                <p className="text-white/90 text-sm font-medium mb-2">✨ Start New</p>
+                <p className="text-3xl font-extrabold text-white">Interview</p>
               </div>
-              <Play className="w-12 h-12" />
+              <Play className="w-12 h-12 text-white" />
             </div>
           </div>
         </div>
 
         <div className="card">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-dark-800">Recent Interviews</h2>
+            <h2 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Recent Interviews</h2>
             <button
               onClick={loadData}
               disabled={loading}
@@ -152,35 +175,45 @@ export default function Dashboard() {
             </button>
           </div>
           {loading ? (
-            <p className="text-dark-600">Loading...</p>
+            <div className="text-center py-12">
+              <div className="inline-block w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            </div>
           ) : interviews.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-dark-600 mb-4">No interviews yet</p>
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                <Brain className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-slate-300 mb-6 text-lg">No interviews yet. Start your journey!</p>
               <button onClick={() => navigate('/interview/setup')} className="btn-primary">
-                Start Your First Interview
+                Start Your First Interview →
               </button>
             </div>
           ) : (
             <div className="space-y-4">
               {interviews.map((interview) => (
-                <div key={interview.id} className="flex items-center justify-between p-4 bg-dark-50 rounded-lg hover:bg-dark-200 transition-colors">
-                  <div className="flex-1 cursor-pointer" onClick={() => {
+                <div key={interview.id} className="flex items-center justify-between p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                  }}
+                  onClick={() => {
                     if (interview.status === 'completed') {
                       navigate(`/interview/results/${interview.id}`);
                     } else {
                       navigate(`/interview/session/${interview.id}`);
                     }
                   }}>
-                    <p className="font-medium text-dark-800">{interview.config?.type || 'Interview'}</p>
-                    <p className="text-sm text-dark-600">
-                      {interview.config?.role} - {interview.config?.difficulty}
+                  <div className="flex-1">
+                    <p className="font-bold text-white text-lg mb-1">{interview.config?.type || 'Interview'}</p>
+                    <p className="text-sm text-slate-400">
+                      {interview.config?.role} • {interview.config?.difficulty}
                     </p>
                   </div>
-                  <div className="text-right flex items-center gap-3">
+                  <div className="text-right flex items-center gap-4">
                     <div>
-                      <p className="text-sm text-dark-600">{interview.status}</p>
+                      <p className="text-sm text-slate-400 capitalize mb-1">{interview.status}</p>
                       {interview.overallScore && (
-                        <p className="font-bold text-primary-600">{interview.overallScore}/100</p>
+                        <p className="font-extrabold text-2xl bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">{interview.overallScore}/100</p>
                       )}
                     </div>
                     {interview.status === 'completed' && (
@@ -189,7 +222,7 @@ export default function Dashboard() {
                           e.stopPropagation();
                           navigate(`/interview/results/${interview.id}`);
                         }}
-                        className="btn-secondary text-xs px-3 py-1"
+                        className="btn-secondary text-sm px-4 py-2"
                       >
                         View Results
                       </button>

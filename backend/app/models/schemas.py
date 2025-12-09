@@ -4,9 +4,10 @@ from datetime import datetime
 
 class InterviewConfig(BaseModel):
     type: Literal['technical', 'behavioral', 'hr', 'case-study']
-    subType: Optional[Literal['dsa', 'system-design', 'star']] = None
+    subType: Optional[Literal['dsa', 'system-design', 'java', 'react', 'dotnet', 'python', 'nodejs', 'angular', 'spring-boot', 'microservices', 'cloud', 'devops', 'database', 'fresher', 'star']] = None
     industry: str
     role: str
+    company: Optional[str] = None
     difficulty: Literal['entry', 'mid', 'senior']
     durationMinutes: Literal[15, 30, 45, 60]
     voiceEnabled: bool = False

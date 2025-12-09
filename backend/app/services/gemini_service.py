@@ -30,13 +30,86 @@ class GeminiService:
             self.initialized = False
     
     def generate_first_question(self, config: dict, user_profile: dict = None):
+        print(f"=== GEMINI: generate_first_question called ===")
+        print(f"Initialized: {self.initialized}")
+        print(f"Config: {config}")
+        
         if not self.initialized:
+            print("WARNING: Gemini not initialized, using fallback questions")
             # Fallback questions when AI is not available
+            sub_type = config.get('subType', 'dsa')
             fallback_questions = {
                 'technical': {
-                    'entry': "Explain the difference between let, const, and var in JavaScript.",
-                    'mid': "How would you implement a binary search algorithm?",
-                    'senior': "Design a scalable microservices architecture for an e-commerce platform."
+                    'dsa': {
+                        'entry': "Write a function to reverse a string in your preferred language.",
+                        'mid': "Implement a function to find the longest substring without repeating characters.",
+                        'senior': "Design an algorithm to find the median of two sorted arrays with O(log(m+n)) complexity."
+                    },
+                    'java': {
+                        'entry': "Explain the difference between == and .equals() in Java.",
+                        'mid': "How does garbage collection work in Java? Explain the different types of GC.",
+                        'senior': "Design a thread-safe singleton class in Java with lazy initialization."
+                    },
+                    'react': {
+                        'entry': "What is the difference between state and props in React?",
+                        'mid': "Explain React hooks and how useEffect works. Give practical examples.",
+                        'senior': "How would you optimize a React application with large lists? Discuss virtualization and memoization."
+                    },
+                    'dotnet': {
+                        'entry': "What is the difference between value types and reference types in C#?",
+                        'mid': "Explain async/await in C# and when you would use it.",
+                        'senior': "Design a microservices architecture using .NET Core with proper error handling and resilience."
+                    },
+                    'python': {
+                        'entry': "What is the difference between lists and tuples in Python?",
+                        'mid': "Explain decorators in Python and give a practical example.",
+                        'senior': "How would you design a scalable web scraping system using Python?"
+                    },
+                    'nodejs': {
+                        'entry': "What is the event loop in Node.js and how does it work?",
+                        'mid': "Explain the difference between callbacks, promises, and async/await in Node.js.",
+                        'senior': "Design a scalable REST API with Node.js that handles 10,000 concurrent requests."
+                    },
+                    'angular': {
+                        'entry': "What is dependency injection in Angular?",
+                        'mid': "Explain the difference between ngOnInit and constructor in Angular components.",
+                        'senior': "How would you implement lazy loading and route guards in a large Angular application?"
+                    },
+                    'spring-boot': {
+                        'entry': "What is Spring Boot and how is it different from Spring Framework?",
+                        'mid': "Explain dependency injection in Spring Boot and the different types of autowiring.",
+                        'senior': "Design a microservices architecture using Spring Boot with service discovery and API Gateway."
+                    },
+                    'microservices': {
+                        'entry': "What are microservices and how are they different from monolithic architecture?",
+                        'mid': "Explain service discovery and API Gateway patterns in microservices.",
+                        'senior': "Design a distributed transaction management system for microservices with saga pattern."
+                    },
+                    'cloud': {
+                        'entry': "What is the difference between IaaS, PaaS, and SaaS?",
+                        'mid': "Explain AWS Lambda and when you would use serverless architecture.",
+                        'senior': "Design a multi-region, highly available cloud architecture with auto-scaling and disaster recovery."
+                    },
+                    'devops': {
+                        'entry': "What is CI/CD and why is it important?",
+                        'mid': "Explain Docker containers and how they differ from virtual machines.",
+                        'senior': "Design a complete CI/CD pipeline with automated testing, security scanning, and blue-green deployment."
+                    },
+                    'database': {
+                        'entry': "What is the difference between SQL and NoSQL databases?",
+                        'mid': "Explain database normalization and give examples up to 3NF.",
+                        'senior': "Design a database schema for a social media platform handling millions of users with optimal query performance."
+                    },
+                    'fresher': {
+                        'entry': "What are the four pillars of Object-Oriented Programming?",
+                        'mid': "Explain the difference between abstract classes and interfaces.",
+                        'senior': "How would you approach learning a new programming language or framework?"
+                    },
+                    'system-design': {
+                        'entry': "What factors do you consider when designing a scalable system?",
+                        'mid': "Design a URL shortener service like bit.ly.",
+                        'senior': "Design a distributed caching system like Redis with high availability and consistency."
+                    }
                 },
                 'behavioral': {
                     'entry': "Tell me about a time when you had to learn something new quickly.",
@@ -53,20 +126,38 @@ class GeminiService:
             interview_type = config.get('type', 'technical')
             difficulty = config.get('difficulty', 'mid')
             
-            return fallback_questions.get(interview_type, fallback_questions['technical']).get(difficulty, fallback_questions['technical']['mid'])
+            if interview_type == 'technical' and sub_type in fallback_questions['technical']:
+                return fallback_questions['technical'][sub_type].get(difficulty, fallback_questions['technical'][sub_type]['mid'])
+            
+            return fallback_questions.get(interview_type, fallback_questions['technical']['dsa']).get(difficulty, "Tell me about your experience with software development.")
         
         prompt = self._build_first_question_prompt(config, user_profile)
         try:
+            print(f"=== GEMINI: Calling API with prompt ===")
+            print(f"Prompt length: {len(prompt)} chars")
             response = self.flash_model.generate_content(prompt)
-            return self._extract_question(response.text)
+            question = self._extract_question(response.text)
+            print(f"=== GEMINI: Success! Generated question ===")
+            print(f"Question: {question[:100]}...")
+            return question
         except Exception as e:
-            print(f"Gemini API error: {e}")
+            print(f"=== GEMINI: API ERROR ===")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            import traceback
+            traceback.print_exc()
             # Fallback to predefined questions
             self.initialized = False  # Disable for subsequent calls
+            print("Falling back to predefined questions")
             return self.generate_first_question(config, user_profile)
     
     def evaluate_and_generate_next(self, config: dict, qa_history: list, current_answer: str):
+        print(f"=== GEMINI: evaluate_and_generate_next called ===")
+        print(f"Initialized: {self.initialized}")
+        print(f"QA History length: {len(qa_history)}")
+        
         if not self.initialized:
+            print("WARNING: Gemini not initialized, using fallback evaluation")
             # Fallback evaluation when AI is not available
             score = 75  # Default good score
             feedback = "Good answer! You demonstrated solid understanding."
@@ -102,41 +193,83 @@ class GeminiService:
             }
         prompt = self._build_evaluation_prompt(config, qa_history, current_answer)
         try:
+            print(f"=== GEMINI: Calling evaluation API ===")
+            print(f"Prompt length: {len(prompt)} chars")
             response = self.pro_model.generate_content(prompt)
-            return self._parse_evaluation_response(response.text)
+            result = self._parse_evaluation_response(response.text)
+            print(f"=== GEMINI: Evaluation success ===")
+            print(f"Score: {result.get('score')}, Next: {result.get('nextQuestion', 'N/A')[:50]}")
+            return result
         except Exception as e:
-            print(f"Gemini API error: {e}")
+            print(f"=== GEMINI: Evaluation API ERROR ===")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            import traceback
+            traceback.print_exc()
             # Fallback to predefined evaluation
             self.initialized = False  # Disable for subsequent calls
-            return self.evaluate_and_generate_next(config, qa_history, current_answer)
+            print("Falling back to predefined evaluation")
             return self.evaluate_and_generate_next(config, qa_history, current_answer)
     
     def _build_first_question_prompt(self, config: dict, user_profile: dict = None):
         interview_type = config.get('type', 'technical')
+        sub_type = config.get('subType', '')
         role = config.get('role', 'Software Engineer')
+        company = config.get('company', '')
         difficulty = config.get('difficulty', 'mid')
         
-        prompt = f"""You are an expert interviewer conducting a {interview_type} interview for a {role} position at {difficulty} level.
+        company_context = f" at {company}" if company else ""
+        
+        prompt = f"""You are an expert interviewer conducting a {interview_type} interview for a {role} position{company_context} at {difficulty} level.
 
-Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
+"""
+        
+        if interview_type == 'technical' and sub_type:
+            tech_contexts = {
+                'java': 'Focus on Java core concepts, OOP, collections, multithreading, JVM, Spring framework',
+                'react': 'Focus on React hooks, component lifecycle, state management, Redux, performance optimization',
+                'dotnet': 'Focus on .NET framework, C#, ASP.NET, Entity Framework, LINQ, design patterns',
+                'python': 'Focus on Python core concepts, data structures, OOP, decorators, generators, Django/Flask',
+                'nodejs': 'Focus on Node.js, Express, async/await, event loop, REST APIs, microservices',
+                'angular': 'Focus on Angular components, services, dependency injection, RxJS, TypeScript',
+                'spring-boot': 'Focus on Spring Boot, dependency injection, REST APIs, JPA, microservices architecture',
+                'microservices': 'Focus on microservices patterns, API Gateway, service discovery, containerization, Kubernetes',
+                'cloud': 'Focus on cloud platforms (AWS/Azure/GCP), serverless, containers, scalability, DevOps',
+                'devops': 'Focus on CI/CD, Docker, Kubernetes, Jenkins, Git, infrastructure as code, monitoring',
+                'database': 'Focus on SQL, database design, normalization, indexing, transactions, NoSQL, query optimization',
+                'fresher': 'Focus on basic programming concepts, OOP, data structures, simple algorithms suitable for fresh graduates',
+                'dsa': 'Focus on algorithms, data structures, problem-solving, time/space complexity',
+                'system-design': 'Focus on scalability, architecture, trade-offs, distributed systems'
+            }
+            
+            if sub_type in tech_contexts:
+                prompt += f"{tech_contexts[sub_type]}\n\n"
+        
+        prompt += f"""Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
 
 For technical interviews:
-- DSA: Focus on algorithms, data structures, problem-solving
-- System Design: Focus on scalability, architecture, trade-offs
+- Make questions specific to the chosen technology/sub-type
+- Include practical scenarios and real-world problems
+- Difficulty: entry=basic concepts, mid=intermediate with scenarios, senior=complex design/architecture
 
 For behavioral interviews:
 - Use STAR method framework
 - Focus on past experiences, leadership, teamwork
 
 For HR interviews:
-- Focus on motivations, culture fit, career goals
+- Focus on motivations, culture fit, career goals"""
 
-Return only the question text, nothing else."""
+        if company:
+            prompt += f"\n- Tailor the question style to {company}'s interview approach"
+
+        prompt += "\n\nReturn only the question text, nothing else."
         
         return prompt
     
     def _build_evaluation_prompt(self, config: dict, qa_history: list, current_answer: str):
         interview_type = config.get('type', 'technical')
+        sub_type = config.get('subType', '')
+        company = config.get('company', '')
         difficulty = config.get('difficulty', 'mid')
         
         history_text = "\n".join([
@@ -144,7 +277,10 @@ Return only the question text, nothing else."""
             for qa in qa_history[-3:]  # Last 3 Q&A for context
         ])
         
-        prompt = f"""You are an expert interviewer evaluating a candidate's response in a {interview_type} interview at {difficulty} level.
+        company_context = f" at {company}" if company else ""
+        tech_context = f" focusing on {sub_type}" if sub_type else ""
+        
+        prompt = f"""You are an expert interviewer evaluating a candidate's response in a {interview_type} interview{tech_context}{company_context} at {difficulty} level.
 
 Previous Q&A:
 {history_text}
@@ -153,12 +289,12 @@ Current Answer:
 {current_answer}
 
 Evaluate the answer and provide:
-1. Score (0-100)
-2. Feedback (what was good, what could be improved)
-3. A model/ideal answer
+1. Score (0-100) - Be realistic and consider the difficulty level and technology context
+2. Feedback (what was good, what could be improved) - Be specific to the technology/sub-type
+3. A model/ideal answer - Include technology-specific best practices
 4. List of strengths (2-3 points)
 5. List of improvements (2-3 points)
-6. Next follow-up question (or "INTERVIEW_COMPLETE" if enough questions asked)
+6. Next follow-up question (or "INTERVIEW_COMPLETE" if enough questions asked) - Make it relevant to {sub_type if sub_type else interview_type}
 
 Return response as JSON:
 {{

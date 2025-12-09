@@ -12,9 +12,10 @@ export interface User {
 
 export interface InterviewConfig {
   type: 'technical' | 'behavioral' | 'hr' | 'case-study';
-  subType?: 'dsa' | 'system-design' | 'star';
+  subType?: 'dsa' | 'system-design' | 'java' | 'react' | 'dotnet' | 'python' | 'nodejs' | 'angular' | 'spring-boot' | 'microservices' | 'cloud' | 'devops' | 'database' | 'fresher' | 'star';
   industry: string;
   role: string;
+  company?: string;
   difficulty: 'entry' | 'mid' | 'senior';
   durationMinutes: 15 | 30 | 45 | 60;
   voiceEnabled: boolean;

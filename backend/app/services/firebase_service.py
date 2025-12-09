@@ -66,7 +66,12 @@ class FirebaseService:
         return doc.to_dict() if doc.exists else None
     
     def create_interview(self, interview_data: dict):
+        print(f"=== FIREBASE: create_interview called ===")
+        print(f"Initialized: {self.initialized}")
+        print(f"User ID: {interview_data.get('userId')}")
+        
         if not self.initialized:
+            print("WARNING: Firebase not initialized, using in-memory storage")
             # Use in-memory storage for development
             import uuid
             interview_id = str(uuid.uuid4())
@@ -76,10 +81,13 @@ class FirebaseService:
             if 'interviews' not in self.mock_storage:
                 self.mock_storage['interviews'] = {}
             self.mock_storage['interviews'][interview_id] = interview_data
+            print(f"Saved to mock storage with ID: {interview_id}")
             return interview_data
+        
         doc_ref = self.db.collection('interviews').document()
         interview_data['id'] = doc_ref.id
         doc_ref.set(interview_data)
+        print(f"=== FIREBASE: Interview created in Firestore with ID: {doc_ref.id} ===")
         return interview_data
     
     def get_interview(self, interview_id: str):
@@ -92,13 +100,24 @@ class FirebaseService:
         return doc.to_dict() if doc.exists else None
     
     def update_interview(self, interview_id: str, data: dict):
+        print(f"=== FIREBASE: update_interview called ===")
+        print(f"Interview ID: {interview_id}")
+        print(f"Update keys: {list(data.keys())}")
+        
         if not self.initialized:
+            print("WARNING: Firebase not initialized, updating mock storage")
             # Use in-memory storage for development
             if hasattr(self, 'mock_storage') and 'interviews' in self.mock_storage:
                 if interview_id in self.mock_storage['interviews']:
                     self.mock_storage['interviews'][interview_id].update(data)
+                    print(f"Updated mock storage for interview {interview_id}")
+                else:
+                    print(f"WARNING: Interview {interview_id} not found in mock storage")
             return
+        
         self.db.collection('interviews').document(interview_id).update(data)
+        print(f"=== FIREBASE: Interview {interview_id} updated in Firestore ===")
+        return
     
     def get_user_interviews(self, user_id: str, limit: int = 10):
         if not self.initialized:

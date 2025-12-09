@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { interviewAPI } from '../services/api';
@@ -27,39 +28,72 @@ export default function InterviewResults() {
     }
   };
 
-  const downloadResults = () => {
+  const downloadPDFResults = () => {
     if (!interview) return;
-
-    const resultsData = {
-      interviewId: interview.id,
-      config: interview.config,
-      startedAt: interview.startedAt,
-      endedAt: interview.endedAt,
-      overallScore: interview.overallScore,
-      metrics: interview.metrics,
-      questionsAndAnswers: interview.qa.map((qa: any, index: number) => ({
-        questionNumber: index + 1,
-        question: qa.questionText,
-        answer: qa.answerText,
-        score: qa.aiScore,
-        feedback: qa.aiFeedback,
-        responseTime: (qa.endTs - qa.startTs) / 1000, // seconds
-      })),
-      transcript: interview.transcript,
-    };
-
-    // Create and download JSON file
-    const dataStr = JSON.stringify(resultsData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = `interview-results-${interview.id}.json`;
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-
-    toast.success('Results downloaded successfully!');
+    const doc = new jsPDF();
+    let y = 10;
+    doc.setFontSize(18);
+    doc.text('Interview Results', 10, y);
+    y += 10;
+    doc.setFontSize(12);
+    doc.text(`Interview ID: ${interview.id}`, 10, y);
+    y += 8;
+    doc.text(`Started At: ${interview.startedAt || ''}`, 10, y);
+    y += 8;
+    doc.text(`Ended At: ${interview.endedAt || ''}`, 10, y);
+    y += 8;
+    doc.text(`Overall Score: ${interview.overallScore?.toFixed(1) || avgScore.toFixed(1)}`, 10, y);
+    y += 8;
+    doc.text(`Questions Answered: ${interview.qa.length}`, 10, y);
+    y += 8;
+    doc.text(`Avg Response Time: ${interview.metrics?.avgResponseTime?.toFixed(1) || '0'}s`, 10, y);
+    y += 8;
+    doc.text(`Total Duration: ${interview.endedAt && interview.startedAt ? formatDuration((new Date(interview.endedAt).getTime() - new Date(interview.startedAt).getTime()) / 1000) : 'N/A'}`, 10, y);
+    y += 10;
+    doc.text('Interview Configuration:', 10, y);
+    y += 8;
+    Object.entries(interview.config || {}).forEach(([key, value]) => {
+      doc.text(`${key}: ${String(value)}`, 12, y);
+      y += 7;
+    });
+    y += 5;
+    doc.text('Questions & Answers:', 10, y);
+    y += 8;
+    interview.qa.forEach((qa: any, idx: number) => {
+      doc.setFont(undefined, 'bold');
+      doc.text(`Q${idx + 1}: ${qa.questionText}`, 12, y);
+      doc.setFont(undefined, 'normal');
+      y += 7;
+      doc.text(`Your Answer: ${qa.answerText}`, 14, y);
+      y += 7;
+      doc.text(`Score: ${qa.aiScore}/100`, 14, y);
+      y += 7;
+      if (qa.aiFeedback) {
+        doc.text(`AI Feedback: ${qa.aiFeedback}`, 14, y);
+        y += 7;
+      }
+      doc.text(`Response Time: ${formatDuration((qa.endTs - qa.startTs) / 1000)}`, 14, y);
+      y += 10;
+      if (y > 270) {
+        doc.addPage();
+        y = 10;
+      }
+    });
+    if (interview.transcript) {
+      doc.text('Full Transcript:', 10, y);
+      y += 8;
+      const transcriptLines = interview.transcript.split('\n');
+      transcriptLines.forEach((line: string) => {
+        doc.text(line, 12, y);
+        y += 6;
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+    }
+    doc.save(`interview-results-${interview.id}.pdf`);
+    toast.success('PDF downloaded successfully!');
   };
 
   const formatDuration = (seconds: number) => {
@@ -106,9 +140,9 @@ export default function InterviewResults() {
               <ArrowLeft className="w-5 h-5" />
               Back to Dashboard
             </button>
-            <button onClick={downloadResults} className="btn-primary flex items-center gap-2">
+            <button onClick={downloadPDFResults} className="btn-primary flex items-center gap-2">
               <Download className="w-5 h-5" />
-              Download Results
+              Download PDF
             </button>
           </div>
 
@@ -143,9 +177,9 @@ export default function InterviewResults() {
                 </div>
               </div>
 
-              <button onClick={downloadResults} className="btn-primary flex items-center gap-2 mx-auto">
+              <button onClick={downloadPDFResults} className="btn-primary flex items-center gap-2 mx-auto">
                 <Download className="w-5 h-5" />
-                Download Results
+                Download PDF
               </button>
             </div>
           </div>

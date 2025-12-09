@@ -12,31 +12,57 @@ export default function Landing() {
         <meta name="description" content="Practice realistic mock interviews with AI-powered feedback. Track your progress and improve your interview skills with InterviewAI." />
         <meta name="keywords" content="AI interview, mock interview, interview practice, career preparation, job interview" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
-      <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-2 text-2xl font-bold text-primary-500">
-          <Brain className="w-8 h-8" />
-          <span>InterviewAI</span>
+      <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <nav className="container mx-auto px-6 py-6 flex justify-between items-center relative z-10">
+        <div className="flex items-center gap-3 text-2xl font-bold">
+          <div className="relative">
+            <Brain className="w-10 h-10 text-indigo-400 animate-pulse" />
+            <div className="absolute inset-0 w-10 h-10 bg-indigo-500/30 rounded-full blur-xl" />
+          </div>
+          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold">InterviewAI</span>
         </div>
         <button onClick={() => navigate('/auth')} className="btn-primary">
-          Get Started
+          Get Started →
         </button>
       </nav>
 
-      <main className="container mx-auto px-6 py-20">
-        <div className="text-center max-w-4xl mx-auto mb-20 fade-in">
-          <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-            Master Your Interviews with AI
+      <main className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
+        <div className="text-center max-w-5xl mx-auto mb-16 sm:mb-20 fade-in">
+          <div className="inline-block mb-4 sm:mb-6 px-4 sm:px-6 py-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm">
+            <span className="text-indigo-300 text-xs sm:text-sm font-medium">🚀 Powered by Advanced AI Technology</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-tight px-2">
+            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
+              Master Your Interviews
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              with AI Precision
+            </span>
           </h1>
-          <p className="text-xl text-dark-600 mb-8 slide-up">
-            Practice realistic mock interviews, get instant AI-powered feedback, and track your progress.
+          <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-4">
+            Experience next-generation interview preparation with AI-powered feedback, 
+            real-time analysis, and personalized coaching to ace your dream job.
           </p>
-          <button onClick={() => navigate('/auth')} className="btn-primary text-lg px-8 py-4 slide-up">
-            Start Practicing Now
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+            <button onClick={() => navigate('/auth')} className="btn-primary text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 group w-full sm:w-auto">
+              Start Practicing Now
+              <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button onClick={() => navigate('/auth')} className="btn-secondary text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 w-full sm:w-auto">
+              View Demo
+            </button>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 fade-in px-4">
           <FeatureCard
             icon={<Brain className="w-12 h-12 text-primary-500" />}
             title="AI-Powered"
@@ -66,10 +92,15 @@ export default function Landing() {
 
 function FeatureCard({ icon, title, description }: any) {
   return (
-    <div className="card text-center hover:scale-105 transition-transform duration-200">
-      <div className="flex justify-center mb-4">{icon}</div>
-      <h3 className="text-xl font-bold mb-2 text-dark-800">{title}</h3>
-      <p className="text-dark-600">{description}</p>
+    <div className="card text-center group hover:scale-105">
+      <div className="flex justify-center mb-6 relative">
+        <div className="absolute inset-0 flex justify-center items-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
+        </div>
+        <div className="relative">{icon}</div>
+      </div>
+      <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
+      <p className="text-slate-300 leading-relaxed">{description}</p>
     </div>
   );
 }
