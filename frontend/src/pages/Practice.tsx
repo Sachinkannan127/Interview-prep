@@ -199,8 +199,13 @@ export default function Practice() {
   );
 }
 
+  // Show history view
+  if (showHistory) {
+    return <PracticeHistory onBack={() => setShowHistory(false)} />;
+  }
+
   return (
-    <>
+    <div>
       <Helmet>
         <title>Practice Session - InterviewAI</title>
         <meta name="description" content="Answer practice questions and receive instant AI-powered feedback on your responses." />
@@ -520,12 +525,4 @@ function PracticeHistory({ onBack }: { onBack: () => void }) {
         </div>
       </div>
     </div>
-  </>
-  );
-
-  // Show history view
-  if (showHistory) {
-    return <PracticeHistory onBack={() => setShowHistory(false)} />;
-  }
-}
-
+  )
