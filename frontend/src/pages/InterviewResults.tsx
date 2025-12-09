@@ -76,10 +76,10 @@ export default function InterviewResults() {
     doc.text('Questions & Answers:', 10, y);
     y += 8;
     interview.qa.forEach((qa: any, idx: number) => {
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       const questionText = String(qa.questionText ?? '');
       doc.text(`Q${idx + 1}: ${questionText}`, 12, y);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       y += 7;
       const answerText = String(qa.answerText ?? '');
       doc.text(`Your Answer: ${answerText}`, 14, y);
