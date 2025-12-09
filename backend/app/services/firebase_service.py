@@ -7,24 +7,47 @@ load_dotenv()
 
 class FirebaseService:
     def __init__(self):
+        self.initialized = False
+        self.db = None
+        
         try:
+            # Check if we should initialize Firebase
             cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
+            project_id = os.getenv('FIREBASE_PROJECT_ID')
+            
+            # Skip Firebase initialization if credentials look like mock/placeholder
+            if not project_id or project_id == 'your_firebase_project_id':
+                print("Info: Using mock Firebase (no real credentials configured)")
+                print("Backend will run with in-memory storage for development")
+                self.mock_storage = {}
+                return
+            
             if cred_path and os.path.exists(cred_path):
+                # Check if it's a mock file
+                with open(cred_path, 'r') as f:
+                    content = f.read()
+                    if 'MOCK_PRIVATE_KEY' in content:
+                        print("Info: Mock Firebase credentials detected")
+                        print("Backend will run with in-memory storage for development")
+                        self.mock_storage = {}
+                        return
+                
                 cred = credentials.Certificate(cred_path)
             else:
                 # For deployment with environment variables
                 cred = credentials.ApplicationDefault()
             
             initialize_app(cred, {
-                'projectId': os.getenv('FIREBASE_PROJECT_ID'),
+                'projectId': project_id,
             })
             
             self.db = firestore.client()
             self.initialized = True
+            print("Success: Firebase initialized successfully")
         except Exception as e:
-            print(f"Warning: Firebase not initialized: {str(e)}")
-            print("Backend will run without Firebase functionality")
-            self.db = None
+            print(f"Info: Firebase not initialized: {str(e)}")
+            print("Backend will run with in-memory storage for development")
+            self.mock_storage = {}
             self.initialized = False
     
     def verify_token(self, token: str):
@@ -44,7 +67,16 @@ class FirebaseService:
     
     def create_interview(self, interview_data: dict):
         if not self.initialized:
-            raise ValueError("Firebase not initialized")
+            # Use in-memory storage for development
+            import uuid
+            interview_id = str(uuid.uuid4())
+            interview_data['id'] = interview_id
+            if not hasattr(self, 'mock_storage'):
+                self.mock_storage = {}
+            if 'interviews' not in self.mock_storage:
+                self.mock_storage['interviews'] = {}
+            self.mock_storage['interviews'][interview_id] = interview_data
+            return interview_data
         doc_ref = self.db.collection('interviews').document()
         interview_data['id'] = doc_ref.id
         doc_ref.set(interview_data)
@@ -52,17 +84,28 @@ class FirebaseService:
     
     def get_interview(self, interview_id: str):
         if not self.initialized:
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'interviews' in self.mock_storage:
+                return self.mock_storage['interviews'].get(interview_id)
             return None
         doc = self.db.collection('interviews').document(interview_id).get()
         return doc.to_dict() if doc.exists else None
     
     def update_interview(self, interview_id: str, data: dict):
         if not self.initialized:
-            raise ValueError("Firebase not initialized")
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'interviews' in self.mock_storage:
+                if interview_id in self.mock_storage['interviews']:
+                    self.mock_storage['interviews'][interview_id].update(data)
+            return
         self.db.collection('interviews').document(interview_id).update(data)
     
     def get_user_interviews(self, user_id: str, limit: int = 10):
         if not self.initialized:
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'interviews' in self.mock_storage:
+                user_interviews = [v for v in self.mock_storage['interviews'].values() if v.get('userId') == user_id]
+                return sorted(user_interviews, key=lambda x: x.get('startedAt', ''), reverse=True)[:limit]
             return []
         docs = self.db.collection('interviews')\
             .where('userId', '==', user_id)\
