@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { interviewAPI } from '../services/api';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { Brain, Play, TrendingUp, LogOut } from 'lucide-react';
+import { Brain, Play, TrendingUp, LogOut, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Dashboard() {
@@ -13,6 +13,26 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadInterviews();
+
+    // Refresh data when window/tab becomes visible again
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadInterviews();
+      }
+    };
+
+    // Refresh data when window gains focus
+    const handleFocus = () => {
+      loadInterviews();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const loadInterviews = async () => {
@@ -94,7 +114,17 @@ export default function Dashboard() {
         </div>
 
         <div className="card">
-          <h2 className="text-2xl font-bold text-dark-800 mb-6">Recent Interviews</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-dark-800">Recent Interviews</h2>
+            <button
+              onClick={loadInterviews}
+              disabled={loading}
+              className="btn-secondary flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
           {loading ? (
             <p className="text-dark-600">Loading...</p>
           ) : interviews.length === 0 ? (
