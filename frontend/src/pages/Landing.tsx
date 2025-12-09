@@ -1,11 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { Brain, Mic, TrendingUp, Shield } from 'lucide-react';
 
 export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
+    <>
+      <Helmet>
+        <title>InterviewAI - Master Your Interviews with AI</title>
+        <meta name="description" content="Practice realistic mock interviews with AI-powered feedback. Track your progress and improve your interview skills with InterviewAI." />
+        <meta name="keywords" content="AI interview, mock interview, interview practice, career preparation, job interview" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
       <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
         <div className="flex items-center gap-2 text-2xl font-bold text-primary-500">
           <Brain className="w-8 h-8" />
@@ -53,6 +60,7 @@ export default function Landing() {
         </div>
       </main>
     </div>
+    </>
   );
 }
 

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { interviewAPI, questionsAPI } from '../services/api';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -63,7 +64,13 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
+    <>
+      <Helmet>
+        <title>Dashboard - InterviewAI</title>
+        <meta name="description" content="Track your interview progress, view practice sessions, and monitor your performance with detailed analytics." />
+        <meta name="keywords" content="dashboard, analytics, interview history, progress tracking" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200">
       <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
         <div className="flex items-center gap-2 text-2xl font-bold text-primary-500">
           <Brain className="w-8 h-8" />
@@ -217,5 +224,6 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+    </>
   );
 }

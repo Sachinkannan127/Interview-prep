@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { ArrowLeft, BookOpen, Sparkles, Target, CheckCircle, History } from 'lucide-react';
 import { questionsAPI } from '../services/api';
 import toast from 'react-hot-toast';
@@ -110,7 +111,13 @@ export default function Practice() {
 
   if (!started) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-12 px-6">
+      <>
+        <Helmet>
+          <title>Practice Mode - InterviewAI</title>
+          <meta name="description" content="Generate custom practice questions and get instant AI feedback to improve your interview skills." />
+          <meta name="keywords" content="practice mode, interview questions, AI feedback, skill improvement" />
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-12 px-6">
         <div className="container mx-auto max-w-4xl">
           <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-dark-600 hover:text-dark-800 mb-8">
             <ArrowLeft className="w-5 h-5" />
@@ -192,7 +199,12 @@ export default function Practice() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-12 px-6">
+    <>
+      <Helmet>
+        <title>Practice Session - InterviewAI</title>
+        <meta name="description" content="Answer practice questions and receive instant AI-powered feedback on your responses." />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-12 px-6">
       <div className="container mx-auto max-w-4xl">
         <button onClick={() => setStarted(false)} className="flex items-center gap-2 text-dark-600 hover:text-dark-800 mb-8">
           <ArrowLeft className="w-5 h-5" />

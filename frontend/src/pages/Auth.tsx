@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../services/firebase';
@@ -68,7 +69,13 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 flex items-center justify-center px-6">
+    <>
+      <Helmet>
+        <title>Login / Sign Up - InterviewAI</title>
+        <meta name="description" content="Sign in or create an account to start practicing AI-powered mock interviews and improve your skills." />
+        <meta name="keywords" content="login, sign up, interview practice, user account" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 flex items-center justify-center px-6">
       <div className="card max-w-md w-full">
         <div className="text-center mb-8">
           <Brain className="w-16 h-16 text-primary-500 mx-auto mb-4" />
@@ -154,8 +161,8 @@ export default function Auth() {
           >
             {isLogin ? 'Sign Up' : 'Sign In'}
           </button>
-        </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
