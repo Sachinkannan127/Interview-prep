@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Mic, Check } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 
 export default function InterviewSetup() {
   const navigate = useNavigate();
@@ -14,29 +14,28 @@ export default function InterviewSetup() {
     company: '',
     difficulty: 'mid',
     durationMinutes: 30,
-    voiceEnabled: false,
     avatarEnabled: false,
     videoEnabled: false,
   });
   const [loading, setLoading] = useState(false);
-  const [micTested, setMicTested] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(false);
 
-  const testMicrophone = async () => {
+  const testCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       stream.getTracks().forEach(track => track.stop());
-      setMicTested(true);
-      toast.success('✅ Microphone access granted! You can now start the interview.');
+      setCameraPermission(true);
+      toast.success('✅ Camera access granted! You can now start the interview.');
     } catch (error: any) {
-      console.error('Microphone test failed:', error);
-      let errorMsg = 'Microphone test failed. ';
+      console.error('Camera test failed:', error);
+      let errorMsg = 'Camera access failed. ';
       
       if (error.name === 'NotAllowedError') {
-        errorMsg += 'Please click the 🔒 icon in your address bar, allow microphone access, and try again.';
+        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and try again.';
       } else if (error.name === 'NotFoundError') {
-        errorMsg += 'No microphone detected. Please connect a microphone.';
+        errorMsg += 'No camera detected. Please connect a camera.';
       } else if (error.name === 'NotReadableError') {
-        errorMsg += 'Microphone is being used by another application.';
+        errorMsg += 'Camera is being used by another application.';
       } else {
         errorMsg += error.message;
       }
@@ -46,8 +45,8 @@ export default function InterviewSetup() {
   };
 
   const handleStart = async () => {
-    if (config.voiceEnabled && !micTested) {
-      toast.error('Please test your microphone first by clicking the "Test Microphone" button.');
+    if ((config.videoEnabled || config.avatarEnabled) && !cameraPermission) {
+      toast.error('Please test your camera first by clicking the "Test Camera" button.');
       return;
     }
 
@@ -64,8 +63,8 @@ export default function InterviewSetup() {
   };
 
   const handlePreviewQuestions = () => {
-    if (config.voiceEnabled && !micTested) {
-      toast.error('Please test your microphone first by clicking the "Test Microphone" button.');
+    if ((config.videoEnabled || config.avatarEnabled) && !cameraPermission) {
+      toast.error('Please test your camera first by clicking the "Test Camera" button.');
       return;
     }
     navigate('/interview/preview', { state: { config } });
@@ -181,77 +180,61 @@ export default function InterviewSetup() {
               </select>
             </div>
 
-            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
               <input 
                 type="checkbox" 
-                id="voice" 
-                checked={config.voiceEnabled} 
+                id="avatar" 
+                checked={config.avatarEnabled} 
                 onChange={(e) => {
-                  setConfig({ ...config, voiceEnabled: e.target.checked });
+                  setConfig({ ...config, avatarEnabled: e.target.checked });
                   if (!e.target.checked) {
-                    setMicTested(false);
-                    setConfig(prev => ({ ...prev, avatarEnabled: false }));
+                    setCameraPermission(false);
                   }
                 }} 
                 className="w-5 h-5" 
               />
-              <label htmlFor="voice" className="text-sm font-semibold text-white cursor-pointer">🎤 Enable Voice Mode (Speech-to-Text)</label>
+              <label htmlFor="avatar" className="text-sm font-semibold text-white cursor-pointer">🤖 Enable AI Interviewer Avatar (Face-to-Face)</label>
             </div>
 
-            {config.voiceEnabled && (
-              <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-                <input 
-                  type="checkbox" 
-                  id="avatar" 
-                  checked={config.avatarEnabled} 
-                  onChange={(e) => {
-                    setConfig({ ...config, avatarEnabled: e.target.checked });
-                  }} 
-                  className="w-5 h-5" 
-                />
-                <label htmlFor="avatar" className="text-sm font-semibold text-white cursor-pointer">🤖 Enable AI Interviewer Avatar (Face-to-Face)</label>
-              </div>
-            )}
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(236, 72, 153, 0.1)', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
+              <input 
+                type="checkbox" 
+                id="video" 
+                checked={config.videoEnabled} 
+                onChange={(e) => {
+                  setConfig({ ...config, videoEnabled: e.target.checked });
+                  if (!e.target.checked && !config.avatarEnabled) {
+                    setCameraPermission(false);
+                  }
+                }} 
+                className="w-5 h-5" 
+              />
+              <label htmlFor="video" className="text-sm font-semibold text-white cursor-pointer">📹 Enable Video Response (Record Your Answers)</label>
+            </div>
 
-            {config.voiceEnabled && (
-              <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(236, 72, 153, 0.1)', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
-                <input 
-                  type="checkbox" 
-                  id="video" 
-                  checked={config.videoEnabled} 
-                  onChange={(e) => {
-                    setConfig({ ...config, videoEnabled: e.target.checked });
-                  }} 
-                  className="w-5 h-5" 
-                />
-                <label htmlFor="video" className="text-sm font-semibold text-white cursor-pointer">📹 Enable Video Response (Record Your Answers)</label>
-              </div>
-            )}
-
-            {config.voiceEnabled && (
+            {(config.avatarEnabled || config.videoEnabled) && (
               <div className="rounded-xl p-5" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid rgba(59, 130, 246, 0.3)' }}>
                 <p className="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                  <Mic className="w-5 h-5" />
-                  Microphone Setup Required
+                  📹 Camera Setup Required
                 </p>
                 <button
-                  onClick={testMicrophone}
-                  disabled={micTested}
+                  onClick={testCamera}
+                  disabled={cameraPermission}
                   className={`w-full flex items-center justify-center gap-2 mb-4 px-6 py-3 rounded-xl font-semibold transition-all ${
-                    micTested 
+                    cameraPermission 
                       ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white' 
                       : 'btn-secondary'
                   }`}
                 >
-                  {micTested ? <Check className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                  {micTested ? 'Microphone Ready ✓' : 'Test Microphone'}
+                  {cameraPermission ? <Check className="w-5 h-5" /> : '📹'}
+                  {cameraPermission ? 'Camera Ready ✓' : 'Test Camera'}
                 </button>
                 <div className="text-xs text-blue-200 bg-blue-950/30 p-3 rounded-lg">
                   <p className="font-semibold mb-2">If permission denied:</p>
                   <ol className="list-decimal ml-4 space-y-1">
-                    <li>Click the 🔒 or 🎤 icon at the LEFT of your address bar</li>
-                    <li>Find "Microphone" and change to "Allow"</li>
-                    <li>Click "Test Microphone" again</li>
+                    <li>Click the 🔒 or 📹 icon at the LEFT of your address bar</li>
+                    <li>Find "Camera" and change to "Allow"</li>
+                    <li>Click "Test Camera" again</li>
                   </ol>
                 </div>
               </div>

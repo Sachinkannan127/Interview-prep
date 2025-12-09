@@ -248,6 +248,28 @@ class GeminiService:
         prompt += f"""Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
 
 For technical interviews:
+- Entry level: Focus on fundamental concepts, basic syntax, common patterns
+- Mid level: Test practical experience, problem-solving, design decisions
+- Senior level: Architecture, scalability, trade-offs, complex scenarios
+
+For behavioral interviews:
+- Use STAR format questions (Situation, Task, Action, Result)
+- Focus on real-world scenarios relevant to the role
+
+For HR interviews:
+- Ask about motivation, career goals, company fit
+- Cultural alignment and soft skills
+
+Important guidelines:
+1. Ask ONE clear, specific question
+2. Make it conversational and professional
+3. Ensure it's relevant to the role and difficulty level
+4. Keep it concise (1-3 sentences)
+5. For coding questions, specify language preference if applicable
+
+Return ONLY the question text, nothing else."""
+
+        return prompt
 - Make questions specific to the chosen technology/sub-type
 - Include practical scenarios and real-world problems
 - Difficulty: entry=basic concepts, mid=intermediate with scenarios, senior=complex design/architecture

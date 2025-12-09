@@ -24,6 +24,26 @@ apiClient.interceptors.request.use(async (config) => {
   return config;
 });
 
+// Add response interceptor for better error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // Server responded with error
+      const message = error.response.data?.detail || error.response.data?.message || error.message;
+      console.error('API Error:', message);
+      return Promise.reject(new Error(message));
+    } else if (error.request) {
+      // Request made but no response
+      console.error('Network Error:', error.message);
+      return Promise.reject(new Error('Network error. Please check your connection and try again.'));
+    } else {
+      console.error('Request Error:', error.message);
+      return Promise.reject(error);
+    }
+  }
+);
+
 export const interviewAPI = {
   startInterview: async (config: any) => {
     const response = await apiClient.post('/api/interviews/start', { config });
