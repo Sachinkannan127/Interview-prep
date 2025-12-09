@@ -5,6 +5,11 @@ import { Helmet } from 'react-helmet';
 import { interviewAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { Download, ArrowLeft, Trophy } from 'lucide-react';
+import { 
+  getScoreBadgeColor, 
+  formatScore,
+  getOverallRating 
+} from '../utils/scoreRanges';
 
 export default function InterviewResults() {
   const { id } = useParams();
@@ -149,6 +154,8 @@ export default function InterviewResults() {
     ? interview.qa.reduce((sum: number, qa: any) => sum + (qa.aiScore || 0), 0) / interview.qa.length
     : 0;
 
+  const overallRating = getOverallRating(interview.overallScore?.toFixed(1) || avgScore);
+
   return (
     <>
       <Helmet>
@@ -173,7 +180,14 @@ export default function InterviewResults() {
             <div className="text-center">
               <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
               <h1 className="text-3xl font-bold text-dark-800 mb-2">Interview Complete!</h1>
-              <p className="text-dark-600 mb-6">Here's how you performed</p>
+              <p className="text-dark-600 mb-4">Here's how you performed</p>
+              
+              {/* Overall Rating */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 rounded-lg">
+                <div className="text-4xl mb-2">{overallRating.emoji}</div>
+                <div className="text-2xl font-bold text-primary-700 mb-1">{overallRating.rating}</div>
+                <div className="text-sm text-primary-600">{overallRating.message}</div>
+              </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center">
@@ -254,12 +268,8 @@ export default function InterviewResults() {
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-medium text-dark-800">Question {index + 1}</h3>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded text-sm font-medium ${
-                        qa.aiScore >= 80 ? 'bg-green-100 text-green-700' :
-                        qa.aiScore >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        Score: {qa.aiScore}/100
+                      <span className={`px-2 py-1 rounded text-sm font-medium ${getScoreBadgeColor(qa.aiScore)}`}>
+                        {formatScore(qa.aiScore, true)}
                       </span>
                       <span className="text-sm text-dark-600">
                         {formatDuration((qa.endTs - qa.startTs) / 1000)}

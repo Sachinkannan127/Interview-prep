@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { speechService } from '../services/speech';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
+import AIAvatar from '../components/AIAvatar';
 import toast from 'react-hot-toast';
 import { Mic, MicOff, Send, Volume2, VolumeX } from 'lucide-react';
 
@@ -190,6 +191,17 @@ export default function InterviewSession() {
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            {/* AI Avatar Section */}
+            {interview.config?.voiceEnabled && interview.config?.avatarEnabled && (
+              <div className="card">
+                <AIAvatar 
+                  isSpeaking={isSpeaking} 
+                  message={isSpeaking ? "I'm asking you a question..." : "Listening to your answer..."}
+                  enabled={true}
+                />
+              </div>
+            )}
+
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-dark-800">Interview in Progress</h2>

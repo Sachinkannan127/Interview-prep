@@ -15,6 +15,7 @@ export default function InterviewSetup() {
     difficulty: 'mid',
     durationMinutes: 30,
     voiceEnabled: false,
+    avatarEnabled: false,
   });
   const [loading, setLoading] = useState(false);
   const [micTested, setMicTested] = useState(false);
@@ -59,6 +60,14 @@ export default function InterviewSetup() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePreviewQuestions = () => {
+    if (config.voiceEnabled && !micTested) {
+      toast.error('Please test your microphone first by clicking the "Test Microphone" button.');
+      return;
+    }
+    navigate('/interview/preview', { state: { config } });
   };
 
   return (
@@ -178,12 +187,30 @@ export default function InterviewSetup() {
                 checked={config.voiceEnabled} 
                 onChange={(e) => {
                   setConfig({ ...config, voiceEnabled: e.target.checked });
-                  if (!e.target.checked) setMicTested(false);
+                  if (!e.target.checked) {
+                    setMicTested(false);
+                    setConfig(prev => ({ ...prev, avatarEnabled: false }));
+                  }
                 }} 
                 className="w-5 h-5" 
               />
               <label htmlFor="voice" className="text-sm font-semibold text-white cursor-pointer">🎤 Enable Voice Mode (Speech-to-Text)</label>
             </div>
+
+            {config.voiceEnabled && (
+              <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+                <input 
+                  type="checkbox" 
+                  id="avatar" 
+                  checked={config.avatarEnabled} 
+                  onChange={(e) => {
+                    setConfig({ ...config, avatarEnabled: e.target.checked });
+                  }} 
+                  className="w-5 h-5" 
+                />
+                <label htmlFor="avatar" className="text-sm font-semibold text-white cursor-pointer">🤖 Enable AI Interviewer Avatar (Face-to-Face)</label>
+              </div>
+            )}
 
             {config.voiceEnabled && (
               <div className="rounded-xl p-5" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid rgba(59, 130, 246, 0.3)' }}>
@@ -214,7 +241,7 @@ export default function InterviewSetup() {
               </div>
             )}
 
-            <button onClick={handleStart} disabled={loading} className="btn-primary w-full mt-8 text-lg py-4">
+            <button onClick={handleStart} disabled={loading} className="btn-primary w-full text-lg py-4">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
@@ -225,6 +252,16 @@ export default function InterviewSetup() {
                   Start Interview 🚀
                 </span>
               )}
+            </button>
+
+            <button 
+              onClick={handlePreviewQuestions} 
+              disabled={loading} 
+              className="btn-secondary w-full text-lg py-4 mt-4"
+            >
+              <span className="flex items-center justify-center gap-2">
+                Preview & Customize Questions 👁️
+              </span>
             </button>
           </div>
         </div>

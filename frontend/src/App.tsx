@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import InterviewSetup from './pages/InterviewSetup';
+import QuestionPreview from './pages/QuestionPreview';
 import InterviewSession from './pages/InterviewSession';
 import InterviewResults from './pages/InterviewResults';
 import Practice from './pages/Practice';
@@ -30,6 +31,7 @@ function App() {
         <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/auth" />} />
         <Route path="/interview/setup" element={user ? <InterviewSetup /> : <Navigate to="/auth" />} />
+        <Route path="/interview/preview" element={user ? <QuestionPreview /> : <Navigate to="/auth" />} />
         <Route path="/interview/session/:id" element={user ? <InterviewSession /> : <Navigate to="/auth" />} />
         <Route path="/interview/results/:id" element={user ? <InterviewResults /> : <Navigate to="/auth" />} />
         <Route path="/practice" element={user ? <Practice /> : <Navigate to="/auth" />} />

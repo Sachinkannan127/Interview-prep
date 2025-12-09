@@ -30,6 +30,21 @@ export const interviewAPI = {
     return response.data;
   },
 
+  generateQuestionSet: async (config: any, count: number = 5) => {
+    const response = await apiClient.post('/api/interviews/generate-question-set', { config, count });
+    return response.data;
+  },
+
+  regenerateQuestion: async (config: any, questionId: string) => {
+    const response = await apiClient.post('/api/interviews/regenerate-question', { config, questionId });
+    return response.data;
+  },
+
+  startInterviewWithQuestions: async (config: any, questions: any[]) => {
+    const response = await apiClient.post('/api/interviews/start-with-questions', { config, questions });
+    return response.data;
+  },
+
   submitAnswer: async (interviewId: string, answerText: string, elapsedMs: number) => {
     const response = await apiClient.post(`/api/interviews/${interviewId}/answer`, {
       answerText,

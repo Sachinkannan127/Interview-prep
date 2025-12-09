@@ -479,5 +479,83 @@ Return as JSON:
         # Shuffle and return requested count
         random.shuffle(questions)
         return questions[:count]
+    
+    def generate_question_set(self, config: dict, count: int = 5) -> list:
+        """Generate a complete set of interview questions upfront"""
+        print(f"=== GEMINI: generate_question_set called ===")
+        print(f"Initialized: {self.initialized}, Count: {count}")
+        
+        if not self.initialized:
+            print("WARNING: Gemini not initialized, using fallback questions")
+            # Return fallback questions
+            category = config.get('type', 'technical')
+            difficulty = config.get('difficulty', 'mid')
+            fallback = self._get_fallback_questions(category, difficulty, count)
+            return [q['question'] for q in fallback]
+        
+        interview_type = config.get('type', 'technical')
+        sub_type = config.get('subType', '')
+        difficulty = config.get('difficulty', 'mid')
+        role = config.get('role', 'Software Engineer')
+        company = config.get('company', '')
+        
+        company_context = f" at {company}" if company else ""
+        tech_context = f" focusing on {sub_type}" if sub_type else ""
+        
+        prompt = f"""You are an expert interviewer preparing a {interview_type} interview{tech_context}{company_context} at {difficulty} level for a {role} position.
+
+Generate exactly {count} diverse interview questions that:
+1. Cover different aspects of the role and technology
+2. Progress naturally in complexity
+3. Are realistic and commonly asked in actual interviews
+4. Are specific to {sub_type if sub_type else interview_type}
+
+Difficulty Guidelines:
+- entry: Basic concepts, foundational knowledge, simple problem-solving
+- mid: Intermediate complexity, practical experience, real-world scenarios
+- senior: Advanced topics, architecture, leadership, complex problem-solving
+
+Return ONLY the questions, one per line, numbered 1-{count}. No additional text or formatting."""
+        
+        try:
+            print(f"=== GEMINI: Calling API for question set ===")
+            response = self.flash_model.generate_content(prompt)
+            questions_text = response.text.strip()
+            
+            # Parse numbered questions
+            lines = questions_text.split('\n')
+            questions = []
+            for line in lines:
+                line = line.strip()
+                if line and any(line.startswith(f"{i}.") or line.startswith(f"{i})") for i in range(1, count + 2)):
+                    # Remove number prefix
+                    question = line.split('.', 1)[-1].split(')', 1)[-1].strip()
+                    if question:
+                        questions.append(question)
+            
+            # Ensure we have the right count
+            if len(questions) < count:
+                print(f"WARNING: Only got {len(questions)} questions, expected {count}")
+                # Pad with fallback questions if needed
+                category = config.get('type', 'technical')
+                difficulty = config.get('difficulty', 'mid')
+                fallback = self._get_fallback_questions(category, difficulty, count - len(questions))
+                questions.extend([q['question'] for q in fallback])
+            
+            questions = questions[:count]  # Trim to exact count
+            
+            print(f"=== GEMINI: Successfully generated {len(questions)} questions ===")
+            return questions
+            
+        except Exception as e:
+            print(f"=== GEMINI: API ERROR in question set generation ===")
+            print(f"Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            # Fallback to predefined questions
+            category = config.get('type', 'technical')
+            difficulty = config.get('difficulty', 'mid')
+            fallback = self._get_fallback_questions(category, difficulty, count)
+            return [q['question'] for q in fallback]
 
 gemini_service = GeminiService()
