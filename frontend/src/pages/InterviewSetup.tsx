@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Mic, Check } from 'lucide-react';
 
 export default function InterviewSetup() {
   const navigate = useNavigate();
@@ -16,8 +16,38 @@ export default function InterviewSetup() {
     voiceEnabled: false,
   });
   const [loading, setLoading] = useState(false);
+  const [micTested, setMicTested] = useState(false);
+
+  const testMicrophone = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop());
+      setMicTested(true);
+      toast.success('✅ Microphone access granted! You can now start the interview.');
+    } catch (error: any) {
+      console.error('Microphone test failed:', error);
+      let errorMsg = 'Microphone test failed. ';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMsg += 'Please click the 🔒 icon in your address bar, allow microphone access, and try again.';
+      } else if (error.name === 'NotFoundError') {
+        errorMsg += 'No microphone detected. Please connect a microphone.';
+      } else if (error.name === 'NotReadableError') {
+        errorMsg += 'Microphone is being used by another application.';
+      } else {
+        errorMsg += error.message;
+      }
+      
+      toast.error(errorMsg, { duration: 8000 });
+    }
+  };
 
   const handleStart = async () => {
+    if (config.voiceEnabled && !micTested) {
+      toast.error('Please test your microphone first by clicking the "Test Microphone" button.');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await interviewAPI.startInterview(config);
@@ -98,9 +128,42 @@ export default function InterviewSetup() {
             </div>
 
             <div className="flex items-center gap-3">
-              <input type="checkbox" id="voice" checked={config.voiceEnabled} onChange={(e) => setConfig({ ...config, voiceEnabled: e.target.checked })} className="w-5 h-5" />
+              <input 
+                type="checkbox" 
+                id="voice" 
+                checked={config.voiceEnabled} 
+                onChange={(e) => {
+                  setConfig({ ...config, voiceEnabled: e.target.checked });
+                  if (!e.target.checked) setMicTested(false);
+                }} 
+                className="w-5 h-5" 
+              />
               <label htmlFor="voice" className="text-sm font-medium text-dark-700">Enable Voice Mode (Speech-to-Text)</label>
             </div>
+
+            {config.voiceEnabled && (
+              <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                <p className="text-blue-900 font-medium mb-3">🎤 Microphone Setup Required</p>
+                <button
+                  onClick={testMicrophone}
+                  disabled={micTested}
+                  className={`btn-secondary w-full flex items-center justify-center gap-2 mb-3 ${
+                    micTested ? 'bg-green-600 hover:bg-green-700 text-white' : ''
+                  }`}
+                >
+                  {micTested ? <Check className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  {micTested ? 'Microphone Ready ✓' : 'Test Microphone'}
+                </button>
+                <div className="text-xs text-blue-800">
+                  <p className="font-semibold mb-1">If permission denied:</p>
+                  <ol className="list-decimal ml-4 space-y-1">
+                    <li>Click the 🔒 or 🎤 icon at the LEFT of your address bar</li>
+                    <li>Find "Microphone" and change to "Allow"</li>
+                    <li>Click "Test Microphone" again</li>
+                  </ol>
+                </div>
+              </div>
+            )}
 
             <button onClick={handleStart} disabled={loading} className="btn-primary w-full mt-8">
               {loading ? 'Starting...' : 'Start Interview'}

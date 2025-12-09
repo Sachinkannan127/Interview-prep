@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { auth, db } from '../services/firebase';
+import { interviewAPI } from '../services/api';
 import { signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 import { Brain, Play, TrendingUp, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -16,20 +16,12 @@ export default function Dashboard() {
   }, []);
 
   const loadInterviews = async () => {
-    if (!auth.currentUser) return;
-    
     try {
-      const q = query(
-        collection(db, 'interviews'),
-        where('userId', '==', auth.currentUser.uid),
-        orderBy('startedAt', 'desc'),
-        limit(10)
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setInterviews(data);
+      const data = await interviewAPI.getUserInterviews();
+      setInterviews(data.interviews || []);
     } catch (error) {
       console.error('Error loading interviews:', error);
+      toast.error('Failed to load interview history');
     } finally {
       setLoading(false);
     }

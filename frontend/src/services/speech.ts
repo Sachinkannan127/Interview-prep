@@ -38,6 +38,13 @@ export class SpeechService {
       return;
     }
 
+    // Start recognition directly - permission is checked in the component
+    this.startRecognition(onResult, onError);
+  }
+
+  private startRecognition(onResult: (transcript: string, isFinal: boolean) => void, onError?: (error: any) => void) {
+    if (!this.recognition) return;
+
     this.recognition.onresult = (event: SpeechRecognitionEvent) => {
       const results = event.results;
       const lastResult = results[results.length - 1];
@@ -58,7 +65,7 @@ export class SpeechService {
         if (onError) onError(msg);
         this.isListening = false;
       } else if (event.error === 'not-allowed') {
-        const msg = 'Microphone permission denied. Please enable it in browser settings.';
+        const msg = 'Microphone permission denied. Click the 🔒 lock icon in your address bar, go to Site Settings, and allow microphone access.';
         if (onError) onError(msg);
         this.isListening = false;
       } else if (event.error === 'network') {

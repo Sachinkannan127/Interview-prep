@@ -70,28 +70,47 @@ export default function InterviewSession() {
       return;
     }
 
-    if (!startTime) setStartTime(Date.now());
-    
-    setIsListening(true);
-    speechService.startListening(
-      (newTranscript, isFinal) => {
-        setTranscript(newTranscript);
-        if (isFinal) {
-          setAnswer((prev) => prev + ' ' + newTranscript);
-          setTranscript('');
-        }
-        updateMetrics(answer + ' ' + newTranscript);
-      },
-      (error) => {
-        console.error('Speech error:', error);
-        toast.error(typeof error === 'string' ? error : 'Speech recognition error. Please check microphone permissions.');
-        setIsListening(false);
-      }
-    );
+    // Check and request microphone permission explicitly
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        console.log('Microphone permission granted, starting recognition');
+        if (!startTime) setStartTime(Date.now());
+        
+        setIsListening(true);
+        speechService.startListening(
+          (newTranscript, isFinal) => {
+            setTranscript(newTranscript);
+            if (isFinal) {
+              setAnswer((prev) => prev + ' ' + newTranscript);
+              setTranscript('');
+            }
+            updateMetrics(answer + ' ' + newTranscript);
+          },
+          (error) => {
+            console.error('Speech error:', error);
+            toast.error(typeof error === 'string' ? error : 'Speech recognition error. Please check microphone permissions.');
+            setIsListening(false);
+          }
+        );
 
-    timerRef.current = setInterval(() => {
-      // Timer for tracking response time
-    }, 1000);
+        timerRef.current = setInterval(() => {
+          // Timer for tracking response time
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error('Microphone permission error:', error);
+        let errorMessage = 'Microphone access denied.';
+        
+        if (error.name === 'NotAllowedError') {
+          errorMessage = '🎤 Microphone permission denied. To fix this:\n\n1. Click the 🔒 (or camera/mic) icon in your browser address bar\n2. Find "Microphone" in the permissions list\n3. Change it from "Block" to "Allow"\n4. Refresh this page and try again';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'No microphone detected. Please connect a microphone and try again.';
+        } else if (error.name === 'NotReadableError') {
+          errorMessage = 'Microphone is already in use by another application. Please close other apps using the microphone and try again.';
+        }
+        
+        toast.error(errorMessage, { duration: 8000 });
+      });
   };
 
   const stopListening = () => {
@@ -216,6 +235,26 @@ export default function InterviewSession() {
                       <div className="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-3">
                         <p className="text-orange-800 text-sm">
                           ⚠️ Speech recognition requires Chrome, Edge, or Safari browser
+                        </p>
+                      </div>
+                    )}
+                    {speechService.isSupported() && (
+                      <div className="bg-blue-50 border border-blue-300 rounded-lg p-3 mb-3">
+                        <p className="text-blue-800 text-sm font-medium mb-2">
+                          🎤 First time using microphone?
+                        </p>
+                        <div className="bg-white rounded p-2 mb-2">
+                          <p className="text-blue-900 text-xs font-semibold mb-1">Quick Fix for "Permission Denied":</p>
+                          <ol className="text-blue-800 text-xs space-y-1 ml-4 list-decimal">
+                            <li>Look for 🔒 or 🎤 icon at the LEFT side of your browser's address bar (where the URL is)</li>
+                            <li>Click that icon</li>
+                            <li>Find "Microphone" and change it to "Allow"</li>
+                            <li>Refresh this page (press F5)</li>
+                            <li>Click "Start Recording" again</li>
+                          </ol>
+                        </div>
+                        <p className="text-blue-700 text-xs">
+                          💡 The browser will ask permission the first time you click "Start Recording"
                         </p>
                       </div>
                     )}
