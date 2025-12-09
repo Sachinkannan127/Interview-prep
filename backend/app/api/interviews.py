@@ -80,7 +80,7 @@ async def submit_answer(
         else:
             current_question = interview.get('firstQuestion', '')
         
-        # Evaluate answer and get next question using Gemini
+        # Evaluate answer using Gemini
         result = gemini_service.evaluate_and_generate_next(
             config=interview['config'],
             qa_history=interview['qa'],
@@ -106,9 +106,18 @@ async def submit_answer(
             "transcript": interview.get('transcript', '') + f"\nQ: {current_question}\nA: {request.answerText}\n"
         })
         
+        # Determine next question
+        # Check if we have pre-generated questions
+        pre_generated_questions = interview.get('questions', [])
+        if pre_generated_questions and len(updated_qa) < len(pre_generated_questions):
+            # Use next pre-generated question
+            next_question = pre_generated_questions[len(updated_qa)]
+        else:
+            # Use AI-generated next question or mark complete
+            next_question = result.get('nextQuestion', '')
+        
         # Check if interview is complete
-        next_question = result.get('nextQuestion', '')
-        if next_question == "INTERVIEW_COMPLETE" or len(updated_qa) >= 10:
+        if next_question == "INTERVIEW_COMPLETE" or len(updated_qa) >= 10 or (pre_generated_questions and len(updated_qa) >= len(pre_generated_questions)):
             return {
                 "nextQuestion": None,
                 "evaluation": result,
