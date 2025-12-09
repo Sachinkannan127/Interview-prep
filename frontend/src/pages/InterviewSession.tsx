@@ -65,6 +65,11 @@ export default function InterviewSession() {
   };
 
   const startListening = () => {
+    if (!speechService.isSupported()) {
+      toast.error('Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+
     if (!startTime) setStartTime(Date.now());
     
     setIsListening(true);
@@ -77,8 +82,9 @@ export default function InterviewSession() {
         }
         updateMetrics(answer + ' ' + newTranscript);
       },
-      (_error) => {
-        toast.error('Speech recognition error');
+      (error) => {
+        console.error('Speech error:', error);
+        toast.error(typeof error === 'string' ? error : 'Speech recognition error. Please check microphone permissions.');
         setIsListening(false);
       }
     );
@@ -189,14 +195,35 @@ export default function InterviewSession() {
                 {interview.config?.voiceEnabled ? (
                   <div>
                     <div className="bg-dark-50 border border-dark-300 rounded-lg p-4 min-h-32 mb-3">
+                      {!answer && !transcript && !isListening && (
+                        <p className="text-dark-400 italic">Click "Start Recording" to speak your answer...</p>
+                      )}
                       <p className="text-dark-800">{answer}</p>
-                      {transcript && <p className="text-primary-600 italic">{transcript}</p>}
+                      {transcript && (
+                        <p className="text-primary-600 italic">
+                          {transcript}
+                          <span className="inline-block w-2 h-4 bg-primary-600 ml-1 animate-pulse"></span>
+                        </p>
+                      )}
+                      {isListening && !transcript && (
+                        <p className="text-primary-600 italic flex items-center gap-2">
+                          <span className="inline-block w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                          Listening...
+                        </p>
+                      )}
                     </div>
+                    {!speechService.isSupported() && (
+                      <div className="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-3">
+                        <p className="text-orange-800 text-sm">
+                          ⚠️ Speech recognition requires Chrome, Edge, or Safari browser
+                        </p>
+                      </div>
+                    )}
                     <div className="flex gap-3">
                       <button
                         onClick={isListening ? stopListening : startListening}
                         className={`btn-primary flex items-center gap-2 ${isListening ? 'bg-red-600 hover:bg-red-700' : ''}`}
-                        disabled={isSpeaking}
+                        disabled={isSpeaking || !speechService.isSupported()}
                       >
                         {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                         {isListening ? 'Stop Recording' : 'Start Recording'}
