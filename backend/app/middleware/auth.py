@@ -6,21 +6,21 @@ import os
 security = HTTPBearer(auto_error=False)
 
 async def get_current_user(request: Request = None, credentials: HTTPAuthorizationCredentials = Security(security)):
-    # Skip authentication for OPTIONS requests (CORS preflight)
-    if request and request.method == "OPTIONS":
-        return {
-            'uid': 'preflight-user',
-            'email': 'preflight@example.com',
-            'name': 'Preflight User',
-            'role': 'user'
-        }
-    
     # Development mode: bypass authentication if Firebase is not initialized
     if not firebase_service.initialized:
         return {
             'uid': 'dev-user-123',
             'email': 'dev@example.com',
             'name': 'Development User',
+            'role': 'user'
+        }
+    
+    # Skip authentication for OPTIONS requests (CORS preflight)
+    if request and request.method == "OPTIONS":
+        return {
+            'uid': 'preflight-user',
+            'email': 'preflight@example.com',
+            'name': 'Preflight User',
             'role': 'user'
         }
     
