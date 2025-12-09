@@ -70,8 +70,30 @@ export const questionsAPI = {
     return response.data;
   },
 
-  evaluatePracticeAnswer: async (data: { question: string; answer: string; category: string }) => {
+  evaluatePracticeAnswer: async (data: { 
+    question: string; 
+    answer: string; 
+    category: string;
+    sessionId?: string;
+  }) => {
     const response = await apiClient.post('/api/questions/evaluate', data);
+    return response.data;
+  },
+
+  finishPracticeSession: async (sessionId: string) => {
+    const response = await apiClient.post(`/api/questions/finish-session/${sessionId}`);
+    return response.data;
+  },
+
+  getPracticeHistory: async (limit: number = 20) => {
+    const response = await apiClient.get('/api/questions/history', {
+      params: { limit }
+    });
+    return response.data;
+  },
+
+  getPracticeSession: async (sessionId: string) => {
+    const response = await apiClient.get(`/api/questions/session/${sessionId}`);
     return response.data;
   },
 };

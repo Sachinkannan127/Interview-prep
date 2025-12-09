@@ -113,5 +113,54 @@ class FirebaseService:
             .limit(limit)\
             .stream()
         return [doc.to_dict() for doc in docs]
+    
+    def create_practice_session(self, session_data: dict):
+        if not self.initialized:
+            # Use in-memory storage for development
+            import uuid
+            session_id = str(uuid.uuid4())
+            session_data['id'] = session_id
+            if not hasattr(self, 'mock_storage'):
+                self.mock_storage = {}
+            if 'practice_sessions' not in self.mock_storage:
+                self.mock_storage['practice_sessions'] = {}
+            self.mock_storage['practice_sessions'][session_id] = session_data
+            return session_data
+        doc_ref = self.db.collection('practice_sessions').document()
+        session_data['id'] = doc_ref.id
+        doc_ref.set(session_data)
+        return session_data
+    
+    def update_practice_session(self, session_id: str, data: dict):
+        if not self.initialized:
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'practice_sessions' in self.mock_storage:
+                if session_id in self.mock_storage['practice_sessions']:
+                    self.mock_storage['practice_sessions'][session_id].update(data)
+            return
+        self.db.collection('practice_sessions').document(session_id).update(data)
+    
+    def get_practice_session(self, session_id: str):
+        if not self.initialized:
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'practice_sessions' in self.mock_storage:
+                return self.mock_storage['practice_sessions'].get(session_id)
+            return None
+        doc = self.db.collection('practice_sessions').document(session_id).get()
+        return doc.to_dict() if doc.exists else None
+    
+    def get_user_practice_sessions(self, user_id: str, limit: int = 20):
+        if not self.initialized:
+            # Use in-memory storage for development
+            if hasattr(self, 'mock_storage') and 'practice_sessions' in self.mock_storage:
+                user_sessions = [v for v in self.mock_storage['practice_sessions'].values() if v.get('userId') == user_id]
+                return sorted(user_sessions, key=lambda x: x.get('startedAt', ''), reverse=True)[:limit]
+            return []
+        docs = self.db.collection('practice_sessions')\
+            .where('userId', '==', user_id)\
+            .order_by('startedAt', direction=firestore.Query.DESCENDING)\
+            .limit(limit)\
+            .stream()
+        return [doc.to_dict() for doc in docs]
 
 firebase_service = FirebaseService()

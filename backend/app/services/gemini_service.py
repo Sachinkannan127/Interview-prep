@@ -240,6 +240,9 @@ Return as JSON array:
         except Exception as e:
             print(f"Gemini API error in practice questions: {e}")
         
+        # Return fallback questions if AI fails
+        return self._get_fallback_questions(category, difficulty, count)
+    
     def evaluate_practice_answer(self, question: str, answer: str, category: str):
         """Quick evaluation for practice mode"""
         if not self.initialized:
@@ -305,23 +308,40 @@ Return as JSON:
     
     def _get_fallback_questions(self, category: str, difficulty: str, count: int) -> list:
         """Fallback questions when AI is not available"""
+        import random
+        
         fallback_questions = {
             "technical": [
                 {"question": "Explain the difference between == and === in JavaScript", "category": "technical", "difficulty": "entry", "hints": ["Type coercion", "Strict equality"], "topics": ["javascript", "operators"]},
                 {"question": "What is the time complexity of binary search?", "category": "technical", "difficulty": "entry", "hints": ["Divide and conquer", "Logarithmic"], "topics": ["algorithms", "complexity"]},
-                {"question": "Design a URL shortening service", "category": "technical", "difficulty": "senior", "hints": ["Database design", "Hashing"], "topics": ["system-design", "scalability"]},
+                {"question": "Explain how closures work in JavaScript", "category": "technical", "difficulty": "mid", "hints": ["Scope", "Function memory"], "topics": ["javascript", "closures"]},
+                {"question": "What is the difference between SQL and NoSQL databases?", "category": "technical", "difficulty": "mid", "hints": ["Structure", "Scalability"], "topics": ["databases", "architecture"]},
+                {"question": "Explain the concept of Big O notation", "category": "technical", "difficulty": "entry", "hints": ["Algorithm efficiency", "Time complexity"], "topics": ["algorithms", "performance"]},
+                {"question": "Design a URL shortening service like bit.ly", "category": "technical", "difficulty": "senior", "hints": ["Database design", "Hashing", "Distributed systems"], "topics": ["system-design", "scalability"]},
+                {"question": "How would you implement a rate limiter?", "category": "technical", "difficulty": "senior", "hints": ["Token bucket", "Sliding window"], "topics": ["system-design", "algorithms"]},
+                {"question": "What are the differences between REST and GraphQL?", "category": "technical", "difficulty": "mid", "hints": ["Query flexibility", "API design"], "topics": ["api", "architecture"]},
             ],
             "behavioral": [
                 {"question": "Tell me about a time you faced a difficult challenge at work", "category": "behavioral", "difficulty": "mid", "hints": ["STAR method", "Specific example"], "topics": ["problem-solving", "resilience"]},
                 {"question": "Describe a situation where you had to work with a difficult team member", "category": "behavioral", "difficulty": "mid", "hints": ["Conflict resolution", "Communication"], "topics": ["teamwork", "communication"]},
+                {"question": "Tell me about a time you failed and what you learned from it", "category": "behavioral", "difficulty": "mid", "hints": ["Self-awareness", "Growth mindset"], "topics": ["learning", "resilience"]},
+                {"question": "Describe a situation where you had to meet a tight deadline", "category": "behavioral", "difficulty": "mid", "hints": ["Time management", "Prioritization"], "topics": ["productivity", "pressure"]},
+                {"question": "Tell me about a time you had to learn something new quickly", "category": "behavioral", "difficulty": "entry", "hints": ["Learning approach", "Adaptability"], "topics": ["learning", "growth"]},
+                {"question": "Describe a situation where you showed leadership", "category": "behavioral", "difficulty": "senior", "hints": ["Initiative", "Team influence"], "topics": ["leadership", "influence"]},
             ],
             "hr": [
                 {"question": "Why do you want to work for our company?", "category": "hr", "difficulty": "entry", "hints": ["Research company", "Align with values"], "topics": ["motivation", "culture-fit"]},
                 {"question": "Where do you see yourself in 5 years?", "category": "hr", "difficulty": "entry", "hints": ["Career goals", "Growth"], "topics": ["career-planning", "ambition"]},
+                {"question": "What are your salary expectations?", "category": "hr", "difficulty": "mid", "hints": ["Market research", "Value proposition"], "topics": ["negotiation", "compensation"]},
+                {"question": "Why are you leaving your current job?", "category": "hr", "difficulty": "mid", "hints": ["Stay positive", "Growth focused"], "topics": ["career-transition", "motivation"]},
+                {"question": "What is your greatest strength?", "category": "hr", "difficulty": "entry", "hints": ["Job relevant", "Specific examples"], "topics": ["self-awareness", "skills"]},
+                {"question": "What is your greatest weakness?", "category": "hr", "difficulty": "entry", "hints": ["Show self-awareness", "Improvement steps"], "topics": ["self-awareness", "growth"]},
             ]
         }
         
         questions = fallback_questions.get(category, fallback_questions["technical"])
+        # Shuffle and return requested count
+        random.shuffle(questions)
         return questions[:count]
 
 gemini_service = GeminiService()

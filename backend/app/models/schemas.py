@@ -59,3 +59,22 @@ class AIResponse(BaseModel):
     type: Literal['question', 'evaluation', 'follow-up']
     nextQuestion: Optional[str] = None
     evaluation: Optional[AIEvaluation] = None
+
+class PracticeQuestion(BaseModel):
+    question: str
+    answer: str
+    score: float
+    feedback: str
+    answeredAt: datetime
+
+class PracticeSession(BaseModel):
+    id: str
+    userId: str
+    category: str
+    difficulty: str
+    startedAt: datetime
+    endedAt: Optional[datetime] = None
+    questions: List[PracticeQuestion] = []
+    averageScore: Optional[float] = None
+    totalQuestions: int = 0
+    completedQuestions: int = 0
