@@ -195,8 +195,9 @@ export default function Practice() {
           </div>
         </div>
       </div>
-    );
-  }
+    </>
+  );
+}
 
   return (
     <>
@@ -363,6 +364,7 @@ export default function Practice() {
         )}
       </div>
     </div>
+  </>
   );
 
   // Show history view
@@ -518,6 +520,12 @@ function PracticeHistory({ onBack }: { onBack: () => void }) {
         </div>
       </div>
     </div>
+  </>
   );
+
+  // Show history view
+  if (showHistory) {
+    return <PracticeHistory onBack={() => setShowHistory(false)} />;
+  }
 }
 
