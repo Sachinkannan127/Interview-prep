@@ -11,6 +11,9 @@ router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 @router.post("/start")
 async def start_interview(request: StartInterviewRequest, user: dict = Depends(get_current_user)):
     try:
+        print(f"Starting interview for user: {user['uid']}")
+        print(f"Interview config: {request.config.dict()}")
+        
         # Generate first question using Gemini
         first_question = gemini_service.generate_first_question(
             config=request.config.dict(),
@@ -21,7 +24,7 @@ async def start_interview(request: StartInterviewRequest, user: dict = Depends(g
         interview_data = {
             "userId": user['uid'],
             "config": request.config.dict(),
-            "startedAt": datetime.now(),
+            "startedAt": datetime.now().isoformat(),
             "status": "in_progress",
             "transcript": "",
             "qa": [],
@@ -30,11 +33,16 @@ async def start_interview(request: StartInterviewRequest, user: dict = Depends(g
         
         interview = firebase_service.create_interview(interview_data)
         
+        print(f"Interview created with ID: {interview['id']}")
+        
         return {
             "interviewId": interview['id'],
             "firstQuestion": first_question
         }
     except Exception as e:
+        print(f"Error starting interview: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to start interview: {str(e)}")
 
 @router.post("/{interview_id}/answer")

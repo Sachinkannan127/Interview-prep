@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Interview API Test</h1>
+    <button onclick="testAPI()">Test Start Interview</button>
+    <button onclick="testQuestions()">Test Questions</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            try {
+                const response = await fetch('http://localhost:8001/api/interviews/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        config: {
+                            type: 'technical',
+                            industry: 'Software',
+                            role: 'Frontend Developer',
+                            difficulty: 'entry',
+                            durationMinutes: 15,
+                            voiceEnabled: false
+                        }
+                    })
+                });
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testQuestions() {
+            const result = document.getElementById('result');
+            try {
+                const response = await fetch('http://localhost:8001/api/questions');
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

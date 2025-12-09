@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { auth } from './firebase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -11,10 +11,15 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-  const user = auth.currentUser;
-  if (user) {
-    const token = await user.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    // For development, continue without auth token
+    console.log('Auth token not available, continuing without authentication');
   }
   return config;
 });
@@ -55,6 +60,18 @@ export const questionsAPI = {
     if (category) params.append('category', category);
     if (difficulty) params.append('difficulty', difficulty);
     const response = await apiClient.get(`/api/questions?${params.toString()}`);
+    return response.data;
+  },
+
+  generatePracticeQuestions: async (category: string, difficulty: string, count: number = 5) => {
+    const response = await apiClient.get('/api/questions/generate', {
+      params: { category, difficulty, count }
+    });
+    return response.data;
+  },
+
+  evaluatePracticeAnswer: async (data: { question: string; answer: string; category: string }) => {
+    const response = await apiClient.post('/api/questions/evaluate', data);
     return response.data;
   },
 };
