@@ -6,11 +6,13 @@ interface AIAvatarProps {
   message?: string;
   onAnimationEnd?: () => void;
   enabled: boolean;
+  reaction?: 'positive' | 'neutral' | 'thinking' | 'encouraging' | null;
+  score?: number;
 }
 
-export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled }: AIAvatarProps) {
+export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled, reaction, score }: AIAvatarProps) {
   const [avatarEnabled, setAvatarEnabled] = useState(enabled);
-  const [expression, setExpression] = useState<'neutral' | 'happy' | 'thinking' | 'talking'>('neutral');
+  const [expression, setExpression] = useState<'neutral' | 'happy' | 'thinking' | 'talking' | 'excellent' | 'encouraging'>('neutral');
   const animationRef = useRef<number>();
 
   useEffect(() => {
@@ -21,6 +23,22 @@ export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled 
         animationRef.current = requestAnimationFrame(animate);
       };
       animate();
+    } else if (reaction) {
+      // Show reaction based on feedback
+      if (reaction === 'positive' && score && score >= 85) {
+        setExpression('excellent');
+      } else if (reaction === 'encouraging') {
+        setExpression('encouraging');
+      } else if (reaction === 'thinking') {
+        setExpression('thinking');
+      } else {
+        setExpression('happy');
+      }
+      
+      // Return to neutral after 3 seconds
+      setTimeout(() => {
+        setExpression('neutral');
+      }, 3000);
     } else {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -36,7 +54,7 @@ export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled 
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isSpeaking, onAnimationEnd]);
+  }, [isSpeaking, reaction, score, onAnimationEnd]);
 
   if (!avatarEnabled) {
     return (
@@ -69,10 +87,12 @@ export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled 
               {/* Eyes */}
               <div className="absolute top-16 left-0 right-0 flex justify-center gap-8">
                 <div className={`w-3 h-3 rounded-full bg-white transition-all duration-200 ${
-                  expression === 'thinking' ? 'h-1' : 'h-3'
+                  expression === 'thinking' ? 'h-1' : 
+                  expression === 'excellent' ? 'w-4 h-4' : 'h-3'
                 }`} />
                 <div className={`w-3 h-3 rounded-full bg-white transition-all duration-200 ${
-                  expression === 'thinking' ? 'h-1' : 'h-3'
+                  expression === 'thinking' ? 'h-1' : 
+                  expression === 'excellent' ? 'w-4 h-4' : 'h-3'
                 }`} />
               </div>
               
@@ -80,14 +100,27 @@ export default function AIAvatar({ isSpeaking, message, onAnimationEnd, enabled 
               <div className="absolute bottom-16 left-0 right-0 flex justify-center">
                 {expression === 'talking' ? (
                   <div className="w-16 h-8 rounded-full bg-white/80 animate-pulse" />
-                ) : expression === 'happy' ? (
-                  <div className="w-16 h-2 rounded-full bg-white" style={{ 
+                ) : expression === 'happy' || expression === 'excellent' ? (
+                  <div className="w-16 h-4 bg-white rounded-full" style={{ 
                     clipPath: 'ellipse(50% 100% at 50% 0%)' 
                   }} />
+                ) : expression === 'encouraging' ? (
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 bg-white rounded-full animate-bounce" />
+                    <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                    <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  </div>
                 ) : (
                   <div className="w-12 h-1 rounded-full bg-white/60" />
                 )}
               </div>
+              
+              {/* Special effects for excellent response */}
+              {expression === 'excellent' && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-4xl animate-ping">⭐</div>
+                </div>
+              )}
             </div>
             
             {/* Speaking Indicator */}

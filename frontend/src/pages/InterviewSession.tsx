@@ -4,6 +4,7 @@ import { interviewAPI } from '../services/api';
 import { speechService } from '../services/speech';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import AIAvatar from '../components/AIAvatar';
+import VideoRecorder from '../components/VideoRecorder';
 import toast from 'react-hot-toast';
 import { Mic, MicOff, Send, Volume2, VolumeX } from 'lucide-react';
 
@@ -18,6 +19,10 @@ export default function InterviewSession() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+  const [isVideoRecording, setIsVideoRecording] = useState(false);
+  const [avatarReaction, setAvatarReaction] = useState<'positive' | 'neutral' | 'thinking' | 'encouraging' | null>(null);
+  const [lastScore, setLastScore] = useState<number | null>(null);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
@@ -140,14 +145,39 @@ export default function InterviewSession() {
 
     setLoading(true);
     stopListening();
+    
+    // Show thinking reaction
+    setAvatarReaction('thinking');
 
     try {
       const response = await interviewAPI.submitAnswer(id!, finalAnswer.trim(), elapsedMs);
+      
+      // Get score from evaluation
+      const score = response.evaluation?.score || 0;
+      setLastScore(score);
+      
+      // Show appropriate reaction based on score
+      if (score >= 85) {
+        setAvatarReaction('positive');
+        toast.success('Excellent answer! 🌟');
+      } else if (score >= 70) {
+        setAvatarReaction('encouraging');
+        toast.success('Good job! 👍');
+      } else {
+        setAvatarReaction('neutral');
+        toast('Keep going! 💪');
+      }
+      
+      // Clear reaction after showing feedback
+      setTimeout(() => {
+        setAvatarReaction(null);
+      }, 3000);
       
       if (response.nextQuestion) {
         setCurrentQuestion(response.nextQuestion);
         setAnswer('');
         setTranscript('');
+        setVideoBlob(null);
         setStartTime(null);
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
         
@@ -160,6 +190,7 @@ export default function InterviewSession() {
         navigate('/dashboard');
       }
     } catch (error: any) {
+      setAvatarReaction(null);
       toast.error(error.message || 'Failed to submit answer');
     } finally {
       setLoading(false);
@@ -191,14 +222,44 @@ export default function InterviewSession() {
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            {/* AI Avatar Section */}
-            {interview.config?.voiceEnabled && interview.config?.avatarEnabled && (
+            {/* AI Avatar Section - Always visible when enabled */}
+            {interview.config?.avatarEnabled && (
               <div className="card">
                 <AIAvatar 
                   isSpeaking={isSpeaking} 
-                  message={isSpeaking ? "I'm asking you a question..." : "Listening to your answer..."}
+                  message={
+                    isSpeaking ? currentQuestion : 
+                    avatarReaction === 'thinking' ? "Let me evaluate your answer..." :
+                    avatarReaction === 'positive' ? "Excellent work! That was a great answer! 🌟" :
+                    avatarReaction === 'encouraging' ? "Good job! You're doing well! 👍" :
+                    "I'm listening to your answer..."
+                  }
                   enabled={true}
+                  reaction={avatarReaction}
+                  score={lastScore || undefined}
                 />
+              </div>
+            )}
+
+            {/* Video Recording Section */}
+            {interview.config?.videoEnabled && (
+              <div className="card">
+                <h3 className="text-lg font-semibold text-dark-800 mb-4">📹 Video Response</h3>
+                <VideoRecorder
+                  onRecordingComplete={(blob) => setVideoBlob(blob)}
+                  isRecording={isVideoRecording}
+                  onStartRecording={() => {
+                    setIsVideoRecording(true);
+                    if (!startTime) setStartTime(Date.now());
+                  }}
+                  onStopRecording={() => setIsVideoRecording(false)}
+                  enabled={interview.config?.videoEnabled}
+                />
+                {videoBlob && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-700">✓ Video answer recorded ({(videoBlob.size / 1024 / 1024).toFixed(2)} MB)</p>
+                  </div>
+                )}
               </div>
             )}
 

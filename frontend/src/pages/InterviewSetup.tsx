@@ -16,6 +16,7 @@ export default function InterviewSetup() {
     durationMinutes: 30,
     voiceEnabled: false,
     avatarEnabled: false,
+    videoEnabled: false,
   });
   const [loading, setLoading] = useState(false);
   const [micTested, setMicTested] = useState(false);
@@ -209,6 +210,21 @@ export default function InterviewSetup() {
                   className="w-5 h-5" 
                 />
                 <label htmlFor="avatar" className="text-sm font-semibold text-white cursor-pointer">🤖 Enable AI Interviewer Avatar (Face-to-Face)</label>
+              </div>
+            )}
+
+            {config.voiceEnabled && (
+              <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(236, 72, 153, 0.1)', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
+                <input 
+                  type="checkbox" 
+                  id="video" 
+                  checked={config.videoEnabled} 
+                  onChange={(e) => {
+                    setConfig({ ...config, videoEnabled: e.target.checked });
+                  }} 
+                  className="w-5 h-5" 
+                />
+                <label htmlFor="video" className="text-sm font-semibold text-white cursor-pointer">📹 Enable Video Response (Record Your Answers)</label>
               </div>
             )}
 
