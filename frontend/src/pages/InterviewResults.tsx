@@ -36,7 +36,8 @@ export default function InterviewResults() {
     doc.text('Interview Results', 10, y);
     y += 10;
     doc.setFontSize(12);
-    doc.text(`Interview ID: ${interview.id}`, 10, y);
+    const interviewId = String(interview.id ?? '');
+    doc.text(`Interview ID: ${interviewId}`, 10, y);
     y += 8;
     const startedAtStr = interview.startedAt ? String(interview.startedAt) : '';
     const endedAtStr = interview.endedAt ? String(interview.endedAt) : '';
@@ -44,11 +45,14 @@ export default function InterviewResults() {
     y += 8;
     doc.text(`Ended At: ${endedAtStr}`, 10, y);
     y += 8;
-    doc.text(`Overall Score: ${interview.overallScore?.toFixed(1) || avgScore.toFixed(1)}`, 10, y);
+    const overallScore = interview.overallScore?.toFixed(1) || avgScore.toFixed(1);
+    doc.text(`Overall Score: ${overallScore}`, 10, y);
     y += 8;
-    doc.text(`Questions Answered: ${interview.qa.length}`, 10, y);
+    const qaLength = String(interview.qa.length);
+    doc.text(`Questions Answered: ${qaLength}`, 10, y);
     y += 8;
-    doc.text(`Avg Response Time: ${interview.metrics?.avgResponseTime?.toFixed(1) || '0'}s`, 10, y);
+    const avgResponseTime = interview.metrics?.avgResponseTime?.toFixed(1) || '0';
+    doc.text(`Avg Response Time: ${avgResponseTime}s`, 10, y);
     y += 8;
     let totalDuration = 'N/A';
     if (endedAtStr && startedAtStr) {
@@ -63,7 +67,9 @@ export default function InterviewResults() {
     doc.text('Interview Configuration:', 10, y);
     y += 8;
     Object.entries(interview.config || {}).forEach(([key, value]) => {
-      doc.text(`${key}: ${String(value)}`, 12, y);
+      const keyStr = String(key);
+      const valueStr = String(value ?? '');
+      doc.text(`${keyStr}: ${valueStr}`, 12, y);
       y += 7;
     });
     y += 5;
@@ -71,18 +77,23 @@ export default function InterviewResults() {
     y += 8;
     interview.qa.forEach((qa: any, idx: number) => {
       doc.setFont(undefined, 'bold');
-      doc.text(`Q${idx + 1}: ${qa.questionText ?? ''}`, 12, y);
+      const questionText = String(qa.questionText ?? '');
+      doc.text(`Q${idx + 1}: ${questionText}`, 12, y);
       doc.setFont(undefined, 'normal');
       y += 7;
-      doc.text(`Your Answer: ${qa.answerText ?? ''}`, 14, y);
+      const answerText = String(qa.answerText ?? '');
+      doc.text(`Your Answer: ${answerText}`, 14, y);
       y += 7;
-      doc.text(`Score: ${qa.aiScore ?? ''}/100`, 14, y);
+      const scoreText = String(qa.aiScore ?? '');
+      doc.text(`Score: ${scoreText}/100`, 14, y);
       y += 7;
       if (qa.aiFeedback) {
-        doc.text(`AI Feedback: ${qa.aiFeedback}`, 14, y);
+        const feedbackText = String(qa.aiFeedback);
+        doc.text(`AI Feedback: ${feedbackText}`, 14, y);
         y += 7;
       }
-      doc.text(`Response Time: ${formatDuration((qa.endTs - qa.startTs) / 1000)}`, 14, y);
+      const responseTime = formatDuration((qa.endTs - qa.startTs) / 1000);
+      doc.text(`Response Time: ${responseTime}`, 14, y);
       y += 10;
       if (y > 270) {
         doc.addPage();
@@ -94,7 +105,8 @@ export default function InterviewResults() {
       y += 8;
       const transcriptLines = interview.transcript.split('\n');
       transcriptLines.forEach((line: string) => {
-        doc.text(line, 12, y);
+        const lineText = String(line ?? '');
+        doc.text(lineText, 12, y);
         y += 6;
         if (y > 270) {
           doc.addPage();
