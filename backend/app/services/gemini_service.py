@@ -270,23 +270,6 @@ Important guidelines:
 Return ONLY the question text, nothing else."""
 
         return prompt
-- Make questions specific to the chosen technology/sub-type
-- Include practical scenarios and real-world problems
-- Difficulty: entry=basic concepts, mid=intermediate with scenarios, senior=complex design/architecture
-
-For behavioral interviews:
-- Use STAR method framework
-- Focus on past experiences, leadership, teamwork
-
-For HR interviews:
-- Focus on motivations, culture fit, career goals"""
-
-        if company:
-            prompt += f"\n- Tailor the question style to {company}'s interview approach"
-
-        prompt += "\n\nReturn only the question text, nothing else."
-        
-        return prompt
     
     def _build_evaluation_prompt(self, config: dict, qa_history: list, current_answer: str):
         interview_type = config.get('type', 'technical')
