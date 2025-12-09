@@ -14,7 +14,6 @@ export default function InterviewSetup() {
     company: '',
     difficulty: 'mid',
     durationMinutes: 30,
-    avatarEnabled: false,
     videoEnabled: false,
   });
   const [loading, setLoading] = useState(false);
@@ -22,30 +21,30 @@ export default function InterviewSetup() {
 
   const testCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       stream.getTracks().forEach(track => track.stop());
       setCameraPermission(true);
       toast.success('✅ Camera access granted! You can now start the interview.');
     } catch (error: any) {
       console.error('Camera test failed:', error);
       let errorMsg = 'Camera access failed. ';
-      
-      if (error.name === 'NotAllowedError') {
-        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and try again.';
+
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page.';
       } else if (error.name === 'NotFoundError') {
         errorMsg += 'No camera detected. Please connect a camera.';
       } else if (error.name === 'NotReadableError') {
         errorMsg += 'Camera is being used by another application.';
       } else {
-        errorMsg += error.message;
+        errorMsg += 'Please check your camera permissions and try again.';
       }
-      
-      toast.error(errorMsg, { duration: 8000 });
+
+      toast.error(errorMsg, { duration: 10000 });
     }
   };
 
   const handleStart = async () => {
-    if ((config.videoEnabled || config.avatarEnabled) && !cameraPermission) {
+    if (config.videoEnabled && !cameraPermission) {
       toast.error('Please test your camera first by clicking the "Test Camera" button.');
       return;
     }
@@ -56,6 +55,7 @@ export default function InterviewSetup() {
       toast.success('Interview started!');
       navigate(`/interview/session/${response.interviewId}`);
     } catch (error: any) {
+      console.error('Start interview error:', error);
       toast.error(error.message || 'Failed to start interview');
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ export default function InterviewSetup() {
   };
 
   const handlePreviewQuestions = () => {
-    if ((config.videoEnabled || config.avatarEnabled) && !cameraPermission) {
+    if (config.videoEnabled && !cameraPermission) {
       toast.error('Please test your camera first by clicking the "Test Camera" button.');
       return;
     }
@@ -180,22 +180,6 @@ export default function InterviewSetup() {
               </select>
             </div>
 
-            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-              <input 
-                type="checkbox" 
-                id="avatar" 
-                checked={config.avatarEnabled} 
-                onChange={(e) => {
-                  setConfig({ ...config, avatarEnabled: e.target.checked });
-                  if (!e.target.checked) {
-                    setCameraPermission(false);
-                  }
-                }} 
-                className="w-5 h-5" 
-              />
-              <label htmlFor="avatar" className="text-sm font-semibold text-white cursor-pointer">🤖 Enable AI Interviewer Avatar (Face-to-Face)</label>
-            </div>
-
             <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(236, 72, 153, 0.1)', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
               <input 
                 type="checkbox" 
@@ -203,7 +187,7 @@ export default function InterviewSetup() {
                 checked={config.videoEnabled} 
                 onChange={(e) => {
                   setConfig({ ...config, videoEnabled: e.target.checked });
-                  if (!e.target.checked && !config.avatarEnabled) {
+                  if (!e.target.checked) {
                     setCameraPermission(false);
                   }
                 }} 
@@ -212,7 +196,7 @@ export default function InterviewSetup() {
               <label htmlFor="video" className="text-sm font-semibold text-white cursor-pointer">📹 Enable Video Response (Record Your Answers)</label>
             </div>
 
-            {(config.avatarEnabled || config.videoEnabled) && (
+            {config.videoEnabled && (
               <div className="rounded-xl p-5" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid rgba(59, 130, 246, 0.3)' }}>
                 <p className="text-blue-300 font-semibold mb-4 flex items-center gap-2">
                   📹 Camera Setup Required

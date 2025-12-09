@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
-import AIAvatar from '../components/AIAvatar';
-import VideoRecorder from '../components/VideoRecorder';
 import toast from 'react-hot-toast';
-import { Send } from 'lucide-react';
+import { Send, Video, VideoOff } from 'lucide-react';
 
 export default function InterviewSession() {
   const { id } = useParams();
@@ -15,10 +13,9 @@ export default function InterviewSession() {
   const [answer, setAnswer] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  const [isVideoRecording, setIsVideoRecording] = useState(false);
-  const [avatarReaction, setAvatarReaction] = useState<'positive' | 'neutral' | 'thinking' | 'encouraging' | null>(null);
-  const [lastScore, setLastScore] = useState<number | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
@@ -31,8 +28,69 @@ export default function InterviewSession() {
     loadInterview();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      stopCamera();
     };
   }, [id]);
+
+  useEffect(() => {
+    if (interview?.config?.videoEnabled && !stream) {
+      // Auto-start camera when video is enabled
+      startCamera();
+    }
+  }, [interview]);
+
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: 'user'
+        }, 
+        audio: false 
+      });
+      setStream(mediaStream);
+      setIsCameraOn(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        // Ensure video plays
+        videoRef.current.play().catch(e => console.error('Video play error:', e));
+      }
+      toast.success('✅ Camera started successfully!');
+    } catch (error: any) {
+      console.error('Camera access error:', error);
+      let errorMsg = 'Camera access failed. ';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page.';
+      } else if (error.name === 'NotFoundError') {
+        errorMsg += 'No camera detected. Please connect a camera.';
+      } else if (error.name === 'NotReadableError') {
+        errorMsg += 'Camera is being used by another application.';
+      } else {
+        errorMsg += 'Please check your camera permissions and try again.';
+      }
+      
+      toast.error(errorMsg, { duration: 10000 });
+      setIsCameraOn(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsCameraOn(false);
+    }
+  };
+
+  const toggleCamera = () => {
+    if (isCameraOn) {
+      stopCamera();
+    } else {
+      startCamera();
+    }
+  };
 
   const loadInterview = async () => {
     try {
@@ -73,38 +131,25 @@ export default function InterviewSession() {
     const elapsedMs = startTime ? Date.now() - startTime : 0;
 
     setLoading(true);
-    
-    // Show thinking reaction
-    setAvatarReaction('thinking');
 
     try {
       const response = await interviewAPI.submitAnswer(id!, answer.trim(), elapsedMs);
       
       // Get score from evaluation
       const score = response.evaluation?.score || 0;
-      setLastScore(score);
       
-      // Show appropriate reaction based on score
+      // Show appropriate feedback based on score
       if (score >= 85) {
-        setAvatarReaction('positive');
         toast.success('Excellent answer! 🌟');
       } else if (score >= 70) {
-        setAvatarReaction('encouraging');
         toast.success('Good job! 👍');
       } else {
-        setAvatarReaction('neutral');
         toast('Keep going! 💪');
       }
-      
-      // Clear reaction after showing feedback
-      setTimeout(() => {
-        setAvatarReaction(null);
-      }, 3000);
       
       if (response.nextQuestion) {
         setCurrentQuestion(response.nextQuestion);
         setAnswer('');
-        setVideoBlob(null);
         setStartTime(null);
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
       } else {
@@ -113,7 +158,6 @@ export default function InterviewSession() {
         navigate('/dashboard');
       }
     } catch (error: any) {
-      setAvatarReaction(null);
       console.error('Submit answer error:', error);
       toast.error(error?.response?.data?.detail || error.message || 'Failed to submit answer');
     } finally {
@@ -142,50 +186,42 @@ export default function InterviewSession() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
+      {/* User Camera in Top Right Corner */}
+      {interview.config?.videoEnabled && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500">
+            {isCameraOn ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-48 h-36 object-cover"
+              />
+            ) : (
+              <div className="w-48 h-36 flex items-center justify-center bg-dark-700">
+                <VideoOff className="w-8 h-8 text-dark-400" />
+              </div>
+            )}
+            <button
+              onClick={toggleCamera}
+              className="absolute bottom-2 right-2 p-2 bg-dark-900/80 rounded-full hover:bg-dark-900 transition-colors"
+              title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
+            >
+              {isCameraOn ? (
+                <Video className="w-4 h-4 text-green-400" />
+              ) : (
+                <VideoOff className="w-4 h-4 text-red-400" />
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            {/* AI Avatar Section - Always visible when enabled */}
-            {interview.config?.avatarEnabled && (
-              <div className="card">
-                <AIAvatar 
-                  isSpeaking={false}
-                  message={
-                    avatarReaction === 'thinking' ? "Let me evaluate your answer..." :
-                    avatarReaction === 'positive' ? "Excellent work! That was a great answer! 🌟" :
-                    avatarReaction === 'encouraging' ? "Good job! You're doing well! 👍" :
-                    "Ready when you are!"
-                  }
-                  enabled={true}
-                  reaction={avatarReaction}
-                  score={lastScore || undefined}
-                />
-              </div>
-            )}
-
-            {/* Video Recording Section */}
-            {interview.config?.videoEnabled && (
-              <div className="card">
-                <h3 className="text-lg font-semibold text-dark-800 mb-4">📹 Video Response</h3>
-                <VideoRecorder
-                  onRecordingComplete={(blob) => setVideoBlob(blob)}
-                  isRecording={isVideoRecording}
-                  onStartRecording={() => {
-                    setIsVideoRecording(true);
-                    if (!startTime) setStartTime(Date.now());
-                  }}
-                  onStopRecording={() => setIsVideoRecording(false)}
-                  enabled={interview.config?.videoEnabled}
-                />
-                {videoBlob && (
-                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-700">✓ Video answer recorded ({(videoBlob.size / 1024 / 1024).toFixed(2)} MB)</p>
-                  </div>
-                )}
-              </div>
-            )}
-
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-dark-800">Interview in Progress</h2>
