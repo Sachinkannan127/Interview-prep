@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import { interviewAPI } from '../services/api';
 import { speechService } from '../services/speech';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
@@ -170,8 +169,8 @@ export default function InterviewSession() {
     if (confirm('Are you sure you want to end this interview?')) {
       try {
         await interviewAPI.finishInterview(id!);
-        toast.success('Interview ended');
-        navigate('/dashboard');
+        toast.success('Interview completed! View your results below.');
+        navigate(`/interview/results/${id}`);
       } catch (error) {
         toast.error('Failed to end interview');
       }

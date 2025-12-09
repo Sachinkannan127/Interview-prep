@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from datetime import datetime
 from app.models.schemas import StartInterviewRequest, SubmitAnswerRequest
 from app.services.firebase_service import firebase_service
@@ -9,21 +9,21 @@ import uuid
 router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 
 @router.post("/start")
-async def start_interview(request: StartInterviewRequest, user: dict = Depends(get_current_user)):
+async def start_interview(request: Request, req: StartInterviewRequest, user: dict = Depends(get_current_user)):
     try:
         print(f"Starting interview for user: {user['uid']}")
-        print(f"Interview config: {request.config.dict()}")
+        print(f"Interview config: {req.config.dict()}")
         
         # Generate first question using Gemini
         first_question = gemini_service.generate_first_question(
-            config=request.config.dict(),
+            config=req.config.dict(),
             user_profile=user
         )
         
         # Create interview document
         interview_data = {
             "userId": user['uid'],
-            "config": request.config.dict(),
+            "config": req.config.dict(),
             "startedAt": datetime.now().isoformat(),
             "status": "in_progress",
             "transcript": "",

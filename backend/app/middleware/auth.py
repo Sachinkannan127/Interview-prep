@@ -1,11 +1,20 @@
-from fastapi import HTTPException, Security
+from fastapi import HTTPException, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.services.firebase_service import firebase_service
 import os
 
 security = HTTPBearer(auto_error=False)
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)):
+async def get_current_user(request: Request = None, credentials: HTTPAuthorizationCredentials = Security(security)):
+    # Skip authentication for OPTIONS requests (CORS preflight)
+    if request and request.method == "OPTIONS":
+        return {
+            'uid': 'preflight-user',
+            'email': 'preflight@example.com',
+            'name': 'Preflight User',
+            'role': 'user'
+        }
+    
     # Development mode: bypass authentication if Firebase is not initialized
     if not firebase_service.initialized:
         return {

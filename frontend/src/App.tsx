@@ -7,6 +7,7 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import InterviewSetup from './pages/InterviewSetup';
 import InterviewSession from './pages/InterviewSession';
+import InterviewResults from './pages/InterviewResults';
 import Practice from './pages/Practice';
 import AdminPanel from './pages/AdminPanel';
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/auth" />} />
         <Route path="/interview/setup" element={user ? <InterviewSetup /> : <Navigate to="/auth" />} />
         <Route path="/interview/session/:id" element={user ? <InterviewSession /> : <Navigate to="/auth" />} />
+        <Route path="/interview/results/:id" element={user ? <InterviewResults /> : <Navigate to="/auth" />} />
         <Route path="/practice" element={user ? <Practice /> : <Navigate to="/auth" />} />
         <Route path="/admin" element={user ? <AdminPanel /> : <Navigate to="/auth" />} />
       </Routes>

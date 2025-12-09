@@ -163,17 +163,36 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-4">
               {interviews.map((interview) => (
-                <div key={interview.id} className="flex items-center justify-between p-4 bg-dark-50 rounded-lg hover:bg-dark-200 transition-colors cursor-pointer" onClick={() => navigate(`/interview/session/${interview.id}`)}>
-                  <div>
+                <div key={interview.id} className="flex items-center justify-between p-4 bg-dark-50 rounded-lg hover:bg-dark-200 transition-colors">
+                  <div className="flex-1 cursor-pointer" onClick={() => {
+                    if (interview.status === 'completed') {
+                      navigate(`/interview/results/${interview.id}`);
+                    } else {
+                      navigate(`/interview/session/${interview.id}`);
+                    }
+                  }}>
                     <p className="font-medium text-dark-800">{interview.config?.type || 'Interview'}</p>
                     <p className="text-sm text-dark-600">
                       {interview.config?.role} - {interview.config?.difficulty}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-dark-600">{interview.status}</p>
-                    {interview.overallScore && (
-                      <p className="font-bold text-primary-600">{interview.overallScore}/100</p>
+                  <div className="text-right flex items-center gap-3">
+                    <div>
+                      <p className="text-sm text-dark-600">{interview.status}</p>
+                      {interview.overallScore && (
+                        <p className="font-bold text-primary-600">{interview.overallScore}/100</p>
+                      )}
+                    </div>
+                    {interview.status === 'completed' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/interview/results/${interview.id}`);
+                        }}
+                        className="btn-secondary text-xs px-3 py-1"
+                      >
+                        View Results
+                      </button>
                     )}
                   </div>
                 </div>
