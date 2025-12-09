@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Sparkles, Clock, Target, CheckCircle, XCircle, History } from 'lucide-react';
+import { ArrowLeft, BookOpen, Sparkles, Target, CheckCircle, History } from 'lucide-react';
 import { questionsAPI } from '../services/api';
 import toast from 'react-hot-toast';
 

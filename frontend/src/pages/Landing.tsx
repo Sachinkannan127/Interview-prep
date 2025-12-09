@@ -17,19 +17,19 @@ export default function Landing() {
       </nav>
 
       <main className="container mx-auto px-6 py-20">
-        <div className="text-center max-w-4xl mx-auto mb-20">
+        <div className="text-center max-w-4xl mx-auto mb-20 fade-in">
           <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
             Master Your Interviews with AI
           </h1>
-          <p className="text-xl text-dark-600 mb-8">
+          <p className="text-xl text-dark-600 mb-8 slide-up">
             Practice realistic mock interviews, get instant AI-powered feedback, and track your progress.
           </p>
-          <button onClick={() => navigate('/auth')} className="btn-primary text-lg px-8 py-4">
+          <button onClick={() => navigate('/auth')} className="btn-primary text-lg px-8 py-4 slide-up">
             Start Practicing Now
           </button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in">
           <FeatureCard
             icon={<Brain className="w-12 h-12 text-primary-500" />}
             title="AI-Powered"

@@ -86,8 +86,8 @@ export default function Dashboard() {
           <p className="text-dark-600">Ready to practice your interview skills?</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="card">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 fade-in">
+          <div className="card slide-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-dark-600 text-sm">Total Interviews</p>
@@ -97,7 +97,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card">
+          <div className="card slide-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-dark-600 text-sm">Interview Avg Score</p>
@@ -111,7 +111,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card">
+          <div className="card slide-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-dark-600 text-sm">Practice Sessions</p>
@@ -121,7 +121,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/interview/setup')}>
+          <div className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white cursor-pointer hover:scale-105 transition-transform slide-up" onClick={() => navigate('/interview/setup')}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/80 text-sm">Start New</p>
