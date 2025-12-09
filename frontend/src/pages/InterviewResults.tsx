@@ -71,12 +71,12 @@ export default function InterviewResults() {
     y += 8;
     interview.qa.forEach((qa: any, idx: number) => {
       doc.setFont(undefined, 'bold');
-      doc.text(`Q${idx + 1}: ${qa.questionText}`, 12, y);
+      doc.text(`Q${idx + 1}: ${qa.questionText ?? ''}`, 12, y);
       doc.setFont(undefined, 'normal');
       y += 7;
-      doc.text(`Your Answer: ${qa.answerText}`, 14, y);
+      doc.text(`Your Answer: ${qa.answerText ?? ''}`, 14, y);
       y += 7;
-      doc.text(`Score: ${qa.aiScore}/100`, 14, y);
+      doc.text(`Score: ${qa.aiScore ?? ''}/100`, 14, y);
       y += 7;
       if (qa.aiFeedback) {
         doc.text(`AI Feedback: ${qa.aiFeedback}`, 14, y);
