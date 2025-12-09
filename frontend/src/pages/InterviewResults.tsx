@@ -38,9 +38,11 @@ export default function InterviewResults() {
     doc.setFontSize(12);
     doc.text(`Interview ID: ${interview.id}`, 10, y);
     y += 8;
-    doc.text(`Started At: ${interview.startedAt || ''}`, 10, y);
+    const startedAtStr = interview.startedAt ? String(interview.startedAt) : '';
+    const endedAtStr = interview.endedAt ? String(interview.endedAt) : '';
+    doc.text(`Started At: ${startedAtStr}`, 10, y);
     y += 8;
-    doc.text(`Ended At: ${interview.endedAt || ''}`, 10, y);
+    doc.text(`Ended At: ${endedAtStr}`, 10, y);
     y += 8;
     doc.text(`Overall Score: ${interview.overallScore?.toFixed(1) || avgScore.toFixed(1)}`, 10, y);
     y += 8;
@@ -48,7 +50,15 @@ export default function InterviewResults() {
     y += 8;
     doc.text(`Avg Response Time: ${interview.metrics?.avgResponseTime?.toFixed(1) || '0'}s`, 10, y);
     y += 8;
-    doc.text(`Total Duration: ${interview.endedAt && interview.startedAt ? formatDuration((new Date(interview.endedAt).getTime() - new Date(interview.startedAt).getTime()) / 1000) : 'N/A'}`, 10, y);
+    let totalDuration = 'N/A';
+    if (endedAtStr && startedAtStr) {
+      const start = new Date(startedAtStr);
+      const end = new Date(endedAtStr);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        totalDuration = formatDuration((end.getTime() - start.getTime()) / 1000);
+      }
+    }
+    doc.text(`Total Duration: ${totalDuration}`, 10, y);
     y += 10;
     doc.text('Interview Configuration:', 10, y);
     y += 8;
@@ -168,10 +178,18 @@ export default function InterviewResults() {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-purple-600">
-                    {interview.endedAt && interview.startedAt
-                      ? formatDuration((new Date(interview.endedAt).getTime() - new Date(interview.startedAt).getTime()) / 1000)
-                      : 'N/A'
-                    }
+                    {(() => {
+                      const startedAtStr = interview.startedAt ? String(interview.startedAt) : '';
+                      const endedAtStr = interview.endedAt ? String(interview.endedAt) : '';
+                      if (endedAtStr && startedAtStr) {
+                        const start = new Date(startedAtStr);
+                        const end = new Date(endedAtStr);
+                        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                          return formatDuration((end.getTime() - start.getTime()) / 1000);
+                        }
+                      }
+                      return 'N/A';
+                    })()}
                   </div>
                   <div className="text-sm text-dark-600">Total Duration</div>
                 </div>
