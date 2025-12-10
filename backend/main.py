@@ -13,8 +13,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS configuration
-origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
+# CORS configuration - Allow all localhost ports for development
+origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177").split(",")
 
 app.add_middleware(
     CORSMiddleware,

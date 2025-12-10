@@ -62,13 +62,13 @@ export default function InterviewSession() {
       let errorMsg = 'Camera access failed. ';
       
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page.';
+        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page. If you have previously denied access, go to your browser settings to re-enable permissions.';
       } else if (error.name === 'NotFoundError') {
-        errorMsg += 'No camera detected. Please connect a camera.';
+        errorMsg += 'No camera detected. Please connect a camera and ensure it is properly installed.';
       } else if (error.name === 'NotReadableError') {
-        errorMsg += 'Camera is being used by another application.';
+        errorMsg += 'Camera is being used by another application. Close other applications that might be using the camera and try again.';
       } else {
-        errorMsg += 'Please check your camera permissions and try again.';
+        errorMsg += 'Please check your camera permissions and browser settings, then try again.';
       }
       
       toast.error(errorMsg, { duration: 10000 });
