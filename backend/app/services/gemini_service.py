@@ -7,35 +7,62 @@ load_dotenv()
 
 class GeminiService:
     def __init__(self):
+        print("\n" + "="*60)
+        print("GEMINI SERVICE INITIALIZATION")
+        print("="*60)
+        
         api_key = os.getenv('GEMINI_API_KEY')
+        print(f"API Key present: {api_key is not None}")
+        print(f"API Key length: {len(api_key) if api_key else 0}")
+        print(f"API Key starts with: {api_key[:10] if api_key and len(api_key) > 10 else 'N/A'}...")
+        
         if api_key and api_key != 'your_gemini_api_key_here':
             try:
+                print("Configuring Gemini API...")
                 genai.configure(api_key=api_key)
-                # Use the correct Gemini model names for the current API
-                self.flash_model = genai.GenerativeModel('gemini-1.5-flash-002')
-                self.pro_model = genai.GenerativeModel('gemini-1.5-pro-002')
+                print("Creating model instances...")
+                # Use gemini-2.5-flash for both (Pro has 0 quota on free tier)
+                self.flash_model = genai.GenerativeModel('gemini-2.5-flash')
+                self.pro_model = genai.GenerativeModel('gemini-2.5-flash')  # Use Flash for evaluation too
                 self.initialized = True
-                print("Success: Gemini AI initialized successfully")
+                print("✅ SUCCESS: Gemini AI initialized successfully")
+                print(f"Flash Model: {self.flash_model._model_name}")
+                print(f"Pro Model (using Flash): {self.pro_model._model_name}")
+                print("⚠️  Note: Using gemini-2.5-flash for both generation and evaluation (free tier)")
+                print("⚠️  Rate limit: 5 requests per minute per model")
             except Exception as e:
-                print(f"Warning: Failed to initialize Gemini AI: {e}")
+                print(f"❌ ERROR: Failed to initialize Gemini AI")
+                print(f"Error type: {type(e).__name__}")
+                print(f"Error message: {str(e)}")
+                import traceback
+                traceback.print_exc()
                 print("Backend will run with fallback questions")
                 self.flash_model = None
                 self.pro_model = None
                 self.initialized = False
         else:
-            print("Warning: Gemini API key not configured")
+            print("❌ WARNING: Gemini API key not configured or invalid")
             print("Backend will run with fallback questions")
             self.flash_model = None
             self.pro_model = None
             self.initialized = False
+        
+        print("="*60 + "\n")
     
     def generate_first_question(self, config: dict, user_profile: dict = None):
-        print(f"=== GEMINI: generate_first_question called ===")
+        print("\n" + "="*60)
+        print("GENERATE FIRST QUESTION")
+        print("="*60)
         print(f"Initialized: {self.initialized}")
-        print(f"Config: {config}")
+        print(f"Flash Model: {self.flash_model}")
+        print(f"Pro Model: {self.pro_model}")
+        print(f"Config received: {json.dumps(config, indent=2)}")
+        print(f"User profile: {user_profile is not None}")
         
         if not self.initialized:
-            print("WARNING: Gemini not initialized, using fallback questions")
+            print("\n❌ WARNING: Gemini not initialized, using fallback questions")
+            print(f"Flash model state: {self.flash_model}")
+            print(f"Pro model state: {self.pro_model}")
             # Fallback questions when AI is not available
             sub_type = config.get('subType', 'dsa')
             fallback_questions = {
@@ -131,33 +158,61 @@ class GeminiService:
             
             return fallback_questions.get(interview_type, fallback_questions['technical']['dsa']).get(difficulty, "Tell me about your experience with software development.")
         
+        print("\n--- Building prompt ---")
         prompt = self._build_first_question_prompt(config, user_profile)
+        print(f"Prompt length: {len(prompt)} characters")
+        print(f"Prompt preview (first 200 chars):\n{prompt[:200]}...")
+        
         try:
-            print(f"=== GEMINI: Calling API with prompt ===")
-            print(f"Prompt length: {len(prompt)} chars")
+            print("\n--- Calling Gemini API ---")
+            print(f"Using model: {self.flash_model._model_name if self.flash_model else 'None'}")
+            print("Sending request to Gemini...")
+            
             response = self.flash_model.generate_content(prompt)
-            question = self._extract_question(response.text)
-            print(f"=== GEMINI: Success! Generated question ===")
-            print(f"Question: {question[:100]}...")
-            return question
+            
+            print("\n✅ API Response received!")
+            print(f"Response type: {type(response)}")
+            print(f"Response has text: {hasattr(response, 'text')}")
+            
+            if hasattr(response, 'text'):
+                print(f"Response text length: {len(response.text)} chars")
+                print(f"Response preview: {response.text[:200]}...")
+                question = self._extract_question(response.text)
+                print(f"\n✅ SUCCESS: Question generated!")
+                print(f"Final question: {question}")
+                print("="*60 + "\n")
+                return question
+            else:
+                print("❌ ERROR: Response has no text attribute")
+                print(f"Response object: {response}")
+                raise Exception("Invalid response from Gemini API")
+                
         except Exception as e:
-            print(f"=== GEMINI: API ERROR ===")
+            print(f"\n❌ GEMINI API ERROR")
             print(f"Error type: {type(e).__name__}")
             print(f"Error message: {str(e)}")
+            print(f"Error details:")
             import traceback
             traceback.print_exc()
+            
             # Fallback to predefined questions
             self.initialized = False  # Disable for subsequent calls
-            print("Falling back to predefined questions")
+            print("\n⚠️  Falling back to predefined questions")
+            print("="*60 + "\n")
             return self.generate_first_question(config, user_profile)
     
     def evaluate_and_generate_next(self, config: dict, qa_history: list, current_answer: str):
-        print(f"=== GEMINI: evaluate_and_generate_next called ===")
+        print("\n" + "="*60)
+        print("EVALUATE AND GENERATE NEXT")
+        print("="*60)
         print(f"Initialized: {self.initialized}")
+        print(f"Pro Model: {self.pro_model}")
         print(f"QA History length: {len(qa_history)}")
+        print(f"Current answer length: {len(current_answer)} chars")
+        print(f"Config: {json.dumps(config, indent=2)}")
         
         if not self.initialized:
-            print("WARNING: Gemini not initialized, using fallback evaluation")
+            print("\n❌ WARNING: Gemini not initialized, using fallback evaluation")
             # Fallback evaluation when AI is not available
             score = 75  # Default good score
             feedback = "Good answer! You demonstrated solid understanding."
@@ -191,24 +246,48 @@ class GeminiService:
                 "improvements": ["Add more technical details"],
                 "nextQuestion": next_questions[question_count % len(next_questions)]
             }
+        print("\n--- Building evaluation prompt ---")
         prompt = self._build_evaluation_prompt(config, qa_history, current_answer)
+        print(f"Prompt length: {len(prompt)} characters")
+        print(f"Prompt preview (first 300 chars):\n{prompt[:300]}...")
+        
         try:
-            print(f"=== GEMINI: Calling evaluation API ===")
-            print(f"Prompt length: {len(prompt)} chars")
+            print("\n--- Calling Gemini Evaluation API ---")
+            print(f"Using model: {self.pro_model._model_name if self.pro_model else 'None'}")
+            print("Sending evaluation request to Gemini...")
+            
             response = self.pro_model.generate_content(prompt)
-            result = self._parse_evaluation_response(response.text)
-            print(f"=== GEMINI: Evaluation success ===")
-            print(f"Score: {result.get('score')}, Next: {result.get('nextQuestion', 'N/A')[:50]}")
-            return result
+            
+            print("\n✅ API Response received!")
+            print(f"Response type: {type(response)}")
+            print(f"Response has text: {hasattr(response, 'text')}")
+            
+            if hasattr(response, 'text'):
+                print(f"Response text length: {len(response.text)} chars")
+                print(f"Response preview: {response.text[:300]}...")
+                result = self._parse_evaluation_response(response.text)
+                print(f"\n✅ SUCCESS: Evaluation complete!")
+                print(f"Score: {result.get('score')}")
+                print(f"Next question: {result.get('nextQuestion', 'N/A')[:80]}...")
+                print("="*60 + "\n")
+                return result
+            else:
+                print("❌ ERROR: Response has no text attribute")
+                print(f"Response object: {response}")
+                raise Exception("Invalid response from Gemini API")
+                
         except Exception as e:
-            print(f"=== GEMINI: Evaluation API ERROR ===")
+            print(f"\n❌ GEMINI EVALUATION API ERROR")
             print(f"Error type: {type(e).__name__}")
             print(f"Error message: {str(e)}")
+            print(f"Error details:")
             import traceback
             traceback.print_exc()
+            
             # Fallback to predefined evaluation
             self.initialized = False  # Disable for subsequent calls
-            print("Falling back to predefined evaluation")
+            print("\n⚠️  Falling back to predefined evaluation")
+            print("="*60 + "\n")
             return self.evaluate_and_generate_next(config, qa_history, current_answer)
     
     def _build_first_question_prompt(self, config: dict, user_profile: dict = None):

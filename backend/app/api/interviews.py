@@ -25,19 +25,31 @@ class StartWithQuestionsRequest(BaseModel):
 @router.post("/start")
 async def start_interview(request: Request, req: StartInterviewRequest, user: dict = Depends(get_current_user)):
     try:
-        print(f"Starting interview for user: {user['uid']}")
-        print(f"Interview config: {req.config.dict()}")
+        print("\n" + "="*70)
+        print("START INTERVIEW API ENDPOINT")
+        print("="*70)
+        print(f"User ID: {user['uid']}")
+        print(f"User email: {user.get('email', 'N/A')}")
+        print(f"Interview config received:")
+        config_dict = req.config.dict()
+        for key, value in config_dict.items():
+            print(f"  {key}: {value}")
         
+        print("\n--- Calling Gemini Service to generate first question ---")
         # Generate first question using Gemini
         first_question = gemini_service.generate_first_question(
-            config=req.config.dict(),
+            config=config_dict,
             user_profile=user
         )
+        
+        print(f"\n--- First question received ---")
+        print(f"Question length: {len(first_question)} chars")
+        print(f"Question: {first_question}")
         
         # Create interview document
         interview_data = {
             "userId": user['uid'],
-            "config": req.config.dict(),
+            "config": config_dict,
             "startedAt": datetime.now().isoformat(),
             "status": "in_progress",
             "transcript": "",
@@ -45,18 +57,23 @@ async def start_interview(request: Request, req: StartInterviewRequest, user: di
             "firstQuestion": first_question
         }
         
+        print("\n--- Creating interview document ---")
         interview = firebase_service.create_interview(interview_data)
         
-        print(f"Interview created with ID: {interview['id']}")
+        print(f"\n✅ SUCCESS: Interview created with ID: {interview['id']}")
+        print("="*70 + "\n")
         
         return {
             "interviewId": interview['id'],
             "firstQuestion": first_question
         }
     except Exception as e:
-        print(f"Error starting interview: {str(e)}")
+        print(f"\n❌ ERROR in start_interview endpoint")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
         import traceback
         traceback.print_exc()
+        print("="*70 + "\n")
         raise HTTPException(status_code=500, detail=f"Failed to start interview: {str(e)}")
 
 @router.post("/{interview_id}/answer")
