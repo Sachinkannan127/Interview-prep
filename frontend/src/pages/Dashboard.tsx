@@ -162,6 +162,44 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* AI Avatar Mock Interview Section */}
+        <div className="card mb-8 sm:mb-12 fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">🤖 AI Avatar Mock Interview</h2>
+              <p className="text-slate-300 text-sm sm:text-base">Practice with AI-powered face-to-face interview simulation</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer" onClick={() => {
+              toast.info('AI Avatar Mock Interview coming soon! 🚀');
+              navigate('/interview/setup');
+            }}>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl">🎭</div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1">Behavioral Round</h3>
+                  <p className="text-slate-400 text-sm">Practice soft skills & behavioral questions</p>
+                </div>
+              </div>
+              <button className="btn-secondary w-full">Start Mock Interview →</button>
+            </div>
+            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer" onClick={() => {
+              toast.info('AI Avatar Mock Interview coming soon! 🚀');
+              navigate('/interview/setup');
+            }}>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl">💼</div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1">Technical Round</h3>
+                  <p className="text-slate-400 text-sm">Face-to-face technical interview simulation</p>
+                </div>
+              </div>
+              <button className="btn-secondary w-full">Start Mock Interview →</button>
+            </div>
+          </div>
+        </div>
+
         <div className="card">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Recent Interviews</h2>

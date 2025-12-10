@@ -33,11 +33,11 @@ export default function InterviewSession() {
   }, [id]);
 
   useEffect(() => {
-    if (interview?.config?.videoEnabled && !stream) {
+    if (interview?.config?.videoEnabled && !stream && !isCameraOn) {
       // Auto-start camera when video is enabled
       startCamera();
     }
-  }, [interview]);
+  }, [interview, stream, isCameraOn]);
 
   const startCamera = async () => {
     try {

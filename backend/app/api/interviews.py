@@ -139,8 +139,13 @@ async def finish_interview(interview_id: str, user: dict = Depends(get_current_u
         if not interview or interview['userId'] != user['uid']:
             raise HTTPException(status_code=404, detail="Interview not found")
         
-        # Calculate overall score
-        scores = [qa.get('aiScore', 0) for qa in interview['qa'] if qa.get('aiScore')]
+        # Calculate overall score from evaluation scores
+        scores = []
+        for qa in interview['qa']:
+            if qa.get('evaluation') and qa['evaluation'].get('score'):
+                scores.append(qa['evaluation']['score'])
+            elif qa.get('aiScore'):
+                scores.append(qa['aiScore'])
         overall_score = sum(scores) / len(scores) if scores else 0
         
         # Calculate metrics
