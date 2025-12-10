@@ -64,7 +64,15 @@ export default function Auth() {
       toast.success('Welcome!');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message);
+      // Handle unauthorized domain error in development
+      if (error.code === 'auth/unauthorized-domain') {
+        toast.error('Firebase Setup Required: Please add "localhost" to authorized domains in Firebase Console.\n\nTemporary Fix: Use Email/Password login below.', {
+          duration: 8000,
+        });
+      } else {
+        toast.error(error.message);
+      }
+      console.error('Google Auth Error:', error);
     }
   };
 
@@ -83,6 +91,13 @@ export default function Auth() {
       </div>
 
       <div className="card max-w-md w-full relative z-10">
+        {/* Firebase Setup Warning */}
+        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+          <p className="text-yellow-300 text-sm text-center">
+            ⚠️ <strong>Google Sign-In Setup Required:</strong> Add "localhost" to Firebase authorized domains, or use <strong>Email/Password</strong> below.
+          </p>
+        </div>
+
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <Brain className="w-20 h-20 text-indigo-400 mx-auto animate-pulse relative z-10" />
