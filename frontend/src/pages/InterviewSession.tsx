@@ -13,7 +13,6 @@ export default function InterviewSession() {
   const [answer, setAnswer] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [aiAvatarSpeaking, setAiAvatarSpeaking] = useState(false);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
@@ -29,36 +28,6 @@ export default function InterviewSession() {
     };
   }, [id]);
 
-  // Text-to-speech for AI interviewer
-  const speakQuestion = (text: string) => {
-    if ('speechSynthesis' in window) {
-      setAiAvatarSpeaking(true);
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-      utterance.lang = 'en-US';
-      
-      utterance.onend = () => {
-        setAiAvatarSpeaking(false);
-      };
-      
-      utterance.onerror = () => {
-        setAiAvatarSpeaking(false);
-      };
-      
-      window.speechSynthesis.cancel(); // Cancel any ongoing speech
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setAiAvatarSpeaking(false);
-    }
-  };
-
   const loadInterview = async () => {
     try {
       const data = await interviewAPI.getInterview(id!);
@@ -69,8 +38,6 @@ export default function InterviewSession() {
       } else {
         const question = data.firstQuestion || 'Loading first question...';
         setCurrentQuestion(question);
-        // Speak the first question
-        setTimeout(() => speakQuestion(question), 500);
       }
     } catch (error: any) {
       console.error('Failed to load interview:', error);
@@ -122,8 +89,6 @@ export default function InterviewSession() {
         setAnswer('');
         setStartTime(null);
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
-        // Speak the next question
-        setTimeout(() => speakQuestion(response.nextQuestion), 500);
       } else {
         toast.success('Interview completed!');
         await interviewAPI.finishInterview(id!);
@@ -159,31 +124,6 @@ export default function InterviewSession() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
-      {/* AI Avatar Interviewer */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className="relative bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg shadow-2xl overflow-hidden border-2 border-indigo-400 p-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-3xl ${aiAvatarSpeaking ? 'animate-pulse' : ''}`}>
-              🤖
-            </div>
-            <div>
-              <h3 className="text-white font-bold text-sm">AI Interviewer</h3>
-              <p className="text-indigo-200 text-xs">{aiAvatarSpeaking ? '🎤 Speaking...' : '🎯 Listening...'}</p>
-            </div>
-          </div>
-          {aiAvatarSpeaking && (
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 animate-pulse" />
-          )}
-          <button
-            onClick={aiAvatarSpeaking ? stopSpeaking : () => speakQuestion(currentQuestion)}
-            className="absolute bottom-2 right-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
-            title={aiAvatarSpeaking ? 'Stop speaking' : 'Repeat question'}
-          >
-            {aiAvatarSpeaking ? '⏸️' : '🔊'}
-          </button>
-        </div>
-      </div>
-
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

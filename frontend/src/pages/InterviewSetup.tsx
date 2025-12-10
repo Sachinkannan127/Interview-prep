@@ -19,7 +19,6 @@ export default function InterviewSetup() {
   const [loading, setLoading] = useState(false);
 
   const handleStart = async () => {
-
     setLoading(true);
     try {
       const response = await interviewAPI.startInterview(config);
