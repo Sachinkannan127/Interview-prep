@@ -31,8 +31,13 @@ export default function InterviewSession() {
   useEffect(() => {
     loadInterview();
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      console.log('InterviewSession unmounting, cleaning up...');
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        console.log('Timer cleared');
+      }
       if (stream) {
+        console.log('Stopping camera on unmount...');
         stream.getTracks().forEach(track => track.stop());
       }
     };
@@ -200,6 +205,17 @@ export default function InterviewSession() {
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
         console.log('Moving to next question');
       } else {
+        // Stop camera when interview completes
+        if (stream) {
+          console.log('Stopping camera on interview completion...');
+          stream.getTracks().forEach(track => track.stop());
+          setStream(null);
+          setIsCameraOn(false);
+          if (videoRef.current) {
+            videoRef.current.srcObject = null;
+          }
+        }
+        
         toast.success('Interview completed! 🎉 Generating your results...');
         await interviewAPI.finishInterview(id!);
         setTimeout(() => {
@@ -217,6 +233,17 @@ export default function InterviewSession() {
   const handleFinishInterview = async () => {
     if (confirm('Are you sure you want to end this interview?')) {
       try {
+        // Stop camera before finishing
+        if (stream) {
+          console.log('Stopping camera on interview finish...');
+          stream.getTracks().forEach(track => track.stop());
+          setStream(null);
+          setIsCameraOn(false);
+          if (videoRef.current) {
+            videoRef.current.srcObject = null;
+          }
+        }
+        
         await interviewAPI.finishInterview(id!);
         toast.success('Interview completed! View your results below.');
         navigate(`/interview/results/${id}`);
