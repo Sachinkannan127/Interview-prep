@@ -39,10 +39,15 @@ export default function InterviewSession() {
   }, [id]);
 
   useEffect(() => {
-    if (interview?.config?.videoEnabled && !stream) {
-      startCamera();
+    if (interview?.config?.videoEnabled && !stream && !isCameraOn) {
+      console.log('Auto-starting camera for video-enabled interview...');
+      // Auto-start camera after a brief delay to ensure page is ready
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [interview]);
+  }, [interview, stream, isCameraOn]);
 
   const startCamera = async () => {
     try {
@@ -126,14 +131,23 @@ export default function InterviewSession() {
   const loadInterview = async () => {
     try {
       const data = await interviewAPI.getInterview(id!);
+      console.log('Interview loaded:', data);
       setInterview(data);
+      
       if (data.qa && data.qa.length > 0) {
         const lastQA = data.qa[data.qa.length - 1];
         setCurrentQuestion(lastQA.questionText);
+        console.log('Resuming interview at question:', data.qa.length + 1);
       } else {
         const question = data.firstQuestion || 'Loading first question...';
         setCurrentQuestion(question);
+        console.log('Starting new interview with first question');
+        // Start timer for first question
+        setStartTime(Date.now());
       }
+      
+      // Show welcome message
+      toast.success('Interview session started! Good luck! 🚀');
     } catch (error: any) {
       console.error('Failed to load interview:', error);
       toast.error(error?.response?.data?.detail || 'Failed to load interview. Please try again.');
@@ -182,12 +196,15 @@ export default function InterviewSession() {
       if (response.nextQuestion) {
         setCurrentQuestion(response.nextQuestion);
         setAnswer('');
-        setStartTime(null);
+        setStartTime(Date.now()); // Start timer for next question
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
+        console.log('Moving to next question');
       } else {
-        toast.success('Interview completed!');
+        toast.success('Interview completed! 🎉 Generating your results...');
         await interviewAPI.finishInterview(id!);
-        navigate('/dashboard');
+        setTimeout(() => {
+          navigate(`/interview/results/${id}`);
+        }, 1500);
       }
     } catch (error: any) {
       console.error('Submit answer error:', error);
