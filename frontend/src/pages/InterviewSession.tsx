@@ -219,38 +219,45 @@ export default function InterviewSession() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
-      {/* Video Camera - Always show if videoEnabled is true */}
+      {/* Video Camera - Show when video is enabled */}
       {interview?.config?.videoEnabled && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50" style={{ width: '192px' }}>
           <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500" style={{ width: '192px', height: '144px' }}>
-            {isCameraOn && stream ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover bg-black"
-                style={{ transform: 'scaleX(-1)' }}
-                onLoadedMetadata={() => console.log('Video metadata loaded')}
-                onPlay={() => console.log('Video playing')}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-dark-700">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover bg-black ${!isCameraOn || !stream ? 'hidden' : ''}`}
+              style={{ transform: 'scaleX(-1)' }}
+              onLoadedMetadata={() => {
+                console.log('Video metadata loaded');
+                console.log('Video dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
+              }}
+              onPlay={() => console.log('Video playing')}
+              onError={(e) => console.error('Video error:', e)}
+            />
+            {(!isCameraOn || !stream) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-dark-700">
                 <div className="text-center px-4">
                   <VideoOff className="w-8 h-8 text-dark-400 mx-auto mb-2" />
-                  <p className="text-xs text-dark-500 mb-2">Camera {stream ? 'Starting...' : 'Off'}</p>
-                  <button 
-                    onClick={startCamera}
-                    className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-xs rounded transition-colors"
-                  >
-                    Turn On
-                  </button>
+                  <p className="text-xs text-dark-500 mb-2">
+                    {stream && !isCameraOn ? 'Camera Paused' : stream ? 'Starting...' : 'Camera Off'}
+                  </p>
+                  {!stream && (
+                    <button 
+                      onClick={startCamera}
+                      className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-xs rounded transition-colors"
+                    >
+                      Turn On
+                    </button>
+                  )}
                 </div>
               </div>
             )}
             <button
               onClick={toggleCamera}
-              className="absolute bottom-2 right-2 p-2 bg-dark-900/80 rounded-full hover:bg-dark-900 transition-colors shadow-lg"
+              className="absolute bottom-2 right-2 p-2 bg-dark-900/80 rounded-full hover:bg-dark-900 transition-colors shadow-lg z-10"
               title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
             >
               {isCameraOn ? (
@@ -261,8 +268,12 @@ export default function InterviewSession() {
             </button>
           </div>
           {/* Debug info */}
-          <div className="mt-2 text-xs text-white bg-dark-900/80 p-2 rounded">
-            Status: {isCameraOn ? 'ON' : 'OFF'} | Stream: {stream ? 'Yes' : 'No'}
+          <div className="mt-2 text-xs text-white bg-dark-900/80 p-2 rounded text-center">
+            <div>Status: <span className={isCameraOn ? 'text-green-400' : 'text-red-400'}>{isCameraOn ? 'ON' : 'OFF'}</span></div>
+            <div>Stream: <span className={stream ? 'text-green-400' : 'text-red-400'}>{stream ? 'Active' : 'None'}</span></div>
+            {videoRef.current?.videoWidth && (
+              <div className="text-blue-400">{videoRef.current.videoWidth}x{videoRef.current.videoHeight}</div>
+            )}
           </div>
         </div>
       )}
