@@ -106,6 +106,49 @@ export default function Dashboard() {
           <p className="text-slate-300 text-base sm:text-lg">Ready to level up your interview skills? 🚀</p>
         </div>
 
+        {/* AI Avatar Mock Interview Section - Prominent Main Feature */}
+        <div className="card mb-8 sm:mb-12 fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">🤖 AI Avatar Mock Interview</h2>
+              <p className="text-slate-300 text-base sm:text-lg">Experience realistic face-to-face interviews with AI-powered avatar simulation</p>
+            </div>
+            <div className="hidden sm:block">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl animate-pulse">
+                🎭
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="p-8 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+              toast.success('AI Avatar Mock Interview coming soon! 🚀');
+              navigate('/interview/setup');
+            }}>
+              <div className="flex items-center gap-6 mb-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg">🎭</div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Behavioral Round</h3>
+                  <p className="text-slate-400 text-base">Practice soft skills & behavioral questions with AI avatar</p>
+                </div>
+              </div>
+              <button className="btn-primary w-full text-lg py-3">Start Behavioral Mock Interview →</button>
+            </div>
+            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+              toast.success('AI Avatar Mock Interview coming soon! 🚀');
+              navigate('/interview/setup');
+            }}>
+              <div className="flex items-center gap-6 mb-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-4xl shadow-lg">💼</div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Technical Round</h3>
+                  <p className="text-slate-400 text-base">Face-to-face technical interview with AI avatar simulation</p>
+                </div>
+              </div>
+              <button className="btn-primary w-full text-lg py-3">Start Technical Mock Interview →</button>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 fade-in">
           <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
@@ -158,44 +201,6 @@ export default function Dashboard() {
                 <p className="text-3xl font-extrabold text-white">Interview</p>
               </div>
               <Play className="w-12 h-12 text-white" />
-            </div>
-          </div>
-        </div>
-
-        {/* AI Avatar Mock Interview Section */}
-        <div className="card mb-8 sm:mb-12 fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">🤖 AI Avatar Mock Interview</h2>
-              <p className="text-slate-300 text-sm sm:text-base">Practice with AI-powered face-to-face interview simulation</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer" onClick={() => {
-              toast.info('AI Avatar Mock Interview coming soon! 🚀');
-              navigate('/interview/setup');
-            }}>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl">🎭</div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">Behavioral Round</h3>
-                  <p className="text-slate-400 text-sm">Practice soft skills & behavioral questions</p>
-                </div>
-              </div>
-              <button className="btn-secondary w-full">Start Mock Interview →</button>
-            </div>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer" onClick={() => {
-              toast.info('AI Avatar Mock Interview coming soon! 🚀');
-              navigate('/interview/setup');
-            }}>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl">💼</div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">Technical Round</h3>
-                  <p className="text-slate-400 text-sm">Face-to-face technical interview simulation</p>
-                </div>
-              </div>
-              <button className="btn-secondary w-full">Start Mock Interview →</button>
             </div>
           </div>
         </div>
