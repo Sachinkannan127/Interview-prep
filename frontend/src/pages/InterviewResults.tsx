@@ -35,6 +35,12 @@ export default function InterviewResults() {
 
   const downloadPDFResults = () => {
     if (!interview) return;
+    
+    // Calculate average score
+    const avgScore = interview.qa.length > 0
+      ? interview.qa.reduce((sum: number, qa: any) => sum + (qa.aiScore || 0), 0) / interview.qa.length
+      : 0;
+    
     const doc = new jsPDF();
     let y = 10;
     doc.setFontSize(18);
