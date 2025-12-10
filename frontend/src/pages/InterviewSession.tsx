@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
-import { Send } from 'lucide-react';
+import { Send, Video, VideoOff, MessageCircle, X } from 'lucide-react';
 
 export default function InterviewSession() {
   const { id } = useParams();
@@ -13,20 +13,96 @@ export default function InterviewSession() {
   const [answer, setAnswer] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
     confidenceScore: 0,
     responseTime: 0,
   });
+  const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
     loadInterview();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
     };
   }, [id]);
+
+  useEffect(() => {
+    if (interview?.config?.videoEnabled && !stream) {
+      startCamera();
+    }
+  }, [interview]);
+
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      setStream(mediaStream);
+      setIsCameraOn(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+      toast.success('Camera enabled');
+    } catch (error) {
+      console.error('Camera access error:', error);
+      toast.error('Failed to access camera. Please check permissions.');
+    }
+  };
+
+  const toggleCamera = () => {
+    if (isCameraOn && stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsCameraOn(false);
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      toast('Camera turned off');
+    } else {
+      startCamera();
+    }
+  };
+
+  const handleChatSubmit = async () => {
+    if (!chatInput.trim()) return;
+    
+    const userMessage = chatInput.trim();
+    setChatMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setChatInput('');
+    setChatLoading(true);
+
+    try {
+      // Call Gemini API for chat response
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, context: 'interview' })
+      });
+      
+      if (!response.ok) throw new Error('Chat failed');
+      
+      const data = await response.json();
+      setChatMessages(prev => [...prev, { role: 'ai', text: data.response }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setChatMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: 'I can help you with interview tips, technical concepts, or answer questions about your interview. What would you like to know?' 
+      }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   const loadInterview = async () => {
     try {
@@ -124,6 +200,122 @@ export default function InterviewSession() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
+      {/* Video Camera */}
+      {interview?.config?.videoEnabled && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500">
+            {isCameraOn && stream ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-48 h-36 object-cover bg-black"
+                style={{ transform: 'scaleX(-1)' }}
+              />
+            ) : (
+              <div className="w-48 h-36 flex items-center justify-center bg-dark-700">
+                <div className="text-center px-4">
+                  <VideoOff className="w-8 h-8 text-dark-400 mx-auto mb-2" />
+                  <p className="text-xs text-dark-500 mb-2">Camera Off</p>
+                  <button 
+                    onClick={startCamera}
+                    className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-xs rounded transition-colors"
+                  >
+                    Turn On
+                  </button>
+                </div>
+              </div>
+            )}
+            <button
+              onClick={toggleCamera}
+              className="absolute bottom-2 right-2 p-2 bg-dark-900/80 rounded-full hover:bg-dark-900 transition-colors shadow-lg"
+              title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
+            >
+              {isCameraOn ? (
+                <Video className="w-4 h-4 text-green-400" />
+              ) : (
+                <VideoOff className="w-4 h-4 text-red-400" />
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* AI Chatbot Button */}
+      <button
+        onClick={() => setShowChat(!showChat)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-white"
+        title="AI Assistant"
+      >
+        {showChat ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+      </button>
+
+      {/* AI Chatbot Panel */}
+      {showChat && (
+        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-dark-800 rounded-lg shadow-2xl border border-primary-500 flex flex-col">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 rounded-t-lg">
+            <h3 className="text-white font-bold flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              AI Interview Assistant
+            </h3>
+            <p className="text-indigo-200 text-xs mt-1">Ask me anything about your interview!</p>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {chatMessages.length === 0 && (
+              <div className="text-center text-dark-400 text-sm py-8">
+                <MessageCircle className="w-12 h-12 mx-auto mb-3 text-dark-500" />
+                <p>Ask me for interview tips, technical help, or clarification!</p>
+              </div>
+            )}
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] rounded-lg p-3 text-sm ${
+                  msg.role === 'user' 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-dark-700 text-slate-200'
+                }`}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+            {chatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-dark-700 rounded-lg p-3 text-sm text-slate-200">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="p-4 border-t border-dark-700">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
+                placeholder="Ask me anything..."
+                className="flex-1 px-3 py-2 bg-dark-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                disabled={chatLoading}
+              />
+              <button
+                onClick={handleChatSubmit}
+                disabled={chatLoading || !chatInput.trim()}
+                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-dark-600 text-white rounded-lg transition-colors"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

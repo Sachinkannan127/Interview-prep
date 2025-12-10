@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-from app.api import interviews, questions
+from app.api import interviews, questions, chat
 
 load_dotenv()
 
@@ -27,6 +27,7 @@ app.add_middleware(
 # Include routers
 app.include_router(interviews.router)
 app.include_router(questions.router)
+app.include_router(chat.router)
 
 @app.get("/")
 async def root():

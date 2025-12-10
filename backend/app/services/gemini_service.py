@@ -549,6 +549,32 @@ Return ONLY the questions, one per line, numbered 1-{count}. No additional text 
             
             questions = questions[:count]  # Trim to exact count
             
+            print(f"=== GEMINI: Generated {len(questions)} questions ===")
+            return questions
+            
+        except Exception as e:
+            print(f"=== GEMINI: API ERROR in question set ===")
+            print(f"Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            # Fallback
+            category = config.get('type', 'technical')
+            difficulty = config.get('difficulty', 'mid')
+            fallback = self._get_fallback_questions(category, difficulty, count)
+            return [q['question'] for q in fallback]
+    
+    def generate_chat_response(self, prompt: str) -> str:
+        """Generate response for AI chat assistant"""
+        if not self.initialized:
+            return "I'm here to help with interview preparation! Ask me about technical concepts, interview strategies, or career advice."
+        
+        try:
+            response = self.flash_model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            print(f"Chat API error: {e}")
+            return "I'm here to help! Could you rephrase your question?"
+            
             print(f"=== GEMINI: Successfully generated {len(questions)} questions ===")
             return questions
             
