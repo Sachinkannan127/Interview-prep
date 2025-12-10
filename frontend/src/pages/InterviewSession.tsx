@@ -46,16 +46,35 @@ export default function InterviewSession() {
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      console.log('Starting camera...');
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }, 
+        audio: false 
+      });
+      console.log('Camera stream obtained:', mediaStream);
       setStream(mediaStream);
       setIsCameraOn(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
+      
+      // Wait for next tick to ensure videoRef is available
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          videoRef.current.play().catch(err => {
+            console.error('Error playing video:', err);
+          });
+          console.log('Video element updated');
+        } else {
+          console.error('Video ref not available');
+        }
+      }, 100);
+      
       toast.success('Camera enabled');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Camera access error:', error);
-      toast.error('Failed to access camera. Please check permissions.');
+      toast.error(`Failed to access camera: ${error.message || 'Please check permissions'}`);
     }
   };
 
@@ -200,24 +219,26 @@ export default function InterviewSession() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
-      {/* Video Camera */}
+      {/* Video Camera - Always show if videoEnabled is true */}
       {interview?.config?.videoEnabled && (
         <div className="fixed top-4 right-4 z-50">
-          <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500">
+          <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500" style={{ width: '192px', height: '144px' }}>
             {isCameraOn && stream ? (
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className="w-48 h-36 object-cover bg-black"
+                className="w-full h-full object-cover bg-black"
                 style={{ transform: 'scaleX(-1)' }}
+                onLoadedMetadata={() => console.log('Video metadata loaded')}
+                onPlay={() => console.log('Video playing')}
               />
             ) : (
-              <div className="w-48 h-36 flex items-center justify-center bg-dark-700">
+              <div className="w-full h-full flex items-center justify-center bg-dark-700">
                 <div className="text-center px-4">
                   <VideoOff className="w-8 h-8 text-dark-400 mx-auto mb-2" />
-                  <p className="text-xs text-dark-500 mb-2">Camera Off</p>
+                  <p className="text-xs text-dark-500 mb-2">Camera {stream ? 'Starting...' : 'Off'}</p>
                   <button 
                     onClick={startCamera}
                     className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-xs rounded transition-colors"
@@ -238,6 +259,10 @@ export default function InterviewSession() {
                 <VideoOff className="w-4 h-4 text-red-400" />
               )}
             </button>
+          </div>
+          {/* Debug info */}
+          <div className="mt-2 text-xs text-white bg-dark-900/80 p-2 rounded">
+            Status: {isCameraOn ? 'ON' : 'OFF'} | Stream: {stream ? 'Yes' : 'No'}
           </div>
         </div>
       )}
