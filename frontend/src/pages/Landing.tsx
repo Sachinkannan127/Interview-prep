@@ -35,6 +35,22 @@ export default function Landing() {
 
       <main className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
         <div className="text-center max-w-5xl mx-auto mb-16 sm:mb-20 fade-in">
+          {/* AI Avatar Animation */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+              {/* Animated AI Avatar */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 animate-spin-slow" style={{ animationDuration: '8s' }} />
+              <div className="absolute inset-2 rounded-full bg-dark-50 flex items-center justify-center">
+                <div className="text-6xl sm:text-7xl animate-bounce" style={{ animationDuration: '2s' }}>
+                  🤖
+                </div>
+              </div>
+              {/* Pulse Rings */}
+              <div className="absolute -inset-4 rounded-full border-2 border-indigo-400/30 animate-ping" style={{ animationDuration: '3s' }} />
+              <div className="absolute -inset-8 rounded-full border-2 border-purple-400/20 animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+            </div>
+          </div>
+          
           <div className="inline-block mb-4 sm:mb-6 px-4 sm:px-6 py-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm">
             <span className="text-indigo-300 text-xs sm:text-sm font-medium">🚀 Powered by Advanced AI Technology</span>
           </div>

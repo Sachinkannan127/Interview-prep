@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
-import { Send, Video, VideoOff } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 export default function InterviewSession() {
   const { id } = useParams();
@@ -13,9 +13,7 @@ export default function InterviewSession() {
   const [answer, setAnswer] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [aiAvatarSpeaking, setAiAvatarSpeaking] = useState(false);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
@@ -28,67 +26,36 @@ export default function InterviewSession() {
     loadInterview();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      stopCamera();
     };
   }, [id]);
 
-  useEffect(() => {
-    if (interview?.config?.videoEnabled && !stream && !isCameraOn) {
-      // Auto-start camera when video is enabled
-      startCamera();
-    }
-  }, [interview, stream, isCameraOn]);
-
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        }, 
-        audio: false 
-      });
-      setStream(mediaStream);
-      setIsCameraOn(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        // Ensure video plays
-        videoRef.current.play().catch(e => console.error('Video play error:', e));
-      }
-      toast.success('✅ Camera started successfully!');
-    } catch (error: any) {
-      console.error('Camera access error:', error);
-      let errorMsg = 'Camera access failed. ';
+  // Text-to-speech for AI interviewer
+  const speakQuestion = (text: string) => {
+    if ('speechSynthesis' in window) {
+      setAiAvatarSpeaking(true);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.lang = 'en-US';
       
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page. If you have previously denied access, go to your browser settings to re-enable permissions.';
-      } else if (error.name === 'NotFoundError') {
-        errorMsg += 'No camera detected. Please connect a camera and ensure it is properly installed.';
-      } else if (error.name === 'NotReadableError') {
-        errorMsg += 'Camera is being used by another application. Close other applications that might be using the camera and try again.';
-      } else {
-        errorMsg += 'Please check your camera permissions and browser settings, then try again.';
-      }
+      utterance.onend = () => {
+        setAiAvatarSpeaking(false);
+      };
       
-      toast.error(errorMsg, { duration: 10000 });
-      setIsCameraOn(false);
+      utterance.onerror = () => {
+        setAiAvatarSpeaking(false);
+      };
+      
+      window.speechSynthesis.cancel(); // Cancel any ongoing speech
+      window.speechSynthesis.speak(utterance);
     }
   };
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-      setIsCameraOn(false);
-    }
-  };
-
-  const toggleCamera = () => {
-    if (isCameraOn) {
-      stopCamera();
-    } else {
-      startCamera();
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setAiAvatarSpeaking(false);
     }
   };
 
@@ -100,7 +67,10 @@ export default function InterviewSession() {
         const lastQA = data.qa[data.qa.length - 1];
         setCurrentQuestion(lastQA.questionText);
       } else {
-        setCurrentQuestion(data.firstQuestion || 'Loading first question...');
+        const question = data.firstQuestion || 'Loading first question...';
+        setCurrentQuestion(question);
+        // Speak the first question
+        setTimeout(() => speakQuestion(question), 500);
       }
     } catch (error: any) {
       console.error('Failed to load interview:', error);
@@ -152,6 +122,8 @@ export default function InterviewSession() {
         setAnswer('');
         setStartTime(null);
         setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
+        // Speak the next question
+        setTimeout(() => speakQuestion(response.nextQuestion), 500);
       } else {
         toast.success('Interview completed!');
         await interviewAPI.finishInterview(id!);
@@ -187,37 +159,30 @@ export default function InterviewSession() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-50 via-dark-100 to-dark-200 py-8 px-6 relative">
-      {/* User Camera in Top Right Corner */}
-      {interview.config?.videoEnabled && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="relative bg-dark-800 rounded-lg shadow-2xl overflow-hidden border-2 border-primary-500">
-            {isCameraOn ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-48 h-36 object-cover"
-              />
-            ) : (
-              <div className="w-48 h-36 flex items-center justify-center bg-dark-700">
-                <VideoOff className="w-8 h-8 text-dark-400" />
-              </div>
-            )}
-            <button
-              onClick={toggleCamera}
-              className="absolute bottom-2 right-2 p-2 bg-dark-900/80 rounded-full hover:bg-dark-900 transition-colors"
-              title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
-            >
-              {isCameraOn ? (
-                <Video className="w-4 h-4 text-green-400" />
-              ) : (
-                <VideoOff className="w-4 h-4 text-red-400" />
-              )}
-            </button>
+      {/* AI Avatar Interviewer */}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="relative bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg shadow-2xl overflow-hidden border-2 border-indigo-400 p-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-3xl ${aiAvatarSpeaking ? 'animate-pulse' : ''}`}>
+              🤖
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-sm">AI Interviewer</h3>
+              <p className="text-indigo-200 text-xs">{aiAvatarSpeaking ? '🎤 Speaking...' : '🎯 Listening...'}</p>
+            </div>
           </div>
+          {aiAvatarSpeaking && (
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 animate-pulse" />
+          )}
+          <button
+            onClick={aiAvatarSpeaking ? stopSpeaking : () => speakQuestion(currentQuestion)}
+            className="absolute bottom-2 right-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+            title={aiAvatarSpeaking ? 'Stop speaking' : 'Repeat question'}
+          >
+            {aiAvatarSpeaking ? '⏸️' : '🔊'}
+          </button>
         </div>
-      )}
+      </div>
 
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-6">

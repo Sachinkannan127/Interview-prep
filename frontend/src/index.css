@@ -67,6 +67,15 @@
   }
 }
 
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @layer components {
   .btn-primary {
     @apply relative px-8 py-3 rounded-xl font-semibold text-white transition-all duration-300;

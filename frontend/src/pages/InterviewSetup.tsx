@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function InterviewSetup() {
   const navigate = useNavigate();
@@ -17,37 +17,8 @@ export default function InterviewSetup() {
     videoEnabled: false,
   });
   const [loading, setLoading] = useState(false);
-  const [cameraPermission, setCameraPermission] = useState(false);
-
-  const testCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      stream.getTracks().forEach(track => track.stop());
-      setCameraPermission(true);
-      toast.success('✅ Camera access granted! You can now start the interview.');
-    } catch (error: any) {
-      console.error('Camera test failed:', error);
-      let errorMsg = 'Camera access failed. ';
-
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMsg += 'Please click the 🔒 icon in your address bar, allow camera access, and refresh the page.';
-      } else if (error.name === 'NotFoundError') {
-        errorMsg += 'No camera detected. Please connect a camera.';
-      } else if (error.name === 'NotReadableError') {
-        errorMsg += 'Camera is being used by another application.';
-      } else {
-        errorMsg += 'Please check your camera permissions and try again.';
-      }
-
-      toast.error(errorMsg, { duration: 10000 });
-    }
-  };
 
   const handleStart = async () => {
-    if (config.videoEnabled && !cameraPermission) {
-      toast.error('Please test your camera first by clicking the "Test Camera" button.');
-      return;
-    }
 
     setLoading(true);
     try {
@@ -63,10 +34,6 @@ export default function InterviewSetup() {
   };
 
   const handlePreviewQuestions = () => {
-    if (config.videoEnabled && !cameraPermission) {
-      toast.error('Please test your camera first by clicking the "Test Camera" button.');
-      return;
-    }
     navigate('/interview/preview', { state: { config } });
   };
 
@@ -187,42 +154,11 @@ export default function InterviewSetup() {
                 checked={config.videoEnabled} 
                 onChange={(e) => {
                   setConfig({ ...config, videoEnabled: e.target.checked });
-                  if (!e.target.checked) {
-                    setCameraPermission(false);
-                  }
                 }} 
                 className="w-5 h-5" 
               />
               <label htmlFor="video" className="text-sm font-semibold text-white cursor-pointer">📹 Enable Video Response (Record Your Answers)</label>
             </div>
-
-            {config.videoEnabled && (
-              <div className="rounded-xl p-5" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid rgba(59, 130, 246, 0.3)' }}>
-                <p className="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                  📹 Camera Setup Required
-                </p>
-                <button
-                  onClick={testCamera}
-                  disabled={cameraPermission}
-                  className={`w-full flex items-center justify-center gap-2 mb-4 px-6 py-3 rounded-xl font-semibold transition-all ${
-                    cameraPermission 
-                      ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white' 
-                      : 'btn-secondary'
-                  }`}
-                >
-                  {cameraPermission ? <Check className="w-5 h-5" /> : '📹'}
-                  {cameraPermission ? 'Camera Ready ✓' : 'Test Camera'}
-                </button>
-                <div className="text-xs text-blue-200 bg-blue-950/30 p-3 rounded-lg">
-                  <p className="font-semibold mb-2">If permission denied:</p>
-                  <ol className="list-decimal ml-4 space-y-1">
-                    <li>Click the 🔒 or 📹 icon at the LEFT of your address bar</li>
-                    <li>Find "Camera" and change to "Allow"</li>
-                    <li>Click "Test Camera" again</li>
-                  </ol>
-                </div>
-              </div>
-            )}
 
             <button onClick={handleStart} disabled={loading} className="btn-primary w-full text-lg py-4">
               {loading ? (
