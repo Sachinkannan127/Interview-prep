@@ -1,42 +1,90 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { auth } from './firebase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+// Determine API URL based on environment
+const getApiBaseUrl = (): string => {
+  // Check if we're in production (Vercel)
+  const prodApiUrl = import.meta.env.VITE_API_BASE_URL;
+  
+  if (prodApiUrl) {
+    return prodApiUrl;
+  }
+  
+  // Default to localhost for development
+  return 'http://localhost:8001';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('API Base URL:', API_BASE_URL);
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30 second timeout
+  withCredentials: false, // Set to true if using cookies
 });
 
-apiClient.interceptors.request.use(async (config) => {
-  try {
-    const user = auth.currentUser;
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor for adding auth token
+apiClient.interceptors.request.use(
+  async (config) => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const token = await user.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.warn('Auth token not available:', error);
+      // Continue without auth token for public endpoints
     }
-  } catch (error) {
-    // For development, continue without auth token
-    console.log('Auth token not available, continuing without authentication');
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
-// Add response interceptor for better error handling
+// Response interceptor for error handling and retry logic
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    // Handle specific error cases
     if (error.response) {
-      // Server responded with error
-      const message = error.response.data?.detail || error.response.data?.message || error.message;
-      console.error('API Error:', message);
+      const status = error.response.status;
+      const data = error.response.data as any;
+      const message = data?.detail || data?.message || error.message;
+
+      // Don't retry on client errors (4xx)
+      if (status >= 400 && status < 500) {
+        console.error(`Client Error (${status}):`, message);
+        return Promise.reject(new Error(message));
+      }
+
+      // Retry on server errors (5xx) - max 3 attempts
+      if (status >= 500 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+
+        if (originalRequest._retryCount <= 2) {
+          console.warn(`Retrying request (attempt ${originalRequest._retryCount + 1})...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * originalRequest._retryCount));
+          return apiClient(originalRequest);
+        }
+      }
+
+      console.error(`Server Error (${status}):`, message);
       return Promise.reject(new Error(message));
     } else if (error.request) {
-      // Request made but no response
+      // Network error - no response received
       console.error('Network Error:', error.message);
-      return Promise.reject(new Error('Network error. Please check your connection and try again.'));
+      return Promise.reject(
+        new Error('Unable to connect to server. Please check your internet connection and try again.')
+      );
     } else {
       console.error('Request Error:', error.message);
       return Promise.reject(error);
