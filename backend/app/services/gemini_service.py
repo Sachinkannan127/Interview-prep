@@ -469,39 +469,173 @@ Return as JSON:
         }
     
     def _get_fallback_questions(self, category: str, difficulty: str, count: int) -> list:
-        """Fallback questions when AI is not available"""
+        """Comprehensive fallback questions when AI is not available"""
         import random
         
         fallback_questions = {
             "technical": [
-                {"question": "Explain the difference between == and === in JavaScript", "category": "technical", "difficulty": "entry", "hints": ["Type coercion", "Strict equality"], "topics": ["javascript", "operators"]},
-                {"question": "What is the time complexity of binary search?", "category": "technical", "difficulty": "entry", "hints": ["Divide and conquer", "Logarithmic"], "topics": ["algorithms", "complexity"]},
-                {"question": "Explain how closures work in JavaScript", "category": "technical", "difficulty": "mid", "hints": ["Scope", "Function memory"], "topics": ["javascript", "closures"]},
-                {"question": "What is the difference between SQL and NoSQL databases?", "category": "technical", "difficulty": "mid", "hints": ["Structure", "Scalability"], "topics": ["databases", "architecture"]},
-                {"question": "Explain the concept of Big O notation", "category": "technical", "difficulty": "entry", "hints": ["Algorithm efficiency", "Time complexity"], "topics": ["algorithms", "performance"]},
-                {"question": "Design a URL shortening service like bit.ly", "category": "technical", "difficulty": "senior", "hints": ["Database design", "Hashing", "Distributed systems"], "topics": ["system-design", "scalability"]},
-                {"question": "How would you implement a rate limiter?", "category": "technical", "difficulty": "senior", "hints": ["Token bucket", "Sliding window"], "topics": ["system-design", "algorithms"]},
-                {"question": "What are the differences between REST and GraphQL?", "category": "technical", "difficulty": "mid", "hints": ["Query flexibility", "API design"], "topics": ["api", "architecture"]},
+                # DSA - Entry Level
+                {"question": "What is the time complexity of binary search?", "category": "technical", "difficulty": "entry", "hints": ["Divide and conquer", "O(log n)"], "topics": ["dsa", "algorithms"]},
+                {"question": "Explain the difference between an array and a linked list", "category": "technical", "difficulty": "entry", "hints": ["Memory layout", "Access time"], "topics": ["dsa", "data-structures"]},
+                {"question": "What is a stack and where is it used?", "category": "technical", "difficulty": "entry", "hints": ["LIFO", "Function calls"], "topics": ["dsa", "data-structures"]},
+                {"question": "Explain Big O notation with examples", "category": "technical", "difficulty": "entry", "hints": ["Time complexity", "Growth rate"], "topics": ["dsa", "complexity"]},
+                
+                # DSA - Mid Level
+                {"question": "How do you detect a cycle in a linked list?", "category": "technical", "difficulty": "mid", "hints": ["Floyd's algorithm", "Two pointers"], "topics": ["dsa", "algorithms"]},
+                {"question": "Implement a LRU cache with O(1) operations", "category": "technical", "difficulty": "mid", "hints": ["HashMap + DoublyLinkedList", "eviction policy"], "topics": ["dsa", "design"]},
+                {"question": "Explain different tree traversal algorithms", "category": "technical", "difficulty": "mid", "hints": ["Inorder, Preorder, Postorder", "BFS vs DFS"], "topics": ["dsa", "trees"]},
+                
+                # DSA - Senior Level
+                {"question": "Design and implement a consistent hashing algorithm", "category": "technical", "difficulty": "senior", "hints": ["Hash ring", "Load balancing"], "topics": ["dsa", "distributed-systems"]},
+                {"question": "Explain dynamic programming with a complex example", "category": "technical", "difficulty": "senior", "hints": ["Memoization", "Optimal substructure"], "topics": ["dsa", "algorithms"]},
+                
+                # System Design - Entry Level
+                {"question": "What is horizontal vs vertical scaling?", "category": "technical", "difficulty": "entry", "hints": ["Scale out vs scale up", "Load distribution"], "topics": ["system-design", "scalability"]},
+                {"question": "Explain what a load balancer does", "category": "technical", "difficulty": "entry", "hints": ["Traffic distribution", "High availability"], "topics": ["system-design", "infrastructure"]},
+                
+                # System Design - Mid Level
+                {"question": "Design a URL shortening service like bit.ly", "category": "technical", "difficulty": "mid", "hints": ["Base62 encoding", "Database design"], "topics": ["system-design", "scalability"]},
+                {"question": "How would you design a distributed cache?", "category": "technical", "difficulty": "mid", "hints": ["Cache eviction", "Consistency"], "topics": ["system-design", "caching"]},
+                {"question": "Explain the CAP theorem with real examples", "category": "technical", "difficulty": "mid", "hints": ["Consistency, Availability, Partition tolerance"], "topics": ["system-design", "distributed-systems"]},
+                
+                # System Design - Senior Level
+                {"question": "Design a globally distributed social media feed like Twitter", "category": "technical", "difficulty": "senior", "hints": ["Fan-out on write vs read", "Eventual consistency"], "topics": ["system-design", "scalability"]},
+                {"question": "Design a rate limiting system for an API gateway", "category": "technical", "difficulty": "senior", "hints": ["Token bucket", "Sliding window"], "topics": ["system-design", "security"]},
+                
+                # Java - Entry Level
+                {"question": "What is the difference between == and equals() in Java?", "category": "technical", "difficulty": "entry", "hints": ["Reference vs value", "Object comparison"], "topics": ["java", "fundamentals"]},
+                {"question": "Explain Java access modifiers", "category": "technical", "difficulty": "entry", "hints": ["public, private, protected", "Encapsulation"], "topics": ["java", "oop"]},
+                
+                # Java - Mid Level
+                {"question": "How does HashMap work internally in Java?", "category": "technical", "difficulty": "mid", "hints": ["Hashing, buckets", "Collision handling"], "topics": ["java", "collections"]},
+                {"question": "Explain Java Stream API and its benefits", "category": "technical", "difficulty": "mid", "hints": ["Functional programming", "Lazy evaluation"], "topics": ["java", "streams"]},
+                {"question": "What are Java memory leaks and how do you prevent them?", "category": "technical", "difficulty": "mid", "hints": ["GC roots", "Strong references"], "topics": ["java", "memory-management"]},
+                
+                # Java - Senior Level
+                {"question": "Explain Java concurrency utilities and best practices", "category": "technical", "difficulty": "senior", "hints": ["Executors, CompletableFuture", "Thread safety"], "topics": ["java", "concurrency"]},
+                
+                # React - Entry Level
+                {"question": "What is the difference between state and props in React?", "category": "technical", "difficulty": "entry", "hints": ["Mutable vs immutable", "Data flow"], "topics": ["react", "fundamentals"]},
+                {"question": "Explain the Virtual DOM in React", "category": "technical", "difficulty": "entry", "hints": ["Reconciliation", "Performance"], "topics": ["react", "internals"]},
+                
+                # React - Mid Level
+                {"question": "How does useEffect hook work?", "category": "technical", "difficulty": "mid", "hints": ["Dependencies array", "Cleanup function"], "topics": ["react", "hooks"]},
+                {"question": "Explain React Context API and when to use it", "category": "technical", "difficulty": "mid", "hints": ["Props drilling", "Global state"], "topics": ["react", "state-management"]},
+                {"question": "What are React optimization techniques?", "category": "technical", "difficulty": "mid", "hints": ["useMemo, useCallback", "React.memo"], "topics": ["react", "performance"]},
+                
+                # React - Senior Level
+                {"question": "Design a scalable React application architecture", "category": "technical", "difficulty": "senior", "hints": ["Component patterns", "State management"], "topics": ["react", "architecture"]},
+                
+                # Python - Entry Level
+                {"question": "What are list comprehensions in Python?", "category": "technical", "difficulty": "entry", "hints": ["Concise syntax", "Filtering"], "topics": ["python", "fundamentals"]},
+                {"question": "Explain the difference between list and tuple", "category": "technical", "difficulty": "entry", "hints": ["Mutable vs immutable", "Performance"], "topics": ["python", "data-structures"]},
+                
+                # Python - Mid Level
+                {"question": "How do decorators work in Python?", "category": "technical", "difficulty": "mid", "hints": ["Function wrappers", "@ syntax"], "topics": ["python", "advanced"]},
+                {"question": "Explain Python generators and yield", "category": "technical", "difficulty": "mid", "hints": ["Lazy evaluation", "Memory efficiency"], "topics": ["python", "generators"]},
+                {"question": "What is the GIL in Python?", "category": "technical", "difficulty": "mid", "hints": ["Global Interpreter Lock", "Threading limitations"], "topics": ["python", "concurrency"]},
+                
+                # Python - Senior Level
+                {"question": "Explain Python metaclasses and their use cases", "category": "technical", "difficulty": "senior", "hints": ["Class creation", "ORM implementations"], "topics": ["python", "advanced"]},
+                
+                # Node.js - Entry Level
+                {"question": "What is the Node.js event loop?", "category": "technical", "difficulty": "entry", "hints": ["Non-blocking I/O", "Callback queue"], "topics": ["nodejs", "fundamentals"]},
+                {"question": "Explain callback functions in Node.js", "category": "technical", "difficulty": "entry", "hints": ["Asynchronous operations", "Error-first callbacks"], "topics": ["nodejs", "async"]},
+                
+                # Node.js - Mid Level
+                {"question": "How do you handle errors in Express.js middleware?", "category": "technical", "difficulty": "mid", "hints": ["Error handling middleware", "next(err)"], "topics": ["nodejs", "express"]},
+                {"question": "Explain streams in Node.js", "category": "technical", "difficulty": "mid", "hints": ["Readable, Writable", "Pipe"], "topics": ["nodejs", "streams"]},
+                
+                # Node.js - Senior Level
+                {"question": "Design a scalable Node.js microservices architecture", "category": "technical", "difficulty": "senior", "hints": ["Service communication", "Load balancing"], "topics": ["nodejs", "architecture"]},
+                
+                # Database - Entry Level
+                {"question": "What is the difference between SQL and NoSQL?", "category": "technical", "difficulty": "entry", "hints": ["Schema", "Scalability"], "topics": ["database", "fundamentals"]},
+                {"question": "Explain database normalization", "category": "technical", "difficulty": "entry", "hints": ["1NF, 2NF, 3NF", "Redundancy"], "topics": ["database", "design"]},
+                
+                # Database - Mid Level
+                {"question": "What are database indexes and how do they work?", "category": "technical", "difficulty": "mid", "hints": ["B-tree", "Query performance"], "topics": ["database", "optimization"]},
+                {"question": "Explain ACID properties in databases", "category": "technical", "difficulty": "mid", "hints": ["Atomicity, Consistency", "Transactions"], "topics": ["database", "transactions"]},
+                
+                # Database - Senior Level
+                {"question": "Design a database sharding strategy", "category": "technical", "difficulty": "senior", "hints": ["Partition key", "Rebalancing"], "topics": ["database", "scalability"]},
+                
+                # Cloud - Mid Level
+                {"question": "What are the benefits of serverless architecture?", "category": "technical", "difficulty": "mid", "hints": ["Auto-scaling", "Pay-per-use"], "topics": ["cloud", "serverless"]},
+                {"question": "Explain container orchestration with Kubernetes", "category": "technical", "difficulty": "mid", "hints": ["Pods, Services", "Auto-scaling"], "topics": ["cloud", "kubernetes"]},
+                
+                # DevOps - Mid Level
+                {"question": "Explain CI/CD pipeline best practices", "category": "technical", "difficulty": "mid", "hints": ["Automated testing", "Deployment stages"], "topics": ["devops", "ci-cd"]},
+                {"question": "What is Infrastructure as Code?", "category": "technical", "difficulty": "mid", "hints": ["Terraform, CloudFormation", "Version control"], "topics": ["devops", "iac"]},
+                
+                # Microservices - Mid Level
+                {"question": "What are the challenges of microservices?", "category": "technical", "difficulty": "mid", "hints": ["Distributed systems", "Network latency"], "topics": ["microservices", "challenges"]},
+                {"question": "Explain service discovery in microservices", "category": "technical", "difficulty": "mid", "hints": ["Service registry", "Health checks"], "topics": ["microservices", "architecture"]},
+                
+                # General - All Levels
+                {"question": "What are RESTful API design principles?", "category": "technical", "difficulty": "mid", "hints": ["HTTP methods", "Stateless"], "topics": ["api", "design"]},
+                {"question": "Explain OAuth 2.0 authentication flow", "category": "technical", "difficulty": "mid", "hints": ["Authorization code", "Access tokens"], "topics": ["security", "auth"]},
             ],
             "behavioral": [
-                {"question": "Tell me about a time you faced a difficult challenge at work", "category": "behavioral", "difficulty": "mid", "hints": ["STAR method", "Specific example"], "topics": ["problem-solving", "resilience"]},
-                {"question": "Describe a situation where you had to work with a difficult team member", "category": "behavioral", "difficulty": "mid", "hints": ["Conflict resolution", "Communication"], "topics": ["teamwork", "communication"]},
-                {"question": "Tell me about a time you failed and what you learned from it", "category": "behavioral", "difficulty": "mid", "hints": ["Self-awareness", "Growth mindset"], "topics": ["learning", "resilience"]},
-                {"question": "Describe a situation where you had to meet a tight deadline", "category": "behavioral", "difficulty": "mid", "hints": ["Time management", "Prioritization"], "topics": ["productivity", "pressure"]},
+                # Entry Level
                 {"question": "Tell me about a time you had to learn something new quickly", "category": "behavioral", "difficulty": "entry", "hints": ["Learning approach", "Adaptability"], "topics": ["learning", "growth"]},
-                {"question": "Describe a situation where you showed leadership", "category": "behavioral", "difficulty": "senior", "hints": ["Initiative", "Team influence"], "topics": ["leadership", "influence"]},
+                {"question": "Describe a challenging bug you fixed", "category": "behavioral", "difficulty": "entry", "hints": ["Problem-solving", "Technical approach"], "topics": ["debugging", "problem-solving"]},
+                {"question": "How do you handle feedback on your work?", "category": "behavioral", "difficulty": "entry", "hints": ["Growth mindset", "Constructive response"], "topics": ["feedback", "improvement"]},
+                {"question": "Tell me about a successful project you completed", "category": "behavioral", "difficulty": "entry", "hints": ["Impact", "Your contribution"], "topics": ["achievement", "delivery"]},
+                
+                # Mid Level
+                {"question": "Tell me about a time you faced a difficult challenge at work", "category": "behavioral", "difficulty": "mid", "hints": ["STAR method", "Problem-solving"], "topics": ["problem-solving", "resilience"]},
+                {"question": "Describe a situation where you had to work with a difficult team member", "category": "behavioral", "difficulty": "mid", "hints": ["Conflict resolution", "Communication"], "topics": ["teamwork", "communication"]},
+                {"question": "Tell me about a time you failed and what you learned", "category": "behavioral", "difficulty": "mid", "hints": ["Self-awareness", "Growth mindset"], "topics": ["learning", "resilience"]},
+                {"question": "Describe a situation where you had to meet a tight deadline", "category": "behavioral", "difficulty": "mid", "hints": ["Time management", "Prioritization"], "topics": ["productivity", "pressure"]},
+                {"question": "Tell me about a time you disagreed with a technical decision", "category": "behavioral", "difficulty": "mid", "hints": ["Technical reasoning", "Collaboration"], "topics": ["decision-making", "teamwork"]},
+                {"question": "Describe a project where you had to balance competing priorities", "category": "behavioral", "difficulty": "mid", "hints": ["Trade-offs", "Stakeholder management"], "topics": ["prioritization", "decision-making"]},
+                
+                # Senior Level
+                {"question": "Describe your experience leading a technical team", "category": "behavioral", "difficulty": "senior", "hints": ["Leadership style", "Team development"], "topics": ["leadership", "management"]},
+                {"question": "Tell me about a time you made an architectural decision", "category": "behavioral", "difficulty": "senior", "hints": ["Technical trade-offs", "Long-term impact"], "topics": ["architecture", "decision-making"]},
+                {"question": "How do you mentor junior developers?", "category": "behavioral", "difficulty": "senior", "hints": ["Coaching approach", "Knowledge transfer"], "topics": ["mentorship", "leadership"]},
+                {"question": "Describe a time you drove a major technical initiative", "category": "behavioral", "difficulty": "senior", "hints": ["Vision", "Execution"], "topics": ["leadership", "initiative"]},
+                {"question": "How do you handle disagreements about technical direction?", "category": "behavioral", "difficulty": "senior", "hints": ["Influence", "Consensus building"], "topics": ["leadership", "collaboration"]},
             ],
             "hr": [
+                # Entry Level
                 {"question": "Why do you want to work for our company?", "category": "hr", "difficulty": "entry", "hints": ["Research company", "Align with values"], "topics": ["motivation", "culture-fit"]},
                 {"question": "Where do you see yourself in 5 years?", "category": "hr", "difficulty": "entry", "hints": ["Career goals", "Growth"], "topics": ["career-planning", "ambition"]},
+                {"question": "What is your greatest strength?", "category": "hr", "difficulty": "entry", "hints": ["Job relevant", "Specific examples"], "topics": ["self-awareness", "skills"]},
+                {"question": "What is your greatest weakness?", "category": "hr", "difficulty": "entry", "hints": ["Self-awareness", "Improvement steps"], "topics": ["self-awareness", "growth"]},
+                {"question": "Why did you choose this career path?", "category": "hr", "difficulty": "entry", "hints": ["Passion", "Journey"], "topics": ["career", "motivation"]},
+                {"question": "What motivates you at work?", "category": "hr", "difficulty": "entry", "hints": ["Intrinsic motivation", "Work preferences"], "topics": ["motivation", "values"]},
+                
+                # Mid Level
                 {"question": "What are your salary expectations?", "category": "hr", "difficulty": "mid", "hints": ["Market research", "Value proposition"], "topics": ["negotiation", "compensation"]},
                 {"question": "Why are you leaving your current job?", "category": "hr", "difficulty": "mid", "hints": ["Stay positive", "Growth focused"], "topics": ["career-transition", "motivation"]},
-                {"question": "What is your greatest strength?", "category": "hr", "difficulty": "entry", "hints": ["Job relevant", "Specific examples"], "topics": ["self-awareness", "skills"]},
-                {"question": "What is your greatest weakness?", "category": "hr", "difficulty": "entry", "hints": ["Show self-awareness", "Improvement steps"], "topics": ["self-awareness", "growth"]},
+                {"question": "How do you handle work-life balance?", "category": "hr", "difficulty": "mid", "hints": ["Boundaries", "Productivity"], "topics": ["wellness", "balance"]},
+                {"question": "Describe your ideal work environment", "category": "hr", "difficulty": "mid", "hints": ["Team dynamics", "Culture preferences"], "topics": ["culture-fit", "preferences"]},
+                {"question": "How do you stay updated with technology trends?", "category": "hr", "difficulty": "mid", "hints": ["Learning resources", "Continuous learning"], "topics": ["learning", "growth"]},
+                {"question": "What do you know about our company and products?", "category": "hr", "difficulty": "mid", "hints": ["Research", "Interest"], "topics": ["preparation", "interest"]},
+                
+                # Senior Level
+                {"question": "What is your leadership philosophy?", "category": "hr", "difficulty": "senior", "hints": ["Leadership style", "Team development"], "topics": ["leadership", "management"]},
+                {"question": "How do you build high-performing teams?", "category": "hr", "difficulty": "senior", "hints": ["Hiring", "Team culture"], "topics": ["leadership", "team-building"]},
+                {"question": "Describe your approach to technical decision-making", "category": "hr", "difficulty": "senior", "hints": ["Trade-offs", "Stakeholders"], "topics": ["decision-making", "leadership"]},
+                {"question": "How do you handle underperforming team members?", "category": "hr", "difficulty": "senior", "hints": ["Coaching", "Performance management"], "topics": ["management", "leadership"]},
+                {"question": "What's your vision for the next 3-5 years in your career?", "category": "hr", "difficulty": "senior", "hints": ["Strategic thinking", "Impact"], "topics": ["career-planning", "vision"]},
+            ],
+            "case-study": [
+                {"question": "A major client is experiencing downtime. Walk me through your incident response", "category": "case-study", "difficulty": "mid", "hints": ["Communication", "Root cause analysis"], "topics": ["incident-management", "problem-solving"]},
+                {"question": "Our API response time has doubled in the last week. How would you investigate?", "category": "case-study", "difficulty": "mid", "hints": ["Monitoring", "Profiling"], "topics": ["performance", "debugging"]},
+                {"question": "Design a strategy to migrate a monolithic application to microservices", "category": "case-study", "difficulty": "senior", "hints": ["Incremental migration", "Risk mitigation"], "topics": ["architecture", "migration"]},
+                {"question": "How would you improve the deployment process for a team releasing multiple times a day?", "category": "case-study", "difficulty": "mid", "hints": ["CI/CD", "Automation"], "topics": ["devops", "process"]},
             ]
         }
         
         questions = fallback_questions.get(category, fallback_questions["technical"])
+        # Filter by difficulty if specified
+        if difficulty:
+            filtered = [q for q in questions if q["difficulty"] == difficulty]
+            if filtered:
+                questions = filtered
         # Shuffle and return requested count
         random.shuffle(questions)
         return questions[:count]
