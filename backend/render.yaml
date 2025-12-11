@@ -10,9 +10,9 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: GEMINI_API_KEY
-        sync: false
+        sync: true
       - key: FIREBASE_PROJECT_ID
-        sync: false
+        sync: true
       - key: FIREBASE_CREDENTIALS_PATH
         value: ./firebase-credentials.json
       - key: CORS_ORIGINS

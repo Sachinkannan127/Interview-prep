@@ -10,9 +10,9 @@ load_dotenv()
 api_key = os.getenv('GEMINI_API_KEY')
 genai.configure(api_key=api_key)
 
-print("\n" + "="*70)
+print("\n" + "="*75)
 print("AVAILABLE GEMINI MODELS")
-print("="*70 + "\n")
+print("="*75 + "\n")
 
 for model in genai.list_models():
     if 'generateContent' in model.supported_generation_methods:
@@ -22,4 +22,4 @@ for model in genai.list_models():
         print(f"  Methods: {', '.join(model.supported_generation_methods)}")
         print()
 
-print("="*70 + "\n")
+print("="*75 + "\n")
