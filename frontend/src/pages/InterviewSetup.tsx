@@ -14,7 +14,7 @@ export default function InterviewSetup() {
     company: '',
     difficulty: 'mid',
     durationMinutes: 30,
-    videoEnabled: false,
+    videoEnabled: true,
   });
   const [loading, setLoading] = useState(false);
 

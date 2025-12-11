@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { ArrowLeft, BookOpen, Sparkles, Target, CheckCircle, History } from 'lucide-react';
+import { ArrowLeft, BookOpen, Sparkles, Target, CheckCircle, History, Video, VideoOff } from 'lucide-react';
 import { questionsAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -33,6 +33,69 @@ export default function Practice() {
   const [started, setStarted] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
+  useEffect(() => {
+    if (started && !stream && !isCameraOn) {
+      // Auto-start camera when practice starts
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [started, stream, isCameraOn]);
+
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }, 
+        audio: false 
+      });
+      setStream(mediaStream);
+      setIsCameraOn(true);
+      
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          videoRef.current.play().catch(err => {
+            console.error('Error playing video:', err);
+          });
+        }
+      }, 100);
+      
+      toast.success('Camera enabled');
+    } catch (error: any) {
+      console.error('Camera access error:', error);
+      toast.error(`Failed to access camera: ${error.message || 'Please check permissions'}`);
+    }
+  };
+
+  const toggleCamera = () => {
+    if (isCameraOn && stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsCameraOn(false);
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      toast('Camera turned off');
+    } else {
+      startCamera();
+    }
+  };
 
   const generateQuestions = async () => {
     setLoading(true);
@@ -88,6 +151,16 @@ export default function Practice() {
 
   const handleFinish = async () => {
     const avgScore = score.reduce((a, b) => a + b, 0) / score.length;
+    
+    // Stop camera when finishing
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsCameraOn(false);
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    }
     
     // Mark session as complete
     if (sessionId) {
@@ -233,6 +306,47 @@ export default function Practice() {
               style={{ width: `${progress}%` }}
             />
           </div>
+        </div>
+
+        {/* Webcam */}
+        <div className="card mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-dark-800">Video Preview</h3>
+            <button 
+              onClick={toggleCamera} 
+              className={`btn ${isCameraOn ? 'btn-secondary' : 'btn-primary'}`}
+            >
+              {isCameraOn ? (
+                <>
+                  <VideoOff className="w-4 h-4 mr-2" />
+                  Turn Off Camera
+                </>
+              ) : (
+                <>
+                  <Video className="w-4 h-4 mr-2" />
+                  Turn On Camera
+                </>
+              )}
+            </button>
+          </div>
+          {isCameraOn && stream ? (
+            <div className="relative bg-dark-900 rounded-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center bg-dark-100 rounded-lg" style={{ paddingBottom: '56.25%', position: 'relative' }}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <VideoOff className="w-12 h-12 text-dark-400 mb-2" />
+                <p className="text-dark-600">Camera is off</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Question Card */}

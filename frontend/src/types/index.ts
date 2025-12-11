@@ -18,7 +18,7 @@ export interface InterviewConfig {
   company?: string;
   difficulty: 'entry' | 'mid' | 'senior';
   durationMinutes: 15 | 30 | 45 | 60;
-  voiceEnabled: boolean;
+  videoEnabled: boolean;
 }
 
 export interface QuestionAnswer {

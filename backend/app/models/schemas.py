@@ -10,7 +10,7 @@ class InterviewConfig(BaseModel):
     company: Optional[str] = None
     difficulty: Literal['entry', 'mid', 'senior']
     durationMinutes: Literal[15, 30, 45, 60]
-    voiceEnabled: bool = False
+    videoEnabled: bool = True
 
 class StartInterviewRequest(BaseModel):
     config: InterviewConfig
