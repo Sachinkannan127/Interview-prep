@@ -21,14 +21,14 @@ class GeminiService:
                 print("Configuring Gemini API...")
                 genai.configure(api_key=api_key)
                 print("Creating model instances...")
-                # Use gemini-2.5-flash for both (Pro has 0 quota on free tier)
-                self.flash_model = genai.GenerativeModel('gemini-2.5-flash')
-                self.pro_model = genai.GenerativeModel('gemini-2.5-flash')  # Use Flash for evaluation too
+                # Use gemini-2.5-flash-native-audio-dialog for question generation
+                self.flash_model = genai.GenerativeModel('gemini-2.5-flash-native-audio-dialog')
+                self.pro_model = genai.GenerativeModel('gemini-2.5-flash-native-audio-dialog')
                 self.initialized = True
                 print("✅ SUCCESS: Gemini AI initialized successfully")
                 print(f"Flash Model: {self.flash_model._model_name}")
-                print(f"Pro Model (using Flash): {self.pro_model._model_name}")
-                print("⚠️  Note: Using gemini-2.5-flash for both generation and evaluation (free tier)")
+                print(f"Pro Model: {self.pro_model._model_name}")
+                print("⚠️  Note: Using gemini-2.5-flash-native-audio-dialog for question generation")
                 print("⚠️  Rate limit: 5 requests per minute per model")
             except Exception as e:
                 print(f"❌ ERROR: Failed to initialize Gemini AI")
@@ -60,103 +60,8 @@ class GeminiService:
         print(f"User profile: {user_profile is not None}")
         
         if not self.initialized:
-            print("\n❌ WARNING: Gemini not initialized, using fallback questions")
-            print(f"Flash model state: {self.flash_model}")
-            print(f"Pro model state: {self.pro_model}")
-            # Fallback questions when AI is not available
-            sub_type = config.get('subType', 'dsa')
-            fallback_questions = {
-                'technical': {
-                    'dsa': {
-                        'entry': "Write a function to reverse a string in your preferred language.",
-                        'mid': "Implement a function to find the longest substring without repeating characters.",
-                        'senior': "Design an algorithm to find the median of two sorted arrays with O(log(m+n)) complexity."
-                    },
-                    'java': {
-                        'entry': "Explain the difference between == and .equals() in Java.",
-                        'mid': "How does garbage collection work in Java? Explain the different types of GC.",
-                        'senior': "Design a thread-safe singleton class in Java with lazy initialization."
-                    },
-                    'react': {
-                        'entry': "What is the difference between state and props in React?",
-                        'mid': "Explain React hooks and how useEffect works. Give practical examples.",
-                        'senior': "How would you optimize a React application with large lists? Discuss virtualization and memoization."
-                    },
-                    'dotnet': {
-                        'entry': "What is the difference between value types and reference types in C#?",
-                        'mid': "Explain async/await in C# and when you would use it.",
-                        'senior': "Design a microservices architecture using .NET Core with proper error handling and resilience."
-                    },
-                    'python': {
-                        'entry': "What is the difference between lists and tuples in Python?",
-                        'mid': "Explain decorators in Python and give a practical example.",
-                        'senior': "How would you design a scalable web scraping system using Python?"
-                    },
-                    'nodejs': {
-                        'entry': "What is the event loop in Node.js and how does it work?",
-                        'mid': "Explain the difference between callbacks, promises, and async/await in Node.js.",
-                        'senior': "Design a scalable REST API with Node.js that handles 10,000 concurrent requests."
-                    },
-                    'angular': {
-                        'entry': "What is dependency injection in Angular?",
-                        'mid': "Explain the difference between ngOnInit and constructor in Angular components.",
-                        'senior': "How would you implement lazy loading and route guards in a large Angular application?"
-                    },
-                    'spring-boot': {
-                        'entry': "What is Spring Boot and how is it different from Spring Framework?",
-                        'mid': "Explain dependency injection in Spring Boot and the different types of autowiring.",
-                        'senior': "Design a microservices architecture using Spring Boot with service discovery and API Gateway."
-                    },
-                    'microservices': {
-                        'entry': "What are microservices and how are they different from monolithic architecture?",
-                        'mid': "Explain service discovery and API Gateway patterns in microservices.",
-                        'senior': "Design a distributed transaction management system for microservices with saga pattern."
-                    },
-                    'cloud': {
-                        'entry': "What is the difference between IaaS, PaaS, and SaaS?",
-                        'mid': "Explain AWS Lambda and when you would use serverless architecture.",
-                        'senior': "Design a multi-region, highly available cloud architecture with auto-scaling and disaster recovery."
-                    },
-                    'devops': {
-                        'entry': "What is CI/CD and why is it important?",
-                        'mid': "Explain Docker containers and how they differ from virtual machines.",
-                        'senior': "Design a complete CI/CD pipeline with automated testing, security scanning, and blue-green deployment."
-                    },
-                    'database': {
-                        'entry': "What is the difference between SQL and NoSQL databases?",
-                        'mid': "Explain database normalization and give examples up to 3NF.",
-                        'senior': "Design a database schema for a social media platform handling millions of users with optimal query performance."
-                    },
-                    'fresher': {
-                        'entry': "What are the four pillars of Object-Oriented Programming?",
-                        'mid': "Explain the difference between abstract classes and interfaces.",
-                        'senior': "How would you approach learning a new programming language or framework?"
-                    },
-                    'system-design': {
-                        'entry': "What factors do you consider when designing a scalable system?",
-                        'mid': "Design a URL shortener service like bit.ly.",
-                        'senior': "Design a distributed caching system like Redis with high availability and consistency."
-                    }
-                },
-                'behavioral': {
-                    'entry': "Tell me about a time when you had to learn something new quickly.",
-                    'mid': "Describe a situation where you had to work with a difficult team member.",
-                    'senior': "How have you handled a major project failure in the past?"
-                },
-                'hr': {
-                    'entry': "Why do you want to work for our company?",
-                    'mid': "Where do you see yourself in 3-5 years?",
-                    'senior': "How would you describe your leadership style?"
-                }
-            }
-            
-            interview_type = config.get('type', 'technical')
-            difficulty = config.get('difficulty', 'mid')
-            
-            if interview_type == 'technical' and sub_type in fallback_questions['technical']:
-                return fallback_questions['technical'][sub_type].get(difficulty, fallback_questions['technical'][sub_type]['mid'])
-            
-            return fallback_questions.get(interview_type, fallback_questions['technical']['dsa']).get(difficulty, "Tell me about your experience with software development.")
+            print("❌ WARNING: Gemini not initialized, using fallback")
+            return self._get_fallback_first_question(config)
         
         print("\n--- Building prompt ---")
         prompt = self._build_first_question_prompt(config, user_profile)
@@ -188,18 +93,24 @@ class GeminiService:
                 raise Exception("Invalid response from Gemini API")
                 
         except Exception as e:
+            error_str = str(e)
             print(f"\n❌ GEMINI API ERROR")
             print(f"Error type: {type(e).__name__}")
-            print(f"Error message: {str(e)}")
+            print(f"Error message: {error_str}")
+            
+            # Check if it's a quota/rate limit error
+            if "429" in error_str or "quota" in error_str.lower() or "rate limit" in error_str.lower():
+                print("⚠️  QUOTA EXCEEDED: Using fallback questions")
+                return self._get_fallback_first_question(config)
+            
             print(f"Error details:")
             import traceback
             traceback.print_exc()
-            
-            # Fallback to predefined questions
-            self.initialized = False  # Disable for subsequent calls
-            print("\n⚠️  Falling back to predefined questions")
             print("="*60 + "\n")
-            return self.generate_first_question(config, user_profile)
+            
+            # For other errors, also use fallback
+            print("⚠️  Using fallback due to API error")
+            return self._get_fallback_first_question(config)
     
     def evaluate_and_generate_next(self, config: dict, qa_history: list, current_answer: str):
         print("\n" + "="*60)
@@ -212,40 +123,9 @@ class GeminiService:
         print(f"Config: {json.dumps(config, indent=2)}")
         
         if not self.initialized:
-            print("\n❌ WARNING: Gemini not initialized, using fallback evaluation")
-            # Fallback evaluation when AI is not available
-            score = 75  # Default good score
-            feedback = "Good answer! You demonstrated solid understanding."
+            print("❌ WARNING: Gemini not initialized, using fallback")
+            return self._get_fallback_evaluation(qa_history, current_answer, config)
             
-            # Generate next question based on history
-            question_count = len(qa_history) + 1
-            if question_count >= 5:
-                return {
-                    "score": score,
-                    "feedback": feedback,
-                    "modelAnswer": "A comprehensive answer would show clear understanding and examples.",
-                    "strengths": ["Clear communication", "Good structure"],
-                    "improvements": ["Add more specific examples"],
-                    "nextQuestion": "INTERVIEW_COMPLETE"
-                }
-            
-            # Simple next questions
-            next_questions = [
-                "Can you provide a specific example from your experience?",
-                "How would you handle this situation differently now?",
-                "What challenges did you face and how did you overcome them?",
-                "Can you elaborate on the technical details?",
-                "What was the outcome and what did you learn?"
-            ]
-            
-            return {
-                "score": score,
-                "feedback": feedback,
-                "modelAnswer": "A strong answer includes specific examples and demonstrates problem-solving skills.",
-                "strengths": ["Good understanding", "Clear explanation"],
-                "improvements": ["Add more technical details"],
-                "nextQuestion": next_questions[question_count % len(next_questions)]
-            }
         print("\n--- Building evaluation prompt ---")
         prompt = self._build_evaluation_prompt(config, qa_history, current_answer)
         print(f"Prompt length: {len(prompt)} characters")
@@ -277,18 +157,24 @@ class GeminiService:
                 raise Exception("Invalid response from Gemini API")
                 
         except Exception as e:
+            error_str = str(e)
             print(f"\n❌ GEMINI EVALUATION API ERROR")
             print(f"Error type: {type(e).__name__}")
-            print(f"Error message: {str(e)}")
+            print(f"Error message: {error_str}")
+            
+            # Check if it's a quota/rate limit error
+            if "429" in error_str or "quota" in error_str.lower() or "rate limit" in error_str.lower():
+                print("⚠️  QUOTA EXCEEDED: Using fallback evaluation")
+                return self._get_fallback_evaluation(qa_history, current_answer, config)
+            
             print(f"Error details:")
             import traceback
             traceback.print_exc()
-            
-            # Fallback to predefined evaluation
-            self.initialized = False  # Disable for subsequent calls
-            print("\n⚠️  Falling back to predefined evaluation")
             print("="*60 + "\n")
-            return self.evaluate_and_generate_next(config, qa_history, current_answer)
+            
+            # For other errors, also use fallback
+            print("⚠️  Using fallback evaluation due to API error")
+            return self._get_fallback_evaluation(qa_history, current_answer, config)
     
     def _build_first_question_prompt(self, config: dict, user_profile: dict = None):
         interview_type = config.get('type', 'technical')
@@ -296,55 +182,120 @@ class GeminiService:
         role = config.get('role', 'Software Engineer')
         company = config.get('company', '')
         difficulty = config.get('difficulty', 'mid')
+        industry = config.get('industry', 'Technology')
         
         company_context = f" at {company}" if company else ""
         
-        prompt = f"""You are an expert interviewer conducting a {interview_type} interview for a {role} position{company_context} at {difficulty} level.
+        # Company-specific question contexts
+        company_specific_contexts = {
+            'Google': 'Google values scalability, algorithms, and system design. Questions often focus on large-scale distributed systems, data structures, and optimization.',
+            'Amazon': 'Amazon emphasizes leadership principles, scalability, and customer obsession. Questions often include behavioral scenarios and system design for e-commerce scale.',
+            'Microsoft': 'Microsoft focuses on software engineering fundamentals, Azure cloud, and collaborative problem-solving. Questions include system design and technology integration.',
+            'Meta': 'Meta (Facebook) emphasizes social media scale, real-time systems, and data-driven decisions. Questions focus on scalability, performance, and user experience.',
+            'Apple': 'Apple values attention to detail, user experience, and system optimization. Questions focus on performance, design patterns, and integration.',
+            'Netflix': 'Netflix emphasizes microservices, cloud architecture (AWS), and streaming at scale. Questions focus on distributed systems and real-time data processing.',
+            'Uber': 'Uber focuses on real-time systems, location-based services, and high availability. Questions include system design for global-scale operations.',
+            'Airbnb': 'Airbnb values user experience, marketplace design, and scalable systems. Questions focus on marketplace dynamics and multi-sided platforms.',
+            'LinkedIn': 'LinkedIn emphasizes social networking scale, data processing, and professional networking features. Questions focus on graph algorithms and social features.',
+            'Twitter': 'Twitter focuses on real-time data streams, high-throughput systems, and content distribution. Questions emphasize scalability and performance.',
+            'Salesforce': 'Salesforce emphasizes CRM systems, multi-tenancy, and enterprise software. Questions focus on business logic and scalable SaaS architectures.',
+            'Oracle': 'Oracle focuses on database systems, enterprise software, and cloud infrastructure. Questions emphasize data management and enterprise solutions.',
+            'IBM': 'IBM values enterprise solutions, cloud computing, and AI integration. Questions focus on enterprise architecture and legacy system integration.',
+            'Spotify': 'Spotify emphasizes music streaming, recommendation systems, and real-time data. Questions focus on audio streaming and personalization algorithms.',
+            'Adobe': 'Adobe focuses on creative software, document processing, and cloud services. Questions emphasize multimedia processing and user experience.',
+            'PayPal': 'PayPal emphasizes payment processing, fraud detection, and financial security. Questions focus on secure transactions and distributed systems.',
+            'Stripe': 'Stripe focuses on payment APIs, financial infrastructure, and developer experience. Questions emphasize API design and financial systems.',
+            'Shopify': 'Shopify values e-commerce platforms, merchant tools, and scalability. Questions focus on multi-tenant systems and e-commerce features.',
+            'Zoom': 'Zoom emphasizes video streaming, real-time communication, and quality of service. Questions focus on WebRTC and video processing.',
+            'Slack': 'Slack focuses on real-time messaging, collaboration tools, and integration platforms. Questions emphasize messaging systems and APIs.',
+        }
+        
+        prompt = f"""You are an expert interviewer conducting a {interview_type} interview for a {role} position{company_context} at {difficulty} level in the {industry} industry.
+
+"""
+        
+        # Add company-specific context if available
+        if company and company in company_specific_contexts:
+            prompt += f"""Company Context for {company}:
+{company_specific_contexts[company]}
+
+Consider {company}'s technology stack, engineering culture, and common interview patterns when generating questions.
 
 """
         
         if interview_type == 'technical' and sub_type:
             tech_contexts = {
-                'java': 'Focus on Java core concepts, OOP, collections, multithreading, JVM, Spring framework',
-                'react': 'Focus on React hooks, component lifecycle, state management, Redux, performance optimization',
-                'dotnet': 'Focus on .NET framework, C#, ASP.NET, Entity Framework, LINQ, design patterns',
-                'python': 'Focus on Python core concepts, data structures, OOP, decorators, generators, Django/Flask',
-                'nodejs': 'Focus on Node.js, Express, async/await, event loop, REST APIs, microservices',
-                'angular': 'Focus on Angular components, services, dependency injection, RxJS, TypeScript',
-                'spring-boot': 'Focus on Spring Boot, dependency injection, REST APIs, JPA, microservices architecture',
-                'microservices': 'Focus on microservices patterns, API Gateway, service discovery, containerization, Kubernetes',
-                'cloud': 'Focus on cloud platforms (AWS/Azure/GCP), serverless, containers, scalability, DevOps',
-                'devops': 'Focus on CI/CD, Docker, Kubernetes, Jenkins, Git, infrastructure as code, monitoring',
-                'database': 'Focus on SQL, database design, normalization, indexing, transactions, NoSQL, query optimization',
-                'fresher': 'Focus on basic programming concepts, OOP, data structures, simple algorithms suitable for fresh graduates',
-                'dsa': 'Focus on algorithms, data structures, problem-solving, time/space complexity',
-                'system-design': 'Focus on scalability, architecture, trade-offs, distributed systems'
+                'java': '''Focus on Java core concepts, OOP, collections, multithreading, JVM internals, Spring framework, design patterns.
+Common topics: Concurrency, memory management, generics, Spring Boot, Hibernate, REST APIs, microservices with Java.''',
+                
+                'react': '''Focus on React hooks, component lifecycle, state management (Redux, Context API), performance optimization, Virtual DOM.
+Common topics: useEffect, useMemo, useCallback, React Router, SSR/SSG with Next.js, testing with Jest/React Testing Library.''',
+                
+                'dotnet': '''Focus on .NET framework, C# language features, ASP.NET Core, Entity Framework, LINQ, async/await, dependency injection.
+Common topics: Middleware, Web APIs, Blazor, SignalR, microservices with .NET, Azure integration, performance optimization.''',
+                
+                'python': '''Focus on Python core concepts, data structures, OOP, decorators, generators, async programming, Django/Flask.
+Common topics: List comprehensions, context managers, metaclasses, FastAPI, data science libraries, web scraping, testing with pytest.''',
+                
+                'nodejs': '''Focus on Node.js event loop, Express.js, async/await, streams, buffers, REST APIs, microservices, npm ecosystem.
+Common topics: Middleware, authentication (JWT, OAuth), database integration (MongoDB, PostgreSQL), WebSockets, error handling, clustering.''',
+                
+                'angular': '''Focus on Angular components, services, dependency injection, RxJS, TypeScript, routing, forms, change detection.
+Common topics: Observables, pipes, directives, lazy loading, state management (NgRx), testing with Jasmine/Karma, Angular Universal.''',
+                
+                'spring-boot': '''Focus on Spring Boot auto-configuration, dependency injection, REST APIs, JPA/Hibernate, security, microservices.
+Common topics: Spring Data, Spring Security, Spring Cloud, service discovery (Eureka), API Gateway, circuit breakers, Docker deployment.''',
+                
+                'microservices': '''Focus on microservices patterns, service discovery, API Gateway, inter-service communication, distributed transactions.
+Common topics: Saga pattern, event sourcing, CQRS, service mesh, containerization (Docker), orchestration (Kubernetes), monitoring, tracing.''',
+                
+                'cloud': '''Focus on cloud platforms (AWS/Azure/GCP), serverless architecture, containers, scalability, DevOps practices.
+Common topics: EC2, Lambda, S3, RDS, VPC, load balancers, auto-scaling, CloudFormation/Terraform, cost optimization, security best practices.''',
+                
+                'devops': '''Focus on CI/CD pipelines, Docker, Kubernetes, Jenkins, GitLab CI, infrastructure as code, monitoring, logging.
+Common topics: Container orchestration, Helm charts, Prometheus, Grafana, ELK stack, blue-green deployment, canary releases, GitOps.''',
+                
+                'database': '''Focus on SQL, database design, normalization, indexing, transactions, query optimization, NoSQL databases.
+Common topics: Joins, subqueries, stored procedures, triggers, ACID properties, CAP theorem, MongoDB, Redis, PostgreSQL, sharding, replication.''',
+                
+                'fresher': '''Focus on programming fundamentals, OOP concepts, basic data structures, simple algorithms, problem-solving approach.
+Common topics: Arrays, strings, loops, functions, classes, inheritance, polymorphism, basic sorting/searching, code quality.''',
+                
+                'dsa': '''Focus on algorithms, data structures, time/space complexity analysis, problem-solving strategies, coding patterns.
+Common topics: Arrays, linked lists, trees, graphs, dynamic programming, greedy algorithms, backtracking, sliding window, two pointers.''',
+                
+                'system-design': '''Focus on scalability, high availability, distributed systems, architecture patterns, trade-offs, capacity planning.
+Common topics: Load balancing, caching, database sharding, microservices vs monolith, CAP theorem, consistency patterns, message queues.'''
             }
             
             if sub_type in tech_contexts:
-                prompt += f"{tech_contexts[sub_type]}\n\n"
+                prompt += f"""{tech_contexts[sub_type]}
+
+"""
         
         prompt += f"""Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
 
 For technical interviews:
-- Entry level: Focus on fundamental concepts, basic syntax, common patterns
-- Mid level: Test practical experience, problem-solving, design decisions
-- Senior level: Architecture, scalability, trade-offs, complex scenarios
+- Entry level: Focus on fundamental concepts, basic syntax, common patterns, simple problem-solving
+- Mid level: Test practical experience, problem-solving, design decisions, real-world scenarios
+- Senior level: Architecture, scalability, trade-offs, complex scenarios, leadership, system design
 
 For behavioral interviews:
 - Use STAR format questions (Situation, Task, Action, Result)
-- Focus on real-world scenarios relevant to the role
+- Focus on real-world scenarios relevant to the role and company culture
+- Assess teamwork, conflict resolution, leadership, and problem-solving
 
 For HR interviews:
-- Ask about motivation, career goals, company fit
-- Cultural alignment and soft skills
+- Ask about motivation, career goals, company fit, cultural alignment
+- Explore soft skills, work style, and long-term aspirations
 
 Important guidelines:
-1. Ask ONE clear, specific question
+1. Ask ONE clear, specific question that is commonly asked in real interviews
 2. Make it conversational and professional
-3. Ensure it's relevant to the role and difficulty level
+3. Ensure it's highly relevant to the role, technology, and difficulty level
 4. Keep it concise (1-3 sentences)
 5. For coding questions, specify language preference if applicable
+6. If a company is specified, tailor the question to their known interview style and focus areas
 
 Return ONLY the question text, nothing else."""
 
@@ -427,7 +378,7 @@ Return response as JSON:
     def generate_practice_questions(self, category: str, difficulty: str, count: int = 5):
         """Generate multiple practice questions for quick practice mode"""
         if not self.initialized:
-            return self._get_fallback_questions(category, difficulty, count)
+            raise Exception("Gemini AI is not initialized. Please check your API key configuration.")
         
         prompt = f"""Generate {count} {category} interview questions at {difficulty} level.
 
@@ -457,20 +408,15 @@ Return as JSON array:
             questions = self._parse_questions_response(response.text)
             if questions:
                 return questions
+            raise Exception("Failed to parse questions from AI response")
         except Exception as e:
             print(f"Gemini API error in practice questions: {e}")
-        
-        # Return fallback questions if AI fails
-        return self._get_fallback_questions(category, difficulty, count)
+            raise Exception(f"Failed to generate practice questions: {str(e)}")
     
     def evaluate_practice_answer(self, question: str, answer: str, category: str):
         """Quick evaluation for practice mode"""
         if not self.initialized:
-            return {
-                "score": 75,
-                "feedback": "Your answer shows understanding. Keep practicing!",
-                "keyPoints": ["Consider adding more details", "Good structure"]
-            }
+            raise Exception("Gemini AI is not initialized. Please check your API key configuration.")
         
         prompt = f"""Evaluate this {category} interview answer:
 
@@ -494,11 +440,7 @@ Return as JSON:
             return self._parse_practice_evaluation(response.text)
         except Exception as e:
             print(f"Gemini API error in practice evaluation: {e}")
-            return {
-                "score": 70,
-                "feedback": "Thank you for your response. Keep practicing!",
-                "keyPoints": ["Good effort", "Practice more examples"]
-            }
+            raise Exception(f"Failed to evaluate practice answer: {str(e)}")
     
     def _parse_questions_response(self, text: str) -> list:
         try:
@@ -570,12 +512,7 @@ Return as JSON:
         print(f"Initialized: {self.initialized}, Count: {count}")
         
         if not self.initialized:
-            print("WARNING: Gemini not initialized, using fallback questions")
-            # Return fallback questions
-            category = config.get('type', 'technical')
-            difficulty = config.get('difficulty', 'mid')
-            fallback = self._get_fallback_questions(category, difficulty, count)
-            return [q['question'] for q in fallback]
+            raise Exception("Gemini AI is not initialized. Please check your API key configuration.")
         
         interview_type = config.get('type', 'technical')
         sub_type = config.get('subType', '')
@@ -619,12 +556,7 @@ Return ONLY the questions, one per line, numbered 1-{count}. No additional text 
             
             # Ensure we have the right count
             if len(questions) < count:
-                print(f"WARNING: Only got {len(questions)} questions, expected {count}")
-                # Pad with fallback questions if needed
-                category = config.get('type', 'technical')
-                difficulty = config.get('difficulty', 'mid')
-                fallback = self._get_fallback_questions(category, difficulty, count - len(questions))
-                questions.extend([q['question'] for q in fallback])
+                raise Exception(f"Only got {len(questions)} questions, expected {count}")
             
             questions = questions[:count]  # Trim to exact count
             
@@ -636,11 +568,7 @@ Return ONLY the questions, one per line, numbered 1-{count}. No additional text 
             print(f"Error: {str(e)}")
             import traceback
             traceback.print_exc()
-            # Fallback
-            category = config.get('type', 'technical')
-            difficulty = config.get('difficulty', 'mid')
-            fallback = self._get_fallback_questions(category, difficulty, count)
-            return [q['question'] for q in fallback]
+            raise Exception(f"Failed to generate question set: {str(e)}")
     
     def generate_chat_response(self, prompt: str) -> str:
         """Generate response for AI chat assistant"""
@@ -667,5 +595,65 @@ Return ONLY the questions, one per line, numbered 1-{count}. No additional text 
             difficulty = config.get('difficulty', 'mid')
             fallback = self._get_fallback_questions(category, difficulty, count)
             return [q['question'] for q in fallback]
+
+    def _get_fallback_practice_questions(self, category: str, difficulty: str, count: int = 5):
+        questions_pool = {
+            'technical': {
+                'entry': [
+                    'What are the four pillars of Object-Oriented Programming?',
+                    'Explain the difference between stack and heap memory.',
+                    'What is the difference between GET and POST HTTP methods?',
+                    'How do you reverse a string in your preferred language?',
+                    'What is the time complexity of binary search?'
+                ],
+                'mid': [
+                    'Explain the SOLID principles in software design.',
+                    'How does a HashMap work internally?',
+                    'What is the difference between Authentication and Authorization?',
+                    'How would you find duplicates in an array efficiently?',
+                    'Explain the CAP theorem in distributed systems.'
+                ],
+                'senior': [
+                    'Design a microservices architecture for an e-commerce platform.',
+                    'How would you implement database sharding?',
+                    'Explain eventual consistency and when to use it.',
+                    'Design a rate limiter for an API.',
+                    'How would you handle cache invalidation in a distributed system?'
+                ]
+            },
+            'behavioral': {
+                'entry': ['Tell me about a time you learned a new technology quickly.', 'Describe a challenging bug you fixed.'],
+                'mid': ['Describe a situation where you disagreed with a technical decision.', 'How do you handle trade-offs in project planning?'],
+                'senior': ['Describe your experience leading a technical team.', 'How do you make architectural decisions?']
+            },
+            'hr': {
+                'entry': ['Why do you want to work here?', 'What are your career goals?'],
+                'mid': ['Where do you see yourself in 5 years?', 'Describe your ideal work environment.'],
+                'senior': ['What is your leadership philosophy?', 'How do you build high-performing teams?']
+            }
+        }
+        questions_list = questions_pool.get(category, {}).get(difficulty, questions_pool['technical']['mid'])
+        return [
+            {
+                'question': q,
+                'category': category,
+                'difficulty': difficulty,
+                'hints': ['Think about best practices and real-world applications'],
+                'topics': [category]
+            }
+            for q in questions_list[:count]
+        ]
+
+    def _get_fallback_practice_evaluation(self, answer: str):
+        word_count = len(answer.split())
+        score = min(85, max(65, 65 + (word_count // 8)))
+        return {
+            'score': score,
+            'feedback': 'Good answer! Keep practicing to improve further.',
+            'keyPoints': [
+                'Shows understanding of the topic',
+                'Continue practicing for better depth'
+            ]
+        }
 
 gemini_service = GeminiService()
