@@ -4,6 +4,7 @@ import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
 import { Send, Video, VideoOff, MessageCircle, X } from 'lucide-react';
+import { InterviewConfig } from '../types';
 
 export default function InterviewSession() {
   const { id } = useParams();
@@ -26,16 +27,11 @@ export default function InterviewSession() {
     responseTime: 0,
   });
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timerRef = useRef<any>(null);
 
   useEffect(() => {
     loadInterview();
     return () => {
       console.log('InterviewSession unmounting, cleaning up...');
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        console.log('Timer cleared');
-      }
       if (stream) {
         console.log('Stopping camera on unmount...');
         stream.getTracks().forEach(track => track.stop());
@@ -133,6 +129,146 @@ export default function InterviewSession() {
     }
   };
 
+  const generateFallbackQuestion = (config: InterviewConfig): string => {
+    const { type, difficulty, company } = config;
+    
+    // Fallback questions organized by type and difficulty
+    const fallbackQuestions = {
+      technical: {
+        entry: [
+          "What is the difference between == and === in JavaScript?",
+          "Explain the concept of Big O notation with examples.",
+          "What is the time complexity of binary search?",
+          "Explain the difference between an array and a linked list.",
+          "What are the four pillars of Object-Oriented Programming?"
+        ],
+        mid: [
+          "How does a HashMap work internally in Java?",
+          "Explain the difference between SQL and NoSQL databases.",
+          "What are closures in JavaScript and how do they work?",
+          "Explain the CAP theorem in distributed systems.",
+          "How do you handle asynchronous operations in Node.js?"
+        ],
+        senior: [
+          "Design a URL shortening service like bit.ly.",
+          "How would you implement a distributed cache?",
+          "Explain microservices architecture and its challenges.",
+          "Design a rate limiting system for an API.",
+          "How would you handle database sharding?"
+        ]
+      },
+      behavioral: {
+        entry: [
+          "Tell me about a time you learned something new quickly.",
+          "Describe a challenging bug you fixed.",
+          "How do you handle feedback on your work?",
+          "Tell me about a successful project you completed.",
+          "Why did you choose this career path?"
+        ],
+        mid: [
+          "Tell me about a time you faced a difficult challenge at work.",
+          "Describe a situation where you had to work with a difficult team member.",
+          "Tell me about a time you failed and what you learned.",
+          "Describe a situation where you had to meet a tight deadline.",
+          "Tell me about a time you disagreed with a technical decision."
+        ],
+        senior: [
+          "Describe your experience leading a technical team.",
+          "Tell me about a time you made an architectural decision.",
+          "How do you mentor junior developers?",
+          "Describe a time you drove a major technical initiative.",
+          "How do you handle disagreements about technical direction?"
+        ]
+      },
+      hr: {
+        entry: [
+          "Why do you want to work for our company?",
+          "Where do you see yourself in 5 years?",
+          "What is your greatest strength?",
+          "What is your greatest weakness?",
+          "Why did you choose this career path?"
+        ],
+        mid: [
+          "What are your salary expectations?",
+          "Why are you leaving your current job?",
+          "How do you handle work-life balance?",
+          "Describe your ideal work environment.",
+          "How do you stay updated with technology trends?"
+        ],
+        senior: [
+          "What is your leadership philosophy?",
+          "How do you build high-performing teams?",
+          "Describe your approach to technical decision-making.",
+          "How do you handle underperforming team members?",
+          "What's your vision for the next 3-5 years in your career?"
+        ]
+      },
+      'case-study': {
+        entry: [
+          "A website is running slowly. How would you investigate?",
+          "How would you explain a complex technical concept to a non-technical person?",
+          "What steps would you take to learn a new programming language?",
+          "How would you debug a problem you can't reproduce?",
+          "How would you prioritize multiple tasks with competing deadlines?"
+        ],
+        mid: [
+          "A major client is experiencing downtime. Walk me through your incident response.",
+          "Our API response time has doubled. How would you investigate?",
+          "How would you improve the deployment process for a team releasing multiple times a day?",
+          "Design a strategy to migrate a monolithic application to microservices.",
+          "How would you handle a security vulnerability in production?"
+        ],
+        senior: [
+          "Design a globally distributed social media feed like Twitter.",
+          "How would you architect a system to handle 1 billion daily active users?",
+          "Design a real-time collaborative editing system like Google Docs.",
+          "How would you implement a recommendation system for an e-commerce platform?",
+          "Design a monitoring and alerting system for a large-scale distributed system."
+        ]
+      }
+    };
+
+    // Get questions for the specific type and difficulty
+    const typeQuestions = fallbackQuestions[type as keyof typeof fallbackQuestions] || fallbackQuestions.technical;
+    const difficultyQuestions = typeQuestions[difficulty as keyof typeof typeQuestions] || typeQuestions.mid;
+    
+    // Return a random question from the appropriate category
+    const randomIndex = Math.floor(Math.random() * difficultyQuestions.length);
+    let question = difficultyQuestions[randomIndex];
+    
+    // Add company context if available
+    if (company && company !== 'General') {
+      const companyContexts: { [key: string]: string } = {
+        'Google': ' (considering Google\'s focus on scalability and algorithms)',
+        'Amazon': ' (considering Amazon\'s leadership principles and customer obsession)',
+        'Microsoft': ' (considering Microsoft\'s enterprise and cloud focus)',
+        'Meta': ' (considering Meta\'s scale and real-time systems)',
+        'Apple': ' (considering Apple\'s design and user experience focus)',
+        'Netflix': ' (considering Netflix\'s streaming and cloud architecture)',
+        'Uber': ' (considering Uber\'s real-time and location-based systems)',
+        'Airbnb': ' (considering Airbnb\'s marketplace and trust systems)',
+        'LinkedIn': ' (considering LinkedIn\'s professional networking)',
+        'Twitter': ' (considering Twitter\'s real-time content distribution)',
+        'Salesforce': ' (considering Salesforce\'s CRM and enterprise software)',
+        'Oracle': ' (considering Oracle\'s database and enterprise solutions)',
+        'IBM': ' (considering IBM\'s enterprise and AI solutions)',
+        'Spotify': ' (considering Spotify\'s music streaming and personalization)',
+        'Adobe': ' (considering Adobe\'s creative software and cloud services)',
+        'PayPal': ' (considering PayPal\'s payment processing and security)',
+        'Stripe': ' (considering Stripe\'s payment APIs and developer experience)',
+        'Shopify': ' (considering Shopify\'s e-commerce platforms)',
+        'Zoom': ' (considering Zoom\'s video communication and quality)',
+        'Slack': ' (considering Slack\'s real-time messaging and collaboration)'
+      };
+      
+      if (companyContexts[company]) {
+        question += companyContexts[company];
+      }
+    }
+    
+    return question;
+  };
+
   const loadInterview = async () => {
     try {
       const data = await interviewAPI.getInterview(id!);
@@ -155,6 +291,17 @@ export default function InterviewSession() {
       toast.success('Interview session started! Good luck! 🚀');
     } catch (error: any) {
       console.error('Failed to load interview:', error);
+      
+      // Try to generate fallback question if interview config is available
+      if (interview?.config) {
+        console.log('API failed, generating client-side fallback question...');
+        const fallbackQuestion = generateFallbackQuestion(interview.config);
+        setCurrentQuestion(fallbackQuestion);
+        setStartTime(Date.now());
+        toast('Using offline mode - some features may be limited');
+        return;
+      }
+      
       toast.error(error?.response?.data?.detail || 'Failed to load interview. Please try again.');
       navigate('/dashboard');
     }
@@ -224,6 +371,29 @@ export default function InterviewSession() {
       }
     } catch (error: any) {
       console.error('Submit answer error:', error);
+      
+      // Generate fallback question if API fails
+      if (interview?.config) {
+        console.log('API failed, generating client-side fallback question...');
+        const fallbackQuestion = generateFallbackQuestion(interview.config);
+        setCurrentQuestion(fallbackQuestion);
+        setAnswer('');
+        setStartTime(Date.now());
+        setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
+        console.log('Moving to fallback question');
+        
+        // Provide basic feedback for the answer
+        const wordCount = answer.trim().split(/\s+/).length;
+        if (wordCount > 50) {
+          toast.success('Good detailed answer! Moving to next question...');
+        } else if (wordCount > 20) {
+          toast('Nice answer! Let\'s continue...');
+        } else {
+          toast('Thanks for your answer! Here\'s the next question...');
+        }
+        return;
+      }
+      
       toast.error(error?.response?.data?.detail || error.message || 'Failed to submit answer');
     } finally {
       setLoading(false);
@@ -452,10 +622,10 @@ export default function InterviewSession() {
             <div className="card">
               <h3 className="text-lg font-bold text-dark-800 mb-4">Interview Info</h3>
               <div className="space-y-2 text-sm">
-                <p><span className="text-dark-600">Type:</span> <span className="font-medium text-dark-800">{interview.config?.type}</span></p>
-                <p><span className="text-dark-600">Role:</span> <span className="font-medium text-dark-800">{interview.config?.role}</span></p>
-                <p><span className="text-dark-600">Difficulty:</span> <span className="font-medium text-dark-800">{interview.config?.difficulty}</span></p>
-                <p><span className="text-dark-600">Duration:</span> <span className="font-medium text-dark-800">{interview.config?.durationMinutes} min</span></p>
+                <p><strong>Type:</strong> {interview?.config?.type}</p>
+                <p><strong>Difficulty:</strong> {interview?.config?.difficulty}</p>
+                <p><strong>Company:</strong> {interview?.config?.company || 'General'}</p>
+                <p><strong>Questions:</strong> {interview?.qa?.length || 0} answered</p>
               </div>
             </div>
           </div>
@@ -465,7 +635,7 @@ export default function InterviewSession() {
   );
 }
 
-function MetricCard({ label, value, color = 'text-dark-800' }: any) {
+function MetricCard({ label, value, color = 'text-dark-800' }: { label: string; value: string; color?: string }) {
   return (
     <div className="flex justify-between items-center">
       <span className="text-sm text-dark-600">{label}</span>

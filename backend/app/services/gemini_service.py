@@ -21,14 +21,14 @@ class GeminiService:
                 print("Configuring Gemini API...")
                 genai.configure(api_key=api_key)
                 print("Creating model instances...")
-                # Use gemini-2.5-flash-native-audio-dialog for question generation
-                self.flash_model = genai.GenerativeModel('gemini-2.5-flash-native-audio-dialog')
-                self.pro_model = genai.GenerativeModel('gemini-2.5-flash-native-audio-dialog')
+                # Use gemini-2.5-flash for question generation
+                self.flash_model = genai.GenerativeModel('gemini-2.5-flash')
+                self.pro_model = genai.GenerativeModel('gemini-2.5-flash')
                 self.initialized = True
                 print("✅ SUCCESS: Gemini AI initialized successfully")
                 print(f"Flash Model: {self.flash_model._model_name}")
                 print(f"Pro Model: {self.pro_model._model_name}")
-                print("⚠️  Note: Using gemini-2.5-flash-native-audio-dialog for question generation")
+                print("⚠️  Note: Using gemini-2.5-flash for question generation")
                 print("⚠️  Rate limit: 5 requests per minute per model")
             except Exception as e:
                 print(f"❌ ERROR: Failed to initialize Gemini AI")
