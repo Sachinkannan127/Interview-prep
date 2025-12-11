@@ -14,8 +14,8 @@ export default defineConfig({
     host: true,
   },
   build: {
-    // Increase the chunk size warning limit to 2000 KiB to avoid noisy warnings
-    // Adjust this value if you want a different threshold (value is in KiB)
-    chunkSizeWarningLimit: 2000,
+    // Increase the chunk size warning limit to 4000 KiB for Vercel deployment
+    // This prevents chunk size warnings during production builds
+    chunkSizeWarningLimit: 4000,
   },
 })
