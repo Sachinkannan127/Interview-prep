@@ -34,7 +34,7 @@ app = FastAPI(
 # CORS configuration
 CORS_ORIGINS = os.getenv(
     "CORS_ORIGINS", 
-    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177"
+    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177,http://localhost:5178,http://localhost:5179"
 )
 origins = [origin.strip() for origin in CORS_ORIGINS.split(",")]
 
@@ -45,8 +45,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Add trusted host middleware for production

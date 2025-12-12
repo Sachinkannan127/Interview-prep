@@ -355,16 +355,19 @@ export default function Dashboard() {
         {/* Practice Sessions Section */}
         <div className="card mt-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-dark-800">Recent Practice Sessions</h2>
-            <button onClick={() => navigate('/practice')} className="btn-primary">
+            <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Recent Practice Sessions</h2>
+            <button onClick={() => navigate('/practice')} className="btn-primary bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
               Start Practice
             </button>
           </div>
           {loading ? (
-            <p className="text-dark-600">Loading...</p>
+            <p className="text-slate-400">Loading...</p>
           ) : practiceSessions.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-dark-600 mb-4">No practice sessions yet</p>
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
+                <Target className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-slate-300 mb-4">No practice sessions yet</p>
               <button onClick={() => navigate('/practice')} className="btn-primary">
                 Start Your First Practice Session
               </button>
@@ -372,18 +375,18 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-4">
               {practiceSessions.slice(0, 5).map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <div key={session.id} className="flex items-center justify-between p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 hover:border-cyan-500/40">
                   <div>
-                    <p className="font-medium text-dark-800">{session.category} - {session.difficulty}</p>
-                    <p className="text-sm text-dark-600">
+                    <p className="font-bold text-white text-lg mb-1">{session.category} - {session.difficulty}</p>
+                    <p className="text-sm text-slate-400">
                       {session.questionsAnswered || 0} questions • {session.averageScore ? Math.round(session.averageScore) : 0}% avg score
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-dark-600">
+                    <p className="text-sm text-slate-400 mb-1">
                       {new Date(session.createdAt).toLocaleDateString()}
                     </p>
-                    <p className="font-bold text-green-600">
+                    <p className="font-extrabold text-2xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                       {session.averageScore ? Math.round(session.averageScore) : 0}/100
                     </p>
                   </div>

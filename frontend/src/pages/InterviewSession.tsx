@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
-import { Send, Video, VideoOff, MessageCircle, X } from 'lucide-react';
+import { Send, Video, VideoOff, MessageCircle, X, Home } from 'lucide-react';
 import { InterviewConfig } from '../types';
 
 export default function InterviewSession() {
@@ -495,7 +495,7 @@ export default function InterviewSession() {
       {/* AI Chatbot Button */}
       <button
         onClick={() => setShowChat(!showChat)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-white"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center text-white"
         title="AI Assistant"
       >
         {showChat ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
@@ -503,19 +503,19 @@ export default function InterviewSession() {
 
       {/* AI Chatbot Panel */}
       {showChat && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-dark-800 rounded-lg shadow-2xl border border-primary-500 flex flex-col">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 rounded-t-lg">
+        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-slate-900 rounded-xl shadow-2xl border-2 border-emerald-500/30 flex flex-col">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-t-xl">
             <h3 className="text-white font-bold flex items-center gap-2">
               <MessageCircle className="w-5 h-5" />
               AI Interview Assistant
             </h3>
-            <p className="text-indigo-200 text-xs mt-1">Ask me anything about your interview!</p>
+            <p className="text-emerald-100 text-xs mt-1">Ask me anything about your interview!</p>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {chatMessages.length === 0 && (
-              <div className="text-center text-dark-400 text-sm py-8">
-                <MessageCircle className="w-12 h-12 mx-auto mb-3 text-dark-500" />
+              <div className="text-center text-slate-400 text-sm py-8">
+                <MessageCircle className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
                 <p>Ask me for interview tips, technical help, or clarification!</p>
               </div>
             )}
@@ -523,8 +523,8 @@ export default function InterviewSession() {
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-lg p-3 text-sm ${
                   msg.role === 'user' 
-                    ? 'bg-primary-600 text-white' 
-                    : 'bg-dark-700 text-slate-200'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' 
+                    : 'bg-slate-800 text-slate-200 border border-emerald-500/20'
                 }`}>
                   {msg.text}
                 </div>
@@ -532,18 +532,18 @@ export default function InterviewSession() {
             ))}
             {chatLoading && (
               <div className="flex justify-start">
-                <div className="bg-dark-700 rounded-lg p-3 text-sm text-slate-200">
+                <div className="bg-slate-800 border border-emerald-500/20 rounded-lg p-3 text-sm text-slate-200">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
-                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
                   </div>
                 </div>
               </div>
             )}
           </div>
           
-          <div className="p-4 border-t border-dark-700">
+          <div className="p-4 border-t border-emerald-500/20">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -551,13 +551,13 @@ export default function InterviewSession() {
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
                 placeholder="Ask me anything..."
-                className="flex-1 px-3 py-2 bg-dark-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="flex-1 px-3 py-2 bg-slate-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-emerald-500/20"
                 disabled={chatLoading}
               />
               <button
                 onClick={handleChatSubmit}
                 disabled={chatLoading || !chatInput.trim()}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-dark-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -572,9 +572,15 @@ export default function InterviewSession() {
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-dark-800">Interview in Progress</h2>
-                <button onClick={handleFinishInterview} className="btn-secondary text-sm">
-                  End Interview
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={() => navigate('/dashboard')} className="btn-secondary text-sm flex items-center gap-1">
+                    <Home className="w-4 h-4" />
+                    Home
+                  </button>
+                  <button onClick={handleFinishInterview} className="btn-secondary text-sm">
+                    End Interview
+                  </button>
+                </div>
               </div>
               
               <div className="bg-primary-50 border-l-4 border-primary-500 p-4 mb-6 rounded">

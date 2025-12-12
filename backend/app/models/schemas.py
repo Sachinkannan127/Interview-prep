@@ -3,7 +3,7 @@ from typing import Optional, List, Literal
 from datetime import datetime
 
 class InterviewConfig(BaseModel):
-    type: Literal['technical', 'behavioral', 'hr', 'case-study']
+    type: Literal['technical', 'behavioral', 'hr', 'case-study', 'aptitude']
     subType: Optional[Literal['dsa', 'system-design', 'java', 'react', 'dotnet', 'python', 'nodejs', 'angular', 'spring-boot', 'microservices', 'cloud', 'devops', 'database', 'fresher', 'star']] = None
     industry: str
     role: str
