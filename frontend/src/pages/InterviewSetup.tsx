@@ -61,6 +61,7 @@ export default function InterviewSetup() {
               <label className="block text-sm font-semibold text-slate-300 mb-2">💼 Interview Type</label>
               <select value={config.type} onChange={(e) => setConfig({ ...config, type: e.target.value as any })} className="input">
                 <option value="technical">Technical</option>
+                <option value="aptitude">Aptitude & Reasoning</option>
                 <option value="behavioral">Behavioral</option>
                 <option value="hr">HR Round</option>
                 <option value="case-study">Case Study</option>

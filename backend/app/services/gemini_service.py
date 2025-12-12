@@ -16,20 +16,22 @@ class GeminiService:
         print(f"API Key length: {len(api_key) if api_key else 0}")
         print(f"API Key starts with: {api_key[:10] if api_key and len(api_key) > 10 else 'N/A'}...")
         
+        # Allow model override via environment variable
+        model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
         if api_key and api_key != 'your_gemini_api_key_here':
             try:
                 print("Configuring Gemini API...")
                 genai.configure(api_key=api_key)
                 print("Creating model instances...")
-                # Use gemini-2.5-flash for question generation
-                self.flash_model = genai.GenerativeModel('gemini-2.5-flash')
-                self.pro_model = genai.GenerativeModel('gemini-2.5-flash')
+                # Use model_name for question generation (default: gemini-2.5-flash, can be gemma-3-27b)
+                self.flash_model = genai.GenerativeModel(model_name)
+                self.pro_model = genai.GenerativeModel(model_name)
                 self.initialized = True
                 print("✅ SUCCESS: Gemini AI initialized successfully")
                 print(f"Flash Model: {self.flash_model._model_name}")
                 print(f"Pro Model: {self.pro_model._model_name}")
-                print("⚠️  Note: Using gemini-2.5-flash for question generation")
-                print("⚠️  Rate limit: 5 requests per minute per model")
+                print(f"⚠️  Note: Using {model_name} for question generation")
+                print("⚠️  Rate limit depends on selected model")
             except Exception as e:
                 print(f"❌ ERROR: Failed to initialize Gemini AI")
                 print(f"Error type: {type(e).__name__}")
@@ -218,6 +220,11 @@ class GeminiService:
             'Shopify': 'Shopify values e-commerce platforms, merchant tools, and scalability. Questions focus on multi-tenant systems and e-commerce features.',
             'Zoom': 'Zoom emphasizes video streaming, real-time communication, and quality of service. Questions focus on WebRTC and video processing.',
             'Slack': 'Slack focuses on real-time messaging, collaboration tools, and integration platforms. Questions emphasize messaging systems and APIs.',
+            'TCS': 'TCS (Tata Consultancy Services) focuses on aptitude, logical reasoning, and coding fundamentals. Questions include number series, data interpretation, and basic programming.',
+            'Infosys': 'Infosys emphasizes problem-solving, quantitative aptitude, and verbal reasoning. Questions include puzzles, pseudocode, and database queries.',
+            'Wipro': 'Wipro focuses on logical reasoning, verbal ability, and quantitative aptitude. Questions include pattern recognition, sentence correction, and data sufficiency.',
+            'Cognizant': 'Cognizant (CTS) emphasizes analytical skills, programming logic, and aptitude. Questions include coding, number systems, and logical deduction.',
+            'Accenture': 'Accenture focuses on critical thinking, problem-solving, and communication. Questions include case analysis, coding, and attention to detail.',
         }
         
         prompt = f"""You are an expert interviewer conducting a {interview_type} interview for a {role} position{company_context} at {difficulty} level in the {industry} industry.
@@ -283,7 +290,30 @@ Common topics: Load balancing, caching, database sharding, microservices vs mono
 
 """
         
+        if interview_type == 'aptitude':
+            prompt += f"""Focus on aptitude and reasoning questions commonly asked in placement drives and competitive exams.
+
+Categories to cover:
+- Quantitative Aptitude: Speed-distance-time, profit-loss, percentage, ratio-proportion, time-work, pipes-cisterns, trains, boats-streams
+- Logical Reasoning: Number series, pattern recognition, coding-decoding, blood relations, seating arrangement, direction sense, syllogisms
+- Verbal Reasoning: Synonyms, antonyms, analogies, sentence completion, reading comprehension
+- Data Interpretation: Tables, bar graphs, pie charts, line graphs, data sufficiency
+- Probability & Statistics: Basic probability, permutations, combinations
+- Puzzles: Logic puzzles, optimization problems, strategy games
+
+Difficulty levels:
+- Entry: Basic concepts, simple calculations, direct formula application
+- Mid: Multi-step problems, pattern analysis, TCS/Infosys/Wipro level questions
+- Senior: Complex puzzles, optimization, Google/Microsoft interview style brain teasers
+
+"""
+        
         prompt += f"""Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
+
+For aptitude interviews:
+- Entry level: Basic formulas, simple calculations, pattern recognition
+- Mid level: Multi-step problems, company-specific previous year questions
+- Senior level: Complex puzzles, optimization, creative problem-solving
 
 For technical interviews:
 - Entry level: Focus on fundamental concepts, basic syntax, common patterns, simple problem-solving
@@ -551,6 +581,87 @@ Return as JSON:
         import random
         
         fallback_questions = {
+            "aptitude": [
+                # Logical Reasoning - Entry Level
+                {"question": "If all Bloops are Razzies and all Razzies are Lazzies, are all Bloops definitely Lazzies?", "category": "aptitude", "difficulty": "entry", "hints": ["Syllogism", "Transitive property"], "topics": ["logical-reasoning", "deduction"]},
+                {"question": "Find the odd one out: 2, 5, 10, 17, 26, 37", "category": "aptitude", "difficulty": "entry", "hints": ["Pattern recognition", "Number series"], "topics": ["logical-reasoning", "patterns"]},
+                {"question": "If CAT = 3120, what is DOG?", "category": "aptitude", "difficulty": "entry", "hints": ["Letter-to-number coding", "Position values"], "topics": ["coding-decoding", "patterns"]},
+                {"question": "A clock shows 3:15. What is the angle between the hour and minute hands?", "category": "aptitude", "difficulty": "entry", "hints": ["Each hour = 30°", "Minute hand position"], "topics": ["clock-problems", "angles"]},
+                
+                # Quantitative Aptitude - Entry Level
+                {"question": "A train 100m long passes a pole in 10 seconds. What is its speed in km/hr?", "category": "aptitude", "difficulty": "entry", "hints": ["Speed = Distance/Time", "Convert m/s to km/hr"], "topics": ["speed-distance-time", "trains"]},
+                {"question": "If the cost price of 12 pens equals the selling price of 10 pens, what is the profit percentage?", "category": "aptitude", "difficulty": "entry", "hints": ["Profit = SP - CP", "Percentage formula"], "topics": ["profit-loss", "percentage"]},
+                {"question": "A sum of money doubles itself in 5 years at simple interest. In how many years will it triple?", "category": "aptitude", "difficulty": "entry", "hints": ["SI = PRT/100", "Rate calculation"], "topics": ["simple-interest", "time-calculation"]},
+                {"question": "The ratio of boys to girls in a class is 3:2. If there are 45 students, how many are girls?", "category": "aptitude", "difficulty": "entry", "hints": ["Total parts = 3+2", "Calculate one part"], "topics": ["ratio-proportion", "basic-math"]},
+                
+                # Verbal Reasoning - Entry Level
+                {"question": "Find the synonym of ABUNDANCE: (a) Scarcity (b) Plenty (c) Lack (d) Shortage", "category": "aptitude", "difficulty": "entry", "hints": ["Means plenty/large quantity"], "topics": ["vocabulary", "synonyms"]},
+                {"question": "Complete: Engineer : Building :: Sculptor : ?", "category": "aptitude", "difficulty": "entry", "hints": ["What does a sculptor create?"], "topics": ["analogies", "relationships"]},
+                
+                # Data Interpretation - Entry Level
+                {"question": "A pie chart shows: Sales 40%, Marketing 25%, R&D 20%, Others 15%. If the total budget is $100,000, what is the R&D budget?", "category": "aptitude", "difficulty": "entry", "hints": ["20% of total", "Simple percentage"], "topics": ["data-interpretation", "percentage"]},
+                
+                # Logical Reasoning - Mid Level (TCS/Infosys/Wipro style)
+                {"question": "Five friends are sitting in a row. A is not at either end. B is to the left of C. D is between B and E. Who is in the middle?", "category": "aptitude", "difficulty": "mid", "hints": ["Draw positions", "Eliminate possibilities"], "topics": ["seating-arrangement", "logical-reasoning"]},
+                {"question": "In a certain code, COMPUTER is written as RFUVQNPC. How is MEDICINE written?", "category": "aptitude", "difficulty": "mid", "hints": ["Reverse and shift", "Pattern analysis"], "topics": ["coding-decoding", "ciphers"]},
+                {"question": "How many times do the hands of a clock coincide in a day?", "category": "aptitude", "difficulty": "mid", "hints": ["Not 24!", "11 times in 12 hours"], "topics": ["clock-problems", "frequency"]},
+                {"question": "A man walks 5 km towards East, turns right and walks 3 km, then turns right and walks 5 km. How far is he from the starting point?", "category": "aptitude", "difficulty": "mid", "hints": ["Draw the path", "Pythagoras theorem"], "topics": ["direction-sense", "geometry"]},
+                
+                # Quantitative Aptitude - Mid Level (Accenture/Cognizant style)
+                {"question": "Two trains 150m and 200m long are running in opposite directions at 54 km/hr and 36 km/hr. In how many seconds will they cross each other?", "category": "aptitude", "difficulty": "mid", "hints": ["Relative speed = sum", "Total distance = sum of lengths"], "topics": ["trains", "relative-speed"]},
+                {"question": "A cistern has two pipes. One fills it in 4 hours and the other empties it in 6 hours. If both are opened, in how many hours will the cistern be filled?", "category": "aptitude", "difficulty": "mid", "hints": ["Work done per hour", "Net fill rate"], "topics": ["pipes-cisterns", "work-time"]},
+                {"question": "The average age of 10 students is 20 years. If the teacher's age is included, the average becomes 22 years. What is the teacher's age?", "category": "aptitude", "difficulty": "mid", "hints": ["Total age before and after"], "topics": ["averages", "age-problems"]},
+                {"question": "A person invested money in two schemes A and B at 10% and 12% simple interest. If the total interest after 1 year is ₹840 and ratio of investment is 2:3, find total investment.", "category": "aptitude", "difficulty": "mid", "hints": ["Let investments be 2x and 3x"], "topics": ["simple-interest", "ratio"]},
+                {"question": "If 20 workers can complete a work in 30 days, how many workers are needed to complete it in 20 days?", "category": "aptitude", "difficulty": "mid", "hints": ["Total work = workers × days", "Inverse proportion"], "topics": ["work-time", "inverse-proportion"]},
+                {"question": "A mixture contains milk and water in ratio 5:3. If 16 liters of water is added, the ratio becomes 5:7. Find the initial quantity of milk.", "category": "aptitude", "difficulty": "mid", "hints": ["Let initial quantities be 5x and 3x"], "topics": ["mixture-alligation", "ratio"]},
+                
+                # Data Interpretation - Mid Level
+                {"question": "A bar graph shows quarterly sales: Q1=$50k, Q2=$75k, Q3=$60k, Q4=$90k. What is the percentage increase from Q1 to Q4?", "category": "aptitude", "difficulty": "mid", "hints": ["% increase = (increase/original) × 100"], "topics": ["data-interpretation", "percentage"]},
+                {"question": "A table shows production of 5 companies over 3 years. Company A produced 200, 250, 300 units. Company B produced 180, 220, 280. Which company had higher growth rate?", "category": "aptitude", "difficulty": "mid", "hints": ["Calculate percentage growth"], "topics": ["data-interpretation", "comparison"]},
+                
+                # Probability & Statistics - Mid Level
+                {"question": "What is the probability of getting at least one head when three coins are tossed?", "category": "aptitude", "difficulty": "mid", "hints": ["P(at least one) = 1 - P(none)", "Total outcomes = 8"], "topics": ["probability", "coins"]},
+                {"question": "In how many ways can 5 people be arranged in a row?", "category": "aptitude", "difficulty": "mid", "hints": ["Permutation", "5!"], "topics": ["permutation-combination", "arrangements"]},
+                
+                # Pattern Recognition (Google/Amazon style) - Mid Level
+                {"question": "Find the next number in series: 1, 4, 9, 16, 25, ?", "category": "aptitude", "difficulty": "mid", "hints": ["Perfect squares"], "topics": ["number-series", "patterns"]},
+                {"question": "Find the missing number: 2, 6, 12, 20, 30, ?", "category": "aptitude", "difficulty": "mid", "hints": ["Difference of differences", "n(n+1)"], "topics": ["number-series", "patterns"]},
+                
+                # Logical Reasoning - Senior Level (Microsoft/Google style)
+                {"question": "You have 8 balls, one is heavier. Using a balance scale only twice, how do you find the heavier ball?", "category": "aptitude", "difficulty": "senior", "hints": ["Divide into groups of 3-3-2", "First weighing narrows down"], "topics": ["logical-puzzles", "optimization"]},
+                {"question": "100 prisoners are lined up. Each can see all prisoners in front but not behind. A hat (red or blue) is placed on each head. Starting from the back, each must say their hat color. How to maximize survivors?", "category": "aptitude", "difficulty": "senior", "hints": ["Parity strategy", "Even/odd count"], "topics": ["logical-puzzles", "strategy"]},
+                {"question": "A bridge can hold 2 people max. 4 people need to cross with times: 1, 2, 5, 10 minutes. They need a flashlight. What's the minimum time?", "category": "aptitude", "difficulty": "senior", "hints": ["Send fast ones back", "Optimize pairs"], "topics": ["optimization", "logical-puzzles"]},
+                {"question": "You're in a room with 3 switches outside. Each controls a bulb inside (you can't see). You can flip switches, then enter once. How to determine which switch controls which bulb?", "category": "aptitude", "difficulty": "senior", "hints": ["Use heat", "Time factor"], "topics": ["logical-puzzles", "creative-thinking"]},
+                
+                # Quantitative Aptitude - Senior Level
+                {"question": "A and B can complete a work in 12 days, B and C in 15 days, C and A in 20 days. How long will A, B, and C together take?", "category": "aptitude", "difficulty": "senior", "hints": ["Find individual work rates", "Add all three rates"], "topics": ["work-time", "equations"]},
+                {"question": "A merchant marks his goods 25% above cost price and gives a discount of 10%. What is his profit percentage?", "category": "aptitude", "difficulty": "senior", "hints": ["Let CP = 100", "Calculate step by step"], "topics": ["profit-loss", "discount"]},
+                {"question": "A cistern can be filled by two pipes A and B in 2 hours and 3 hours respectively. An outlet pipe C can empty it in 4 hours. If all three are opened together, in how many hours will the cistern be filled?", "category": "aptitude", "difficulty": "senior", "hints": ["Net rate = A + B - C"], "topics": ["pipes-cisterns", "work-time"]},
+                
+                # Probability & Combinations - Senior Level
+                {"question": "In how many ways can 7 people be seated around a circular table if 2 specific people must not sit together?", "category": "aptitude", "difficulty": "senior", "hints": ["Circular permutation", "Subtract when together"], "topics": ["permutation-combination", "circular"]},
+                {"question": "A bag contains 5 red, 4 blue, and 3 green balls. What is the probability of drawing 3 balls such that all are of different colors?", "category": "aptitude", "difficulty": "senior", "hints": ["5C1 × 4C1 × 3C1 / 12C3"], "topics": ["probability", "combinations"]},
+                
+                # Data Sufficiency (TCS/Infosys)
+                {"question": "Is x > y? (I) x² > y² (II) x³ > y³. Which statement(s) is/are sufficient?", "category": "aptitude", "difficulty": "senior", "hints": ["Consider negative numbers", "Statement II alone"], "topics": ["data-sufficiency", "inequalities"]},
+                
+                # Previous Year Questions from Top Companies
+                # TCS CodeVita/NQT Style
+                {"question": "A number when divided by 5 leaves remainder 3, when divided by 7 leaves remainder 4. What is the smallest such number?", "category": "aptitude", "difficulty": "mid", "hints": ["Chinese remainder theorem", "LCM approach"], "topics": ["number-theory", "remainders"]},
+                {"question": "How many 4-digit numbers can be formed using digits 1-5 without repetition that are divisible by 4?", "category": "aptitude", "difficulty": "mid", "hints": ["Last 2 digits divisible by 4"], "topics": ["permutation-combination", "divisibility"]},
+                
+                # Infosys Previous Year
+                {"question": "A can do a work in 15 days, B in 20 days. They work together for 4 days, then A leaves. In how many more days will B finish the remaining work?", "category": "aptitude", "difficulty": "mid", "hints": ["Calculate work done in 4 days", "Find remaining work"], "topics": ["work-time", "partnership"]},
+                
+                # Wipro Previous Year
+                {"question": "The sum of three numbers is 98. The ratio of first to second is 2:3 and second to third is 5:8. Find the second number.", "category": "aptitude", "difficulty": "mid", "hints": ["Make ratios comparable", "10:15:24"], "topics": ["ratio-proportion", "equations"]},
+                
+                # Cognizant Previous Year
+                {"question": "A sum of ₹12,000 is divided among A, B, C such that A gets 40% more than B, and B gets 20% more than C. Find C's share.", "category": "aptitude", "difficulty": "mid", "hints": ["Let C = x, B = 1.2x, A = 1.68x"], "topics": ["percentage", "distribution"]},
+                
+                # Accenture Previous Year
+                {"question": "A boat travels 24 km upstream and 28 km downstream in 5 hours. Same boat travels 30 km upstream and 21 km downstream in 6.5 hours. Find speed of boat in still water.", "category": "aptitude", "difficulty": "senior", "hints": ["Let boat speed = b, stream = s", "Solve simultaneous equations"], "topics": ["boats-streams", "equations"]},
+            ],
             "technical": [
                 # DSA - Entry Level
                 {"question": "What is the time complexity of binary search?", "category": "technical", "difficulty": "entry", "hints": ["Divide and conquer", "O(log n)"], "topics": ["dsa", "algorithms"]},
