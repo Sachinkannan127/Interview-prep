@@ -9,21 +9,27 @@ A comprehensive AI-powered mock interview platform that conducts realistic inter
 ### MVP (Implemented)
 
 - ✅ **User Authentication**: Email/Password + Google Sign-in with Firebase
-- ✅ **Interview Configuration**: Multiple types (Technical, Behavioral, HR, Case Study)
-- ✅ **AI Interview Conductor**: Powered by Google Gemini (1.5-pro & 1.5-flash)
+- ✅ **Interview Configuration**: Multiple types (Technical, Behavioral, HR, Case Study, **Aptitude & Reasoning**)
+- ✅ **AI Interview Conductor**: Powered by Google Gemini (gemma-3-27b-it model)
+- ✅ **Aptitude Tests**: 60+ questions covering Quantitative, Logical, Verbal Reasoning
+- ✅ **Company-Specific Questions**: TCS, Infosys, Wipro, Cognizant, Accenture previous year questions
 - ✅ **Voice Mode**: Speech-to-text and text-to-speech using Web Speech API
 - ✅ **Real-time Metrics**: Response time, word count, filler detection, confidence score
 - ✅ **Interview History**: Track all past interviews with scores
+- ✅ **Fallback Questions**: 80+ client-side questions for offline mode
+- ✅ **Firebase Integration**: Persistent storage with Firestore (with mock storage fallback)
 - ✅ **Admin Role**: Special permissions for question management
 - ✅ **Secure**: Firebase security rules and authentication middleware
 
 ### Coming Soon
 
 - 📊 Advanced analytics dashboard with charts
+- 🎭 AI Avatar Mock Interview (face-to-face simulation)
 - 📄 PDF report generation
 - 📚 Expanded question bank
 - 👥 Community-contributed questions
 - 📈 Progress tracking over time
+- 🎥 Video recording and playback
 
 ## 🏗️ Architecture
 
@@ -98,6 +104,28 @@ uvicorn main:app --reload
 
 **See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions.**
 
+## � Firebase Setup
+
+This application uses Firebase for authentication and database storage. The backend supports both:
+- **Production Mode**: Real Firebase Firestore for persistent data
+- **Development Mode**: In-memory mock storage (no Firebase required)
+
+### Quick Start (Development with Mock Storage)
+
+1. The app works out of the box with mock storage
+2. No Firebase setup required for testing
+3. Data stored in-memory (resets on server restart)
+
+### Production Setup (Real Firebase)
+
+1. Create Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Firestore Database and Authentication
+3. Download service account credentials
+4. Place `firebase-credentials.json` in `backend/` folder
+5. Update `.env` files with Firebase config
+
+**📖 See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for complete Firebase setup guide**
+
 ## 🔑 Environment Variables
 
 ### Frontend `.env`
@@ -108,15 +136,24 @@ VITE_FIREBASE_PROJECT_ID=your_project_id
 VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8001
 ```
 
 ### Backend `.env`
 ```env
+# Gemini AI
 GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemma-3-27b-it
+
+# Firebase (Optional - uses mock storage if not configured)
 FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_CREDENTIALS_PATH=./firebase-credentials.json
-CORS_ORIGINS=http://localhost:5173
+FIREBASE_CREDENTIALS_PATH=firebase-credentials.json
+# OR for production deployment:
+# FIREBASE_CREDENTIALS={"type":"service_account",...}
+
+# CORS
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174
+ENVIRONMENT=development
 ```
 
 ## 🎮 Usage

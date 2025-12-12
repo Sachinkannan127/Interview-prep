@@ -106,75 +106,84 @@ export default function Dashboard() {
           <p className="text-slate-300 text-base sm:text-lg">Ready to level up your interview skills? 🚀</p>
         </div>
 
-        {/* AI Avatar Mock Interview Section - Prominent Main Feature */}
-        <div className="card mb-8 sm:mb-12 fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">🤖 AI Avatar Mock Interview</h2>
-              <p className="text-slate-300 text-base sm:text-lg">Experience realistic face-to-face interviews with AI-powered avatar simulation</p>
-            </div>
-            <div className="hidden sm:block">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl animate-pulse">
-                🎭
+        {/* Main Action Cards - Three Equal Options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 sm:mb-12 fade-in">
+          {/* Aptitude Test Card */}
+          <div className="card group hover:scale-105 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 hover:border-orange-500/50 transition-all cursor-pointer" onClick={() => {
+            navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
+          }}>
+            <div className="text-center p-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🧮</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-3">Aptitude & Reasoning</h2>
+              <p className="text-slate-300 text-sm mb-4">Quantitative, Logical & Verbal Reasoning</p>
+              <div className="space-y-2 text-xs text-slate-400 mb-4">
+                <div>📊 Data Interpretation</div>
+                <div>🔢 Number Series</div>
+                <div>🧠 Logical Puzzles</div>
               </div>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">Start Test →</button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="p-8 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
-              toast.success('AI Avatar Mock Interview coming soon! 🚀');
-              navigate('/interview/setup');
-            }}>
-              <div className="flex items-center gap-6 mb-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg">🎭</div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Behavioral Round</h3>
-                  <p className="text-slate-400 text-base">Practice soft skills & behavioral questions with AI avatar</p>
-                </div>
+
+          {/* Behavioral Interview Card */}
+          <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 hover:border-purple-500/50 transition-all cursor-pointer" onClick={() => {
+            toast.success('AI Avatar Mock Interview coming soon! 🚀');
+            navigate('/interview/setup');
+          }}>
+            <div className="text-center p-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🎭</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3">Behavioral Round</h2>
+              <p className="text-slate-300 text-sm mb-4">Soft Skills & Communication Practice</p>
+              <div className="space-y-2 text-xs text-slate-400 mb-4">
+                <div>💬 AI Avatar Simulation</div>
+                <div>🎯 STAR Method</div>
+                <div>📹 Video Analysis</div>
               </div>
-              <button className="btn-primary w-full text-lg py-3">Start Behavioral Mock Interview →</button>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">Start Interview →</button>
             </div>
-            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
-              toast.success('AI Avatar Mock Interview coming soon! 🚀');
-              navigate('/interview/setup');
-            }}>
-              <div className="flex items-center gap-6 mb-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-4xl shadow-lg">💼</div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Technical Round</h3>
-                  <p className="text-slate-400 text-base">Face-to-face technical interview with AI avatar simulation</p>
-                </div>
+          </div>
+
+          {/* Technical Interview Card */}
+          <div className="card group hover:scale-105 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer" onClick={() => {
+            toast.success('AI Avatar Mock Interview coming soon! 🚀');
+            navigate('/interview/setup');
+          }}>
+            <div className="text-center p-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">💼</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">Technical Round</h2>
+              <p className="text-slate-300 text-sm mb-4">DSA, System Design & Coding</p>
+              <div className="space-y-2 text-xs text-slate-400 mb-4">
+                <div>⚡ Live Coding</div>
+                <div>🏗️ System Design</div>
+                <div>🤖 AI Evaluation</div>
               </div>
-              <button className="btn-primary w-full text-lg py-3">Start Technical Mock Interview →</button>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">Start Interview →</button>
             </div>
           </div>
         </div>
 
-        {/* Aptitude Test Section */}
+        {/* Aptitude Test Difficulty Levels - Detailed */}
         <div className="card mb-8 sm:mb-12 fade-in">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent mb-2">🧮 Aptitude & Reasoning Test</h2>
-              <p className="text-slate-300 text-base sm:text-lg">Prepare for placement drives with quantitative, logical & verbal reasoning questions</p>
-            </div>
-            <div className="hidden sm:block">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-4xl animate-pulse">
-                🎯
-              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">🎯 Choose Your Level</h2>
+              <p className="text-slate-300 text-sm sm:text-base">Select difficulty based on your preparation stage</p>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+            <div className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 hover:border-green-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
               navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'entry' } });
             }}>
               <div className="text-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">📚</div>
                 <h3 className="text-xl font-bold text-white mb-2">Entry Level</h3>
-                <p className="text-slate-400 text-sm">Basic concepts, simple calculations, pattern recognition</p>
+                <p className="text-slate-400 text-sm">Perfect for beginners</p>
               </div>
-              <ul className="text-xs text-slate-500 space-y-1 mb-4">
-                <li>• Number Series & Patterns</li>
-                <li>• Basic Percentage & Ratio</li>
-                <li>• Simple Speed & Time</li>
+              <ul className="text-xs text-slate-400 space-y-2 mb-4">
+                <li>✓ Number Series & Patterns</li>
+                <li>✓ Basic Percentage & Ratio</li>
+                <li>✓ Simple Speed & Time</li>
+                <li>✓ Pattern Recognition</li>
               </ul>
               <button className="btn-secondary w-full text-sm py-2">Start Entry Level →</button>
             </div>
@@ -185,12 +194,13 @@ export default function Dashboard() {
               <div className="text-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🎓</div>
                 <h3 className="text-xl font-bold text-white mb-2">Mid Level</h3>
-                <p className="text-slate-400 text-sm">TCS, Infosys, Wipro previous year questions</p>
+                <p className="text-slate-400 text-sm">TCS, Infosys, Wipro style</p>
               </div>
-              <ul className="text-xs text-slate-500 space-y-1 mb-4">
-                <li>• Data Interpretation</li>
-                <li>• Work-Time-Pipes Problems</li>
-                <li>• Probability & Combinations</li>
+              <ul className="text-xs text-slate-400 space-y-2 mb-4">
+                <li>✓ Data Interpretation</li>
+                <li>✓ Work-Time-Pipes Problems</li>
+                <li>✓ Probability & Combinations</li>
+                <li>✓ Company Previous Papers</li>
               </ul>
               <button className="btn-secondary w-full text-sm py-2">Start Mid Level →</button>
             </div>
@@ -201,12 +211,13 @@ export default function Dashboard() {
               <div className="text-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🏆</div>
                 <h3 className="text-xl font-bold text-white mb-2">Senior Level</h3>
-                <p className="text-slate-400 text-sm">Complex puzzles, Google/Microsoft style brain teasers</p>
+                <p className="text-slate-400 text-sm">Google, Microsoft style</p>
               </div>
-              <ul className="text-xs text-slate-500 space-y-1 mb-4">
-                <li>• Optimization Problems</li>
-                <li>• Advanced Logical Puzzles</li>
-                <li>• Strategy & Game Theory</li>
+              <ul className="text-xs text-slate-400 space-y-2 mb-4">
+                <li>✓ Optimization Problems</li>
+                <li>✓ Advanced Logical Puzzles</li>
+                <li>✓ Strategy & Game Theory</li>
+                <li>✓ Brain Teasers</li>
               </ul>
               <button className="btn-secondary w-full text-sm py-2">Start Senior Level →</button>
             </div>

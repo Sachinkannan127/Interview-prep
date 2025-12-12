@@ -1,4 +1,5 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore, auth, initialize_app
 from dotenv import load_dotenv
@@ -11,42 +12,71 @@ class FirebaseService:
         self.db = None
         
         try:
-            # Check if we should initialize Firebase
-            cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
+            # Option 1: Try environment variable (for production deployment)
+            firebase_creds_env = os.getenv('FIREBASE_CREDENTIALS')
+            
+            # Option 2: Try credentials file path
+            cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-credentials.json')
+            
+            # Option 3: Check for project ID to determine if we should initialize
             project_id = os.getenv('FIREBASE_PROJECT_ID')
             
-            # Skip Firebase initialization if credentials look like mock/placeholder
-            if not project_id or project_id == 'your_firebase_project_id':
-                print("Info: Using mock Firebase (no real credentials configured)")
-                print("Backend will run with in-memory storage for development")
-                self.mock_storage = {}
-                return
+            cred = None
             
-            if cred_path and os.path.exists(cred_path):
+            # Priority 1: Environment variable with JSON credentials (production)
+            if firebase_creds_env:
+                try:
+                    cred_dict = json.loads(firebase_creds_env)
+                    cred = credentials.Certificate(cred_dict)
+                    print("✓ Firebase credentials loaded from environment variable")
+                except json.JSONDecodeError:
+                    print("Warning: Invalid JSON in FIREBASE_CREDENTIALS environment variable")
+            
+            # Priority 2: Credentials file (local development)
+            elif cred_path and os.path.exists(cred_path):
                 # Check if it's a mock file
                 with open(cred_path, 'r') as f:
                     content = f.read()
-                    if 'MOCK_PRIVATE_KEY' in content:
-                        print("Info: Mock Firebase credentials detected")
-                        print("Backend will run with in-memory storage for development")
+                    if 'MOCK_PRIVATE_KEY' in content or 'your_' in content:
+                        print("⚠ Mock Firebase credentials detected")
+                        print("ℹ Backend will run with in-memory storage for development")
                         self.mock_storage = {}
                         return
                 
                 cred = credentials.Certificate(cred_path)
-            else:
-                # For deployment with environment variables
-                cred = credentials.ApplicationDefault()
+                print(f"✓ Firebase credentials loaded from file: {cred_path}")
             
-            initialize_app(cred, {
-                'projectId': project_id,
-            })
+            # Priority 3: Application Default Credentials (Google Cloud)
+            elif not cred and project_id and project_id != 'your_firebase_project_id':
+                try:
+                    cred = credentials.ApplicationDefault()
+                    print("✓ Firebase credentials loaded from Application Default")
+                except:
+                    pass
+            
+            # If no credentials found, use mock storage
+            if not cred:
+                print("⚠ No Firebase credentials found")
+                print("ℹ Backend will run with in-memory storage for development")
+                print("ℹ To enable Firebase:")
+                print("  1. Place firebase-credentials.json in backend/ folder")
+                print("  2. Or set FIREBASE_CREDENTIALS environment variable")
+                print("  3. See FIREBASE_SETUP.md for detailed instructions")
+                self.mock_storage = {}
+                return
+            
+            # Initialize Firebase with credentials
+            if not firebase_admin._apps:
+                initialize_app(cred, {
+                    'projectId': project_id,
+                })
             
             self.db = firestore.client()
             self.initialized = True
-            print("Success: Firebase initialized successfully")
+            print("✅ Firebase initialized successfully - Database connected")
         except Exception as e:
-            print(f"Info: Firebase not initialized: {str(e)}")
-            print("Backend will run with in-memory storage for development")
+            print(f"⚠ Firebase initialization failed: {str(e)}")
+            print("ℹ Backend will run with in-memory storage for development")
             self.mock_storage = {}
             self.initialized = False
     
