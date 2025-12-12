@@ -99,8 +99,13 @@ class GeminiService:
             print(f"Error message: {error_str}")
             
             # Check if it's a quota/rate limit error
-            if "429" in error_str or "quota" in error_str.lower() or "rate limit" in error_str.lower():
+            if ("429" in error_str or 
+                "quota" in error_str.lower() or 
+                "rate limit" in error_str.lower() or
+                "exceeded your current quota" in error_str.lower() or
+                "free_tier" in error_str.lower()):
                 print("⚠️  QUOTA EXCEEDED: Using fallback questions")
+                print(f"Quota error detected: {error_str[:200]}...")
                 return self._get_fallback_first_question(config)
             
             print(f"Error details:")
@@ -163,8 +168,13 @@ class GeminiService:
             print(f"Error message: {error_str}")
             
             # Check if it's a quota/rate limit error
-            if "429" in error_str or "quota" in error_str.lower() or "rate limit" in error_str.lower():
+            if ("429" in error_str or 
+                "quota" in error_str.lower() or 
+                "rate limit" in error_str.lower() or
+                "exceeded your current quota" in error_str.lower() or
+                "free_tier" in error_str.lower()):
                 print("⚠️  QUOTA EXCEEDED: Using fallback evaluation")
+                print(f"Quota error detected: {error_str[:200]}...")
                 return self._get_fallback_evaluation(qa_history, current_answer, config)
             
             print(f"Error details:")
@@ -466,6 +476,74 @@ Return as JSON:
             "score": 70,
             "feedback": "Good attempt!",
             "keyPoints": ["Keep practicing"]
+        }
+    
+    def _get_fallback_first_question(self, config: dict) -> str:
+        """Get a fallback first question when AI is not available or quota exceeded"""
+        import random
+        
+        category = config.get('type', 'technical')
+        difficulty = config.get('difficulty', 'mid')
+        
+        # Get fallback questions for the category and difficulty
+        fallback_questions = self._get_fallback_questions(category, difficulty, 10)
+        
+        if fallback_questions:
+            # Pick a random question
+            question_obj = random.choice(fallback_questions)
+            return question_obj['question']
+        
+        # Ultimate fallback if no questions found
+        return "Tell me about yourself and your background in software development."
+    
+    def _get_fallback_evaluation(self, qa_history: list, current_answer: str, config: dict) -> dict:
+        """Get a fallback evaluation when AI is not available or quota exceeded"""
+        word_count = len(current_answer.split())
+        char_count = len(current_answer)
+        
+        # Simple scoring based on answer length and content
+        base_score = 65
+        
+        # Bonus for longer, more detailed answers
+        if word_count > 50:
+            base_score += 10
+        elif word_count > 25:
+            base_score += 5
+        
+        # Bonus for using technical terms (simple heuristic)
+        technical_terms = ['algorithm', 'data', 'structure', 'function', 'class', 'method', 'api', 'database', 'server', 'client']
+        found_terms = sum(1 for term in technical_terms if term.lower() in current_answer.lower())
+        base_score += min(found_terms * 2, 10)
+        
+        score = min(95, max(55, base_score))
+        
+        # Generate feedback based on score
+        if score >= 85:
+            feedback = "Excellent answer! You demonstrated strong understanding and clear communication."
+        elif score >= 75:
+            feedback = "Good answer! You covered the key points well."
+        elif score >= 65:
+            feedback = "Decent answer. Consider providing more specific examples and technical details."
+        else:
+            feedback = "This answer could be improved with more depth and specific examples."
+        
+        # Generate key points based on answer content
+        key_points = []
+        if word_count > 20:
+            key_points.append("Provided a detailed response")
+        if found_terms > 0:
+            key_points.append("Used relevant technical terminology")
+        if len(current_answer.split('.')) > 2:
+            key_points.append("Structured answer with multiple points")
+        
+        if not key_points:
+            key_points = ["Consider adding more specific examples", "Practice explaining technical concepts clearly"]
+        
+        return {
+            "score": score,
+            "feedback": feedback,
+            "keyPoints": key_points,
+            "nextQuestion": self._get_fallback_first_question(config)  # Generate next question
         }
     
     def _get_fallback_questions(self, category: str, difficulty: str, count: int) -> list:
