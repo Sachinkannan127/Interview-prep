@@ -215,6 +215,7 @@ export default function Practice() {
                   className="input"
                 >
                   <option value="technical">Technical</option>
+                  <option value="aptitude">Aptitude & Reasoning</option>
                   <option value="behavioral">Behavioral</option>
                   <option value="hr">HR</option>
                 </select>

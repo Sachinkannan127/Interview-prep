@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
 
 export default function InterviewSetup() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [config, setConfig] = useState({
     type: 'technical',
     subType: 'dsa',
@@ -17,6 +18,20 @@ export default function InterviewSetup() {
     videoEnabled: true,
   });
   const [loading, setLoading] = useState(false);
+
+  // Handle default values from navigation state
+  useEffect(() => {
+    if (location.state) {
+      const { defaultType, defaultDifficulty } = location.state as any;
+      if (defaultType || defaultDifficulty) {
+        setConfig(prev => ({
+          ...prev,
+          ...(defaultType && { type: defaultType }),
+          ...(defaultDifficulty && { difficulty: defaultDifficulty })
+        }));
+      }
+    }
+  }, [location.state]);
 
   const handleStart = async () => {
     setLoading(true);

@@ -149,6 +149,70 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Aptitude Test Section */}
+        <div className="card mb-8 sm:mb-12 fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent mb-2">🧮 Aptitude & Reasoning Test</h2>
+              <p className="text-slate-300 text-base sm:text-lg">Prepare for placement drives with quantitative, logical & verbal reasoning questions</p>
+            </div>
+            <div className="hidden sm:block">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-4xl animate-pulse">
+                🎯
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="p-6 rounded-xl bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'entry' } });
+            }}>
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">📚</div>
+                <h3 className="text-xl font-bold text-white mb-2">Entry Level</h3>
+                <p className="text-slate-400 text-sm">Basic concepts, simple calculations, pattern recognition</p>
+              </div>
+              <ul className="text-xs text-slate-500 space-y-1 mb-4">
+                <li>• Number Series & Patterns</li>
+                <li>• Basic Percentage & Ratio</li>
+                <li>• Simple Speed & Time</li>
+              </ul>
+              <button className="btn-secondary w-full text-sm py-2">Start Entry Level →</button>
+            </div>
+            
+            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 hover:border-yellow-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
+            }}>
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🎓</div>
+                <h3 className="text-xl font-bold text-white mb-2">Mid Level</h3>
+                <p className="text-slate-400 text-sm">TCS, Infosys, Wipro previous year questions</p>
+              </div>
+              <ul className="text-xs text-slate-500 space-y-1 mb-4">
+                <li>• Data Interpretation</li>
+                <li>• Work-Time-Pipes Problems</li>
+                <li>• Probability & Combinations</li>
+              </ul>
+              <button className="btn-secondary w-full text-sm py-2">Start Mid Level →</button>
+            </div>
+            
+            <div className="p-6 rounded-xl bg-gradient-to-br from-red-500/10 to-pink-500/10 border border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'senior' } });
+            }}>
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🏆</div>
+                <h3 className="text-xl font-bold text-white mb-2">Senior Level</h3>
+                <p className="text-slate-400 text-sm">Complex puzzles, Google/Microsoft style brain teasers</p>
+              </div>
+              <ul className="text-xs text-slate-500 space-y-1 mb-4">
+                <li>• Optimization Problems</li>
+                <li>• Advanced Logical Puzzles</li>
+                <li>• Strategy & Game Theory</li>
+              </ul>
+              <button className="btn-secondary w-full text-sm py-2">Start Senior Level →</button>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 fade-in">
           <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
