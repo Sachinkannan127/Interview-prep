@@ -15,11 +15,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     if (isDarkMode) {
       root.classList.add('dark');
+      root.classList.remove('light');
+      body.classList.remove('light');
       localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
+      body.classList.add('light');
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);

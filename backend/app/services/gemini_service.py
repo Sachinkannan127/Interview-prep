@@ -375,6 +375,30 @@ Evaluate the answer and provide:
 5. List of improvements (2-3 points)
 6. Next follow-up question (or "INTERVIEW_COMPLETE" if enough questions asked) - Make it relevant to {sub_type if sub_type else interview_type}
 
+**CRITICAL RULES FOR NEXT QUESTION:**
+"""
+        
+        if interview_type == 'aptitude':
+            prompt += """- ONLY ask aptitude and reasoning questions (quantitative, logical reasoning, verbal reasoning, data interpretation, puzzles)
+- DO NOT ask technical coding, programming, or system design questions
+- DO NOT ask behavioral or communication questions
+- Categories: Number series, percentage, profit-loss, speed-time-distance, logical puzzles, pattern recognition, coding-decoding, data interpretation, verbal reasoning
+- Example: "If a train travels 120 km in 2 hours, what is its speed?" or "Complete the series: 2, 6, 12, 20, ?"
+"""
+        elif interview_type == 'technical':
+            prompt += """- ONLY ask technical questions (coding, algorithms, data structures, system design, frameworks, databases)
+- DO NOT ask aptitude/reasoning questions (number series, percentage, puzzles)
+- DO NOT ask behavioral questions
+- Focus on programming, software engineering, and technical problem-solving
+"""
+        elif interview_type == 'behavioral':
+            prompt += """- ONLY ask behavioral and communication questions (STAR method, teamwork, conflict resolution, leadership)
+- DO NOT ask technical coding questions
+- DO NOT ask aptitude/reasoning questions
+- Focus on soft skills, past experiences, and interpersonal situations
+"""
+        
+        prompt += """
 Return response as JSON:
 {{
   "score": 75,

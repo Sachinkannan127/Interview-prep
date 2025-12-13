@@ -6,6 +6,7 @@ import { Brain, Play, TrendingUp, RefreshCw, Target, FileText, Download } from '
 import toast from 'react-hot-toast';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import jsPDF from 'jspdf';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -55,6 +56,179 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadQuestionPaper = (company: string, year: number, type: string, questions: number, difficulty: string) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    // Header
+    doc.setFillColor(99, 102, 241);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${company} Interview Questions`, pageWidth / 2, 20, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Year ${year} | ${type} | ${difficulty} Level`, pageWidth / 2, 30, { align: 'center' });
+
+    yPosition = 55;
+    doc.setTextColor(0, 0, 0);
+
+    // Question bank based on company and type
+    const questionBanks: Record<string, string[]> = {
+      'Google-Technical': [
+        'Q1. Explain how you would design a URL shortening service like bit.ly.',
+        'Q2. Implement a function to find the longest palindromic substring in a given string.',
+        'Q3. How would you design a distributed cache system?',
+        'Q4. Explain the difference between processes and threads.',
+        'Q5. Design a rate limiter for an API service.',
+        'Q6. Implement a binary search tree and its traversal methods.',
+        'Q7. How would you handle millions of concurrent users in a web application?',
+        'Q8. Explain MapReduce and its use cases.',
+        'Q9. Design a notification system that can send emails, SMS, and push notifications.',
+        'Q10. Implement an LRU (Least Recently Used) cache.'
+      ],
+      'Amazon-Behavioral + Technical': [
+        'Q1. Tell me about a time when you faced a tight deadline.',
+        'Q2. How do you prioritize tasks when working on multiple projects?',
+        'Q3. Implement a function to reverse a linked list.',
+        'Q4. Describe a situation where you had to deal with ambiguity.',
+        'Q5. Explain the CAP theorem in distributed systems.',
+        'Q6. Tell me about a time you failed and what you learned.',
+        'Q7. How would you design Amazon\'s product recommendation system?',
+        'Q8. Describe your approach to debugging a production issue.',
+        'Q9. Implement a function to find the k-th largest element in an array.',
+        'Q10. How do you ensure code quality in your projects?'
+      ],
+      'Microsoft-System Design': [
+        'Q1. Design a file storage system like Dropbox or Google Drive.',
+        'Q2. How would you architect a real-time chat application?',
+        'Q3. Design a social media feed like Twitter or Facebook.',
+        'Q4. Explain how you would build a video streaming service.',
+        'Q5. Design a payment gateway system.',
+        'Q6. How would you implement a distributed job scheduler?',
+        'Q7. Design an online multiplayer gaming system.',
+        'Q8. Explain the architecture of a content delivery network (CDN).',
+        'Q9. Design a parking lot management system.',
+        'Q10. How would you build a search autocomplete feature?'
+      ],
+      'Meta-Coding': [
+        'Q1. Implement a function to detect a cycle in a linked list.',
+        'Q2. Find the median of two sorted arrays.',
+        'Q3. Implement a trie data structure for autocomplete.',
+        'Q4. Design and implement a thread-safe singleton pattern.',
+        'Q5. Solve the "N-Queens" problem using backtracking.',
+        'Q6. Implement a binary heap and heapsort algorithm.',
+        'Q7. Find the shortest path in a weighted graph (Dijkstra\'s algorithm).',
+        'Q8. Implement a function to serialize and deserialize a binary tree.',
+        'Q9. Design a data structure for LFU (Least Frequently Used) cache.',
+        'Q10. Solve the "Word Ladder" problem using BFS.'
+      ],
+      'TCS-Aptitude': [
+        'Q1. If a train travels 60 km in 45 minutes, what is its speed in km/h?',
+        'Q2. Find the next number in the series: 2, 6, 12, 20, 30, ?',
+        'Q3. A can complete a work in 12 days, B in 18 days. How long together?',
+        'Q4. If 20% of A = 30% of B, what is the ratio of A to B?',
+        'Q5. The average of 5 numbers is 27. If one number is excluded, average is 25. Find the excluded number.',
+        'Q6. A profit of 20% is made by selling an article for Rs. 240. What is the cost price?',
+        'Q7. In a class of 60 students, 30 play cricket, 25 play football. 10 play both. How many play neither?',
+        'Q8. If DELHI is coded as 73541 and CALCUTTA as 82589662, how is CALICUT coded?',
+        'Q9. A clock shows 3:15. What is the angle between hour and minute hands?',
+        'Q10. Find the compound interest on Rs. 10000 at 10% per annum for 2 years.'
+      ],
+      'Infosys-Aptitude + Technical': [
+        'Q1. Explain the difference between abstract class and interface in Java.',
+        'Q2. If the ratio of boys to girls is 3:2 and there are 45 boys, how many girls?',
+        'Q3. What is polymorphism? Provide examples.',
+        'Q4. A vendor buys oranges at Rs. 2 for 3 oranges and sells at Rs. 1 per orange. Find profit%.',
+        'Q5. Explain the SOLID principles in object-oriented programming.',
+        'Q6. Find the missing number: 8, 27, 64, 125, ?, 343',
+        'Q7. What is the difference between SQL and NoSQL databases?',
+        'Q8. If a = 5, b = 3, what is the value of (a++ + ++b) * 2?',
+        'Q9. Explain the concept of normalization in databases.',
+        'Q10. A bag contains 5 red, 4 blue, and 3 green balls. What is the probability of drawing a blue ball?'
+      ],
+      'Wipro-Communication + Technical': [
+        'Q1. Introduce yourself and describe your career goals.',
+        'Q2. Explain the HTTP request-response cycle.',
+        'Q3. How do you handle conflicts in a team environment?',
+        'Q4. What is the difference between GET and POST methods?',
+        'Q5. Describe a challenging project you worked on.',
+        'Q6. Explain RESTful API design principles.',
+        'Q7. How do you stay updated with the latest technology trends?',
+        'Q8. What are the advantages of using version control systems like Git?',
+        'Q9. Why do you want to work for our company?',
+        'Q10. Explain the concept of Agile methodology.'
+      ],
+      'Accenture-Aptitude': [
+        'Q1. If 25% of a number is 75, what is 40% of that number?',
+        'Q2. Complete the series: 1, 4, 9, 16, 25, ?',
+        'Q3. A person covers a distance at 40 km/h and returns at 60 km/h. Find average speed.',
+        'Q4. If the cost price is Rs. 800 and selling price is Rs. 1000, find the profit percentage.',
+        'Q5. Find the odd one out: 3, 5, 11, 14, 17, 21',
+        'Q6. If A:B = 2:3 and B:C = 4:5, find A:B:C',
+        'Q7. How many two-digit numbers are divisible by 7?',
+        'Q8. A sum of money doubles itself in 5 years at simple interest. In how many years will it triple?',
+        'Q9. Find the value of x: (x + 5) / 3 = 7',
+        'Q10. The ages of A and B are in ratio 5:3. After 4 years, ratio becomes 11:7. Find their present ages.'
+      ]
+    };
+
+    const key = `${company}-${type}`;
+    const selectedQuestions = questionBanks[key] || [
+      'Q1. Sample question 1 for this company and type.',
+      'Q2. Sample question 2 for this company and type.',
+      'Q3. Sample question 3 for this company and type.',
+      'Q4. Sample question 4 for this company and type.',
+      'Q5. Sample question 5 for this company and type.',
+    ];
+
+    // Add questions
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sample Questions:', 15, yPosition);
+    yPosition += 10;
+
+    doc.setFont('helvetica', 'normal');
+    selectedQuestions.forEach((question, index) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      const lines = doc.splitTextToSize(question, pageWidth - 30);
+      lines.forEach((line: string) => {
+        doc.text(line, 15, yPosition);
+        yPosition += 6;
+      });
+      yPosition += 4;
+    });
+
+    // Footer
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    yPosition = pageHeight - 30;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(0, yPosition - 10, pageWidth, 30, 'F');
+    
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Total Questions: ${questions} | Difficulty: ${difficulty}`, pageWidth / 2, yPosition, { align: 'center' });
+    doc.text('For more questions, visit: www.interviewai.com', pageWidth / 2, yPosition + 7, { align: 'center' });
+    doc.text(`© ${new Date().getFullYear()} InterviewAI - All Rights Reserved`, pageWidth / 2, yPosition + 14, { align: 'center' });
+
+    // Save PDF
+    doc.save(`${company}_${year}_${type.replace(/\s+/g, '_')}_Questions.pdf`);
+    toast.success(`Downloaded ${company} ${year} question paper PDF!`);
   };
 
   return (
@@ -261,9 +435,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="card">
+        {/* Interview History */}
+        <div className="card mb-8 sm:mb-12 fade-in">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Recent Interviews</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Interview History</h2>
             <button
               onClick={loadData}
               disabled={loading}
@@ -391,7 +566,7 @@ export default function Dashboard() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      toast.success(`Downloading ${paper.company} ${paper.year} question paper`);
+                      downloadQuestionPaper(paper.company, paper.year, paper.type, paper.questions);
                     }}
                     className="px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 border border-purple-500/30 hover:border-purple-500/50 text-white font-medium text-sm flex items-center gap-2 transition-all"
                   >
