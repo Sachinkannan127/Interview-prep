@@ -196,7 +196,7 @@ export default function Dashboard() {
     yPosition += 10;
 
     doc.setFont('helvetica', 'normal');
-    selectedQuestions.forEach((question, index) => {
+    selectedQuestions.forEach((question) => {
       if (yPosition > pageHeight - 30) {
         doc.addPage();
         yPosition = 20;
@@ -307,74 +307,6 @@ export default function Dashboard() {
                 <div>🤖 AI Evaluation</div>
               </div>
               <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">Start Interview →</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Aptitude Test Difficulty Levels - Detailed */}
-        <div className="card mb-8 sm:mb-12 fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">🎯 Aptitude & Reasoning - Choose Your Level</h2>
-              <p className="text-slate-300 text-sm sm:text-base">Select difficulty based on your preparation stage</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
-            <div className="p-8 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 hover:border-green-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
-              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'entry' } });
-            }}>
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">📚</div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white mb-2">Entry Level</h3>
-                  <p className="text-slate-300 text-sm mb-3">Perfect for beginners</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                    <div>✓ Number Series & Patterns</div>
-                    <div>✓ Basic Percentage & Ratio</div>
-                    <div>✓ Simple Speed & Time</div>
-                    <div>✓ Pattern Recognition</div>
-                  </div>
-                </div>
-                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
-              </div>
-            </div>
-            
-            <div className="p-8 rounded-xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
-              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
-            }}>
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">🎓</div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white mb-2">Mid Level</h3>
-                  <p className="text-slate-300 text-sm mb-3">TCS, Infosys, Wipro style</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                    <div>✓ Data Interpretation</div>
-                    <div>✓ Work-Time-Pipes Problems</div>
-                    <div>✓ Probability & Combinations</div>
-                    <div>✓ Company Previous Papers</div>
-                  </div>
-                </div>
-                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
-              </div>
-            </div>
-            
-            <div className="p-8 rounded-xl bg-gradient-to-r from-red-500/10 to-pink-500/10 border-2 border-red-500/30 hover:border-red-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
-              navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'senior' } });
-            }}>
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">🏆</div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white mb-2">Senior Level</h3>
-                  <p className="text-slate-300 text-sm mb-3">Google, Microsoft style</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                    <div>✓ Optimization Problems</div>
-                    <div>✓ Advanced Logical Puzzles</div>
-                    <div>✓ Strategy & Game Theory</div>
-                    <div>✓ Brain Teasers</div>
-                  </div>
-                </div>
-                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
-              </div>
             </div>
           </div>
         </div>
@@ -566,7 +498,7 @@ export default function Dashboard() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      downloadQuestionPaper(paper.company, paper.year, paper.type, paper.questions);
+                      downloadQuestionPaper(paper.company, paper.year, paper.type, paper.questions, paper.difficulty);
                     }}
                     className="px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 border border-purple-500/30 hover:border-purple-500/50 text-white font-medium text-sm flex items-center gap-2 transition-all"
                   >

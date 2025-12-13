@@ -291,7 +291,7 @@ Common topics: Load balancing, caching, database sharding, microservices vs mono
 """
         
         if interview_type == 'aptitude':
-            prompt += f"""Focus on aptitude and reasoning questions commonly asked in placement drives and competitive exams.
+            prompt += f"""Focus EXCLUSIVELY on aptitude and reasoning questions commonly asked in placement drives and competitive exams.
 
 Categories to cover:
 - Quantitative Aptitude: Speed-distance-time, profit-loss, percentage, ratio-proportion, time-work, pipes-cisterns, trains, boats-streams
@@ -300,6 +300,8 @@ Categories to cover:
 - Data Interpretation: Tables, bar graphs, pie charts, line graphs, data sufficiency
 - Probability & Statistics: Basic probability, permutations, combinations
 - Puzzles: Logic puzzles, optimization problems, strategy games
+
+**CRITICAL: DO NOT ask any technical programming, coding, algorithm, or system design questions. This is STRICTLY an aptitude test.**
 
 Difficulty levels:
 - Entry: Basic concepts, simple calculations, direct formula application
@@ -310,23 +312,32 @@ Difficulty levels:
         
         prompt += f"""Generate the first interview question. Make it relevant, realistic, and appropriate for the difficulty level.
 
+**CRITICAL QUESTION TYPE ENFORCEMENT:**
+
 For aptitude interviews:
+- ONLY ask aptitude/reasoning questions (quantitative, logical, verbal, data interpretation, puzzles)
+- DO NOT ask any technical coding, programming, or system design questions
+- DO NOT ask behavioral or communication questions
 - Entry level: Basic formulas, simple calculations, pattern recognition
 - Mid level: Multi-step problems, company-specific previous year questions
 - Senior level: Complex puzzles, optimization, creative problem-solving
 
 For technical interviews:
+- ONLY ask technical questions (coding, algorithms, data structures, system design, frameworks, databases)
+- DO NOT ask aptitude questions (speed-time, percentage, number series, logical puzzles)
+- DO NOT ask behavioral questions
 - Entry level: Focus on fundamental concepts, basic syntax, common patterns, simple problem-solving
 - Mid level: Test practical experience, problem-solving, design decisions, real-world scenarios
 - Senior level: Architecture, scalability, trade-offs, complex scenarios, leadership, system design
-- IMPORTANT: Only ask technical questions related to coding, system design, algorithms, data structures, frameworks, and software engineering concepts
 
 For behavioral interviews:
+- ONLY ask behavioral and communication questions (STAR method, teamwork, conflict resolution, leadership)
+- DO NOT ask any technical coding, algorithm, or system design questions
+- DO NOT ask aptitude questions (speed-time, percentage, puzzles)
 - Use STAR format questions (Situation, Task, Action, Result)
 - Focus on communication skills, teamwork, interpersonal dynamics, conflict resolution, leadership
 - Assess soft skills such as: communication, collaboration, adaptability, emotional intelligence, problem-solving in team contexts
 - Ask about scenarios like: handling difficult teammates, giving/receiving feedback, presenting ideas, active listening, negotiation
-- IMPORTANT: Only ask behavioral/communication questions. No technical coding or algorithm questions
 
 For HR interviews:
 - Ask about motivation, career goals, company fit, cultural alignment
@@ -339,7 +350,11 @@ Important guidelines:
 4. Keep it concise (1-3 sentences)
 5. For coding questions, specify language preference if applicable
 6. If a company is specified, tailor the question to their known interview style and focus areas
-7. **CRITICAL**: For technical interviews, ONLY ask technical questions (coding, design, algorithms). For behavioral interviews, ONLY ask communication/soft skill questions (teamwork, conflict resolution, leadership)
+7. **STRICTLY ENFORCE**: 
+   - Aptitude interviews = ONLY aptitude/reasoning questions
+   - Technical interviews = ONLY technical/coding questions
+   - Behavioral interviews = ONLY behavioral/communication questions
+   - NO MIXING OF QUESTION TYPES
 
 Return ONLY the question text, nothing else."""
 
