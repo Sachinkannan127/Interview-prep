@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Brain, Mic, TrendingUp, Shield } from 'lucide-react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -20,18 +22,7 @@ export default function Landing() {
         <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
-      <nav className="container mx-auto px-6 py-6 flex justify-between items-center relative z-10">
-        <div className="flex items-center gap-3 text-2xl font-bold">
-          <div className="relative">
-            <Brain className="w-10 h-10 text-indigo-400 animate-pulse" />
-            <div className="absolute inset-0 w-10 h-10 bg-indigo-500/30 rounded-full blur-xl" />
-          </div>
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold">InterviewAI</span>
-        </div>
-        <button onClick={() => navigate('/auth')} className="btn-primary">
-          Get Started →
-        </button>
-      </nav>
+      <Header showAuthButton={true} />
 
       <main className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
         <div className="text-center max-w-5xl mx-auto mb-16 sm:mb-20 fade-in">
@@ -101,6 +92,8 @@ export default function Landing() {
           />
         </div>
       </main>
+      
+      <Footer />
     </div>
     </>
   );

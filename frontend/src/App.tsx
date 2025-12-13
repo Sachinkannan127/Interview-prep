@@ -11,6 +11,7 @@ import InterviewSession from './pages/InterviewSession';
 import InterviewResults from './pages/InterviewResults';
 import Practice from './pages/Practice';
 import AdminPanel from './pages/AdminPanel';
+import Settings from './pages/Settings';
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -36,6 +37,7 @@ function App() {
         <Route path="/interview/results/:id" element={user ? <InterviewResults /> : <Navigate to="/auth" />} />
         <Route path="/practice" element={user ? <Practice /> : <Navigate to="/auth" />} />
         <Route path="/admin" element={user ? <AdminPanel /> : <Navigate to="/auth" />} />
+        <Route path="/settings" element={user ? <Settings /> : <Navigate to="/auth" />} />
       </Routes>
     </BrowserRouter>
   );
