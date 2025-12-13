@@ -166,60 +166,66 @@ export default function Dashboard() {
         <div className="card mb-8 sm:mb-12 fade-in">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">🎯 Choose Your Level</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">🎯 Aptitude & Reasoning - Choose Your Level</h2>
               <p className="text-slate-300 text-sm sm:text-base">Select difficulty based on your preparation stage</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 hover:border-green-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+          <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
+            <div className="p-8 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 hover:border-green-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
               navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'entry' } });
             }}>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">📚</div>
-                <h3 className="text-xl font-bold text-white mb-2">Entry Level</h3>
-                <p className="text-slate-400 text-sm">Perfect for beginners</p>
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">📚</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-white mb-2">Entry Level</h3>
+                  <p className="text-slate-300 text-sm mb-3">Perfect for beginners</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                    <div>✓ Number Series & Patterns</div>
+                    <div>✓ Basic Percentage & Ratio</div>
+                    <div>✓ Simple Speed & Time</div>
+                    <div>✓ Pattern Recognition</div>
+                  </div>
+                </div>
+                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
               </div>
-              <ul className="text-xs text-slate-400 space-y-2 mb-4">
-                <li>✓ Number Series & Patterns</li>
-                <li>✓ Basic Percentage & Ratio</li>
-                <li>✓ Simple Speed & Time</li>
-                <li>✓ Pattern Recognition</li>
-              </ul>
-              <button className="btn-secondary w-full text-sm py-2">Start Entry Level →</button>
             </div>
             
-            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 hover:border-yellow-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+            <div className="p-8 rounded-xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
               navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
             }}>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🎓</div>
-                <h3 className="text-xl font-bold text-white mb-2">Mid Level</h3>
-                <p className="text-slate-400 text-sm">TCS, Infosys, Wipro style</p>
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">🎓</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-white mb-2">Mid Level</h3>
+                  <p className="text-slate-300 text-sm mb-3">TCS, Infosys, Wipro style</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                    <div>✓ Data Interpretation</div>
+                    <div>✓ Work-Time-Pipes Problems</div>
+                    <div>✓ Probability & Combinations</div>
+                    <div>✓ Company Previous Papers</div>
+                  </div>
+                </div>
+                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
               </div>
-              <ul className="text-xs text-slate-400 space-y-2 mb-4">
-                <li>✓ Data Interpretation</li>
-                <li>✓ Work-Time-Pipes Problems</li>
-                <li>✓ Probability & Combinations</li>
-                <li>✓ Company Previous Papers</li>
-              </ul>
-              <button className="btn-secondary w-full text-sm py-2">Start Mid Level →</button>
             </div>
             
-            <div className="p-6 rounded-xl bg-gradient-to-br from-red-500/10 to-pink-500/10 border border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer hover:scale-105" onClick={() => {
+            <div className="p-8 rounded-xl bg-gradient-to-r from-red-500/10 to-pink-500/10 border-2 border-red-500/30 hover:border-red-500/50 transition-all cursor-pointer hover:scale-105" onClick={() => {
               navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'senior' } });
             }}>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg mx-auto mb-3">🏆</div>
-                <h3 className="text-xl font-bold text-white mb-2">Senior Level</h3>
-                <p className="text-slate-400 text-sm">Google, Microsoft style</p>
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg flex-shrink-0">🏆</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-white mb-2">Senior Level</h3>
+                  <p className="text-slate-300 text-sm mb-3">Google, Microsoft style</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                    <div>✓ Optimization Problems</div>
+                    <div>✓ Advanced Logical Puzzles</div>
+                    <div>✓ Strategy & Game Theory</div>
+                    <div>✓ Brain Teasers</div>
+                  </div>
+                </div>
+                <button className="btn-secondary px-6 py-3 text-sm">Start →</button>
               </div>
-              <ul className="text-xs text-slate-400 space-y-2 mb-4">
-                <li>✓ Optimization Problems</li>
-                <li>✓ Advanced Logical Puzzles</li>
-                <li>✓ Strategy & Game Theory</li>
-                <li>✓ Brain Teasers</li>
-              </ul>
-              <button className="btn-secondary w-full text-sm py-2">Start Senior Level →</button>
             </div>
           </div>
         </div>

@@ -319,11 +319,14 @@ For technical interviews:
 - Entry level: Focus on fundamental concepts, basic syntax, common patterns, simple problem-solving
 - Mid level: Test practical experience, problem-solving, design decisions, real-world scenarios
 - Senior level: Architecture, scalability, trade-offs, complex scenarios, leadership, system design
+- IMPORTANT: Only ask technical questions related to coding, system design, algorithms, data structures, frameworks, and software engineering concepts
 
 For behavioral interviews:
 - Use STAR format questions (Situation, Task, Action, Result)
-- Focus on real-world scenarios relevant to the role and company culture
-- Assess teamwork, conflict resolution, leadership, and problem-solving
+- Focus on communication skills, teamwork, interpersonal dynamics, conflict resolution, leadership
+- Assess soft skills such as: communication, collaboration, adaptability, emotional intelligence, problem-solving in team contexts
+- Ask about scenarios like: handling difficult teammates, giving/receiving feedback, presenting ideas, active listening, negotiation
+- IMPORTANT: Only ask behavioral/communication questions. No technical coding or algorithm questions
 
 For HR interviews:
 - Ask about motivation, career goals, company fit, cultural alignment
@@ -336,6 +339,7 @@ Important guidelines:
 4. Keep it concise (1-3 sentences)
 5. For coding questions, specify language preference if applicable
 6. If a company is specified, tailor the question to their known interview style and focus areas
+7. **CRITICAL**: For technical interviews, ONLY ask technical questions (coding, design, algorithms). For behavioral interviews, ONLY ask communication/soft skill questions (teamwork, conflict resolution, leadership)
 
 Return ONLY the question text, nothing else."""
 

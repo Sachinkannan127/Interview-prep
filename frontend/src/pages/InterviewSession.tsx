@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { interviewAPI } from '../services/api';
 import { detectFillerWords, calculateWordCount, calculateConfidenceScore, formatDuration } from '../utils/metrics';
 import toast from 'react-hot-toast';
-import { Send, Video, VideoOff, MessageCircle, X, Home } from 'lucide-react';
+import { Send, Video, VideoOff, MessageCircle, X, Home, Clock } from 'lucide-react';
 import { InterviewConfig } from '../types';
 
 export default function InterviewSession() {
@@ -20,6 +20,8 @@ export default function InterviewSession() {
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const [interviewEndTime, setInterviewEndTime] = useState<number | null>(null);
   const [metrics, setMetrics] = useState({
     wordCount: 0,
     fillerCount: 0,
@@ -27,6 +29,7 @@ export default function InterviewSession() {
     responseTime: 0,
   });
   const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     loadInterview();
@@ -36,8 +39,53 @@ export default function InterviewSession() {
         console.log('Stopping camera on unmount...');
         stream.getTracks().forEach(track => track.stop());
       }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, [id]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (interview && interviewEndTime) {
+      // Clear any existing timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+
+      // Start countdown timer
+      timerRef.current = setInterval(() => {
+        const now = Date.now();
+        const timeLeft = Math.max(0, Math.floor((interviewEndTime - now) / 1000));
+        setRemainingTime(timeLeft);
+
+        // Auto-end interview when time runs out
+        if (timeLeft === 0) {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          toast.error('Time is up! Interview ended automatically.');
+          handleFinishInterview();
+        }
+
+        // Warning at 5 minutes
+        if (timeLeft === 300) {
+          toast('⏰ 5 minutes remaining!', { icon: '⚠️', duration: 5000 });
+        }
+
+        // Warning at 1 minute
+        if (timeLeft === 60) {
+          toast('⏰ 1 minute remaining!', { icon: '🚨', duration: 5000 });
+        }
+      }, 1000);
+
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    }
+  }, [interview, interviewEndTime]);
 
   useEffect(() => {
     if (interview?.config?.videoEnabled && !stream && !isCameraOn) {
@@ -274,6 +322,21 @@ export default function InterviewSession() {
       const data = await interviewAPI.getInterview(id!);
       console.log('Interview loaded:', data);
       setInterview(data);
+      
+      // Calculate interview end time based on duration
+      if (data.config?.durationMinutes && data.startedAt) {
+        const startTime = new Date(data.startedAt).getTime();
+        const durationMs = data.config.durationMinutes * 60 * 1000;
+        const endTime = startTime + durationMs;
+        setInterviewEndTime(endTime);
+        
+        const now = Date.now();
+        const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+        setRemainingTime(timeLeft);
+        
+        console.log(`Interview duration: ${data.config.durationMinutes} minutes`);
+        console.log(`Time remaining: ${Math.floor(timeLeft / 60)} minutes ${timeLeft % 60} seconds`);
+      }
       
       if (data.qa && data.qa.length > 0) {
         const lastQA = data.qa[data.qa.length - 1];
@@ -573,6 +636,19 @@ export default function InterviewSession() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-dark-800">Interview in Progress</h2>
                 <div className="flex gap-2">
+                  {/* Timer Display */}
+                  {remainingTime > 0 && (
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm ${
+                      remainingTime <= 60 ? 'bg-red-100 text-red-700 animate-pulse' : 
+                      remainingTime <= 300 ? 'bg-yellow-100 text-yellow-700' : 
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {Math.floor(remainingTime / 60)}:{String(remainingTime % 60).padStart(2, '0')}
+                      </span>
+                    </div>
+                  )}
                   <button onClick={() => navigate('/dashboard')} className="btn-secondary text-sm flex items-center gap-1">
                     <Home className="w-4 h-4" />
                     Home

@@ -105,43 +105,60 @@ export default function InterviewSetup() {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">🏢 Target Company (Optional)</label>
-              <select value={config.company} onChange={(e) => setConfig({ ...config, company: e.target.value })} className="input">
-                <option value="">Any Company</option>
-                <option value="TCS">TCS (Tata Consultancy Services)</option>
-                <option value="Infosys">Infosys</option>
-                <option value="Wipro">Wipro</option>
-                <option value="HCL">HCL Technologies</option>
-                <option value="Tech Mahindra">Tech Mahindra</option>
-                <option value="Cognizant">Cognizant (CTS)</option>
-                <option value="Accenture">Accenture</option>
-                <option value="Capgemini">Capgemini</option>
-                <option value="LTI">LTIMindtree</option>
-                <option value="Mphasis">Mphasis</option>
-                <option value="Google">Google</option>
-                <option value="Microsoft">Microsoft</option>
-                <option value="Amazon">Amazon</option>
-                <option value="Meta">Meta (Facebook)</option>
-                <option value="Apple">Apple</option>
-              </select>
-            </div>
+            {(config.type === 'technical' || config.type === 'aptitude') && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">🏢 Target Company (Optional)</label>
+                <select value={config.company} onChange={(e) => setConfig({ ...config, company: e.target.value })} className="input">
+                  <option value="">Any Company</option>
+                  {config.type === 'aptitude' && (
+                    <>
+                      <option value="TCS">TCS (Tata Consultancy Services)</option>
+                      <option value="Infosys">Infosys</option>
+                      <option value="Wipro">Wipro</option>
+                      <option value="HCL">HCL Technologies</option>
+                      <option value="Tech Mahindra">Tech Mahindra</option>
+                      <option value="Cognizant">Cognizant (CTS)</option>
+                      <option value="Accenture">Accenture</option>
+                      <option value="Capgemini">Capgemini</option>
+                      <option value="LTI">LTIMindtree</option>
+                      <option value="Mphasis">Mphasis</option>
+                    </>
+                  )}
+                  {config.type === 'technical' && (
+                    <>
+                      <option value="Google">Google</option>
+                      <option value="Microsoft">Microsoft</option>
+                      <option value="Amazon">Amazon</option>
+                      <option value="Meta">Meta (Facebook)</option>
+                      <option value="Apple">Apple</option>
+                      <option value="Netflix">Netflix</option>
+                      <option value="Uber">Uber</option>
+                      <option value="Airbnb">Airbnb</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            )}
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">🏭 Industry</label>
-              <select value={config.industry} onChange={(e) => setConfig({ ...config, industry: e.target.value })} className="input">
-                <option value="Software Engineering">Software Engineering</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Product Management">Product Management</option>
-                <option value="Finance">Finance</option>
-                <option value="Consulting">Consulting</option>
-              </select>
-            </div>
+            {(config.type === 'technical' || config.type === 'behavioral' || config.type === 'hr') && (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">🏭 Industry</label>
+                  <select value={config.industry} onChange={(e) => setConfig({ ...config, industry: e.target.value })} className="input">
+                    <option value="Software Engineering">Software Engineering</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Product Management">Product Management</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Consulting">Consulting</option>
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">📝 Role</label>
-              <input type="text" value={config.role} onChange={(e) => setConfig({ ...config, role: e.target.value })} className="input" />
-            </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">📝 Role</label>
+                  <input type="text" value={config.role} onChange={(e) => setConfig({ ...config, role: e.target.value })} className="input" />
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">🎯 Difficulty Level</label>
