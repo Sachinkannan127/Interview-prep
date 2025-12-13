@@ -19,12 +19,24 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks - separate large dependencies
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'react-firebase-hooks'],
-          'vendor-ui': ['lucide-react', 'react-hot-toast', 'react-helmet'],
-          'vendor-pdf': ['jspdf'],
+        manualChunks(id) {
+          // Separate vendor chunks for better caching
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            if (id.includes('lucide-react') || id.includes('react-hot-toast') || id.includes('react-helmet')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('jspdf')) {
+              return 'vendor-pdf';
+            }
+            // All other node_modules go into vendor
+            return 'vendor';
+          }
         },
       },
     },
