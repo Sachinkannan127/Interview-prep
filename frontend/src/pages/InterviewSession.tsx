@@ -324,6 +324,13 @@ export default function InterviewSession() {
       setInterview(data);
       
       // Calculate interview end time based on duration
+      console.log('Interview data:', {
+        hasDuration: !!data.config?.durationMinutes,
+        durationMinutes: data.config?.durationMinutes,
+        hasStartedAt: !!data.startedAt,
+        startedAt: data.startedAt
+      });
+      
       if (data.config?.durationMinutes && data.startedAt) {
         const startTime = new Date(data.startedAt).getTime();
         const durationMs = data.config.durationMinutes * 60 * 1000;
@@ -335,7 +342,14 @@ export default function InterviewSession() {
         setRemainingTime(timeLeft);
         
         console.log(`Interview duration: ${data.config.durationMinutes} minutes`);
+        console.log(`Started at: ${new Date(data.startedAt).toLocaleTimeString()}`);
+        console.log(`End time: ${new Date(endTime).toLocaleTimeString()}`);
         console.log(`Time remaining: ${Math.floor(timeLeft / 60)} minutes ${timeLeft % 60} seconds`);
+      } else {
+        console.warn('Timer not initialized - missing duration or startedAt', {
+          duration: data.config?.durationMinutes,
+          startedAt: data.startedAt
+        });
       }
       
       if (data.qa && data.qa.length > 0) {
@@ -637,7 +651,7 @@ export default function InterviewSession() {
                 <h2 className="text-2xl font-bold text-dark-800">Interview in Progress</h2>
                 <div className="flex gap-2">
                   {/* Timer Display */}
-                  {remainingTime > 0 && (
+                  {interviewEndTime && (
                     <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm ${
                       remainingTime <= 60 ? 'bg-red-100 text-red-700 animate-pulse' : 
                       remainingTime <= 300 ? 'bg-yellow-100 text-yellow-700' : 
