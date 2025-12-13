@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.models.schemas import StartInterviewRequest, SubmitAnswerRequest
 from app.services.firebase_service import firebase_service
 from app.services.gemini_service import gemini_service
@@ -7,6 +7,7 @@ from app.middleware.auth import get_current_user
 from pydantic import BaseModel
 from typing import List
 import uuid
+import random
 
 router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 
@@ -345,17 +346,5 @@ async def start_with_questions(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start interview: {str(e)}")
-        
-        for qa in qa_history:
-            if qa.get('aiFeedback'):
-                feedback_summary["detailedFeedback"].append({
-                    "question": qa.get('questionText'),
-                    "answer": qa.get('answerText'),
-                    "score": qa.get('aiScore'),
-                    "feedback": qa.get('aiFeedback'),
-                    "modelAnswer": qa.get('modelAnswer')
-                })
-        
-        return feedback_summary
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get AI feedback: {str(e)}")
+
+

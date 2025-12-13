@@ -7,7 +7,7 @@ import os
 import logging
 from datetime import datetime
 
-from app.api import interviews, questions, chat
+from app.api import interviews, questions, chat, code
 
 # Load environment variables
 load_dotenv()
@@ -76,6 +76,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 app.include_router(interviews.router)
 app.include_router(questions.router)
 app.include_router(chat.router)
+app.include_router(code.router)
 
 @app.get("/")
 async def root():

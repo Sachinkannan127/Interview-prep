@@ -125,7 +125,7 @@ export default function Footer() {
               © {currentYear} InterviewAI. All rights reserved.
             </p>
             <p className="text-slate-500 text-xs">
-              Powered by AI • Built with ❤️
+              Powered by Interview • Built with ❤️
             </p>
           </div>
         </div>

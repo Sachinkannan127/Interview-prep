@@ -301,7 +301,16 @@ Categories to cover:
 - Probability & Statistics: Basic probability, permutations, combinations
 - Puzzles: Logic puzzles, optimization problems, strategy games
 
-**CRITICAL: DO NOT ask any technical programming, coding, algorithm, or system design questions. This is STRICTLY an aptitude test.**
+**ABSOLUTELY FORBIDDEN TOPICS - DO NOT ASK ABOUT:**
+- Programming/Coding (Python, Java, C++, JavaScript, etc.)
+- Algorithms (sorting, searching, recursion, dynamic programming)
+- Data Structures (arrays, linked lists, trees, graphs, stacks, queues)
+- System Design (scalability, databases, APIs, microservices)
+- Software Development (frameworks, libraries, version control)
+- Behavioral Questions (teamwork, leadership, conflict resolution)
+- STAR method questions or soft skills
+
+**THIS IS STRICTLY A QUANTITATIVE/LOGICAL/VERBAL REASONING TEST ONLY**
 
 Difficulty levels:
 - Entry: Basic concepts, simple calculations, direct formula application
@@ -324,20 +333,22 @@ For aptitude interviews:
 
 For technical interviews:
 - ONLY ask technical questions (coding, algorithms, data structures, system design, frameworks, databases)
-- DO NOT ask aptitude questions (speed-time, percentage, number series, logical puzzles)
-- DO NOT ask behavioral questions
-- Entry level: Focus on fundamental concepts, basic syntax, common patterns, simple problem-solving
-- Mid level: Test practical experience, problem-solving, design decisions, real-world scenarios
-- Senior level: Architecture, scalability, trade-offs, complex scenarios, leadership, system design
+- Focus on: Programming languages, OOP concepts, API design, debugging, testing, algorithms, complexity analysis
+- **ABSOLUTELY FORBIDDEN:** Quantitative aptitude (speed-time, profit-loss, percentage calculations, number series, pattern puzzles, logical reasoning, verbal questions)
+- **ABSOLUTELY FORBIDDEN:** Behavioral questions (teamwork, leadership, communication, STAR method)
+- Entry level: Fundamental concepts, basic syntax, common patterns, simple coding problems
+- Mid level: Practical experience, problem-solving, design decisions, real-world technical scenarios
+- Senior level: Architecture, scalability, trade-offs, complex systems, technical leadership
 
 For behavioral interviews:
 - ONLY ask behavioral and communication questions (STAR method, teamwork, conflict resolution, leadership)
-- DO NOT ask any technical coding, algorithm, or system design questions
-- DO NOT ask aptitude questions (speed-time, percentage, puzzles)
+- Focus on: Soft skills, past experiences, interpersonal situations, communication style, work ethic
+- **ABSOLUTELY FORBIDDEN:** Any technical/coding questions (algorithms, data structures, programming languages, frameworks, system design)
+- **ABSOLUTELY FORBIDDEN:** Quantitative aptitude (math calculations, number series, logical puzzles, speed-time problems, percentage)
 - Use STAR format questions (Situation, Task, Action, Result)
-- Focus on communication skills, teamwork, interpersonal dynamics, conflict resolution, leadership
-- Assess soft skills such as: communication, collaboration, adaptability, emotional intelligence, problem-solving in team contexts
-- Ask about scenarios like: handling difficult teammates, giving/receiving feedback, presenting ideas, active listening, negotiation
+- Topics: Teamwork, communication, conflict resolution, leadership, adaptability, time management, feedback
+- Focus on interpersonal dynamics, emotional intelligence, problem-solving in team contexts
+- Ask about scenarios: handling difficult teammates, giving/receiving feedback, presenting ideas, active listening, negotiation
 
 For HR interviews:
 - Ask about motivation, career goals, company fit, cultural alignment
@@ -395,21 +406,24 @@ Evaluate the answer and provide:
         
         if interview_type == 'aptitude':
             prompt += """- ONLY ask aptitude and reasoning questions (quantitative, logical reasoning, verbal reasoning, data interpretation, puzzles)
-- DO NOT ask technical coding, programming, or system design questions
-- DO NOT ask behavioral or communication questions
+- **NEVER ask:** "Write code to...", "Implement an algorithm...", "Design a system...", "Tell me about a time when..."
+- **NEVER ask:** Programming, coding, algorithms, data structures, frameworks, STAR method, teamwork, leadership
+- **ONLY ask:** Math calculations, number patterns, logical puzzles, verbal reasoning, data interpretation
 - Categories: Number series, percentage, profit-loss, speed-time-distance, logical puzzles, pattern recognition, coding-decoding, data interpretation, verbal reasoning
 - Example: "If a train travels 120 km in 2 hours, what is its speed?" or "Complete the series: 2, 6, 12, 20, ?"
 """
         elif interview_type == 'technical':
             prompt += """- ONLY ask technical questions (coding, algorithms, data structures, system design, frameworks, databases)
-- DO NOT ask aptitude/reasoning questions (number series, percentage, puzzles)
-- DO NOT ask behavioral questions
+- **NEVER ask:** "If a train travels...", "Complete the series...", "Calculate percentage...", "Tell me about a time..."
+- **NEVER ask:** Quantitative aptitude, math word problems, number puzzles, logical reasoning, STAR method, teamwork
+- **ONLY ask:** Coding problems, algorithm design, system architecture, technical concepts, debugging, optimization
 - Focus on programming, software engineering, and technical problem-solving
 """
         elif interview_type == 'behavioral':
             prompt += """- ONLY ask behavioral and communication questions (STAR method, teamwork, conflict resolution, leadership)
-- DO NOT ask technical coding questions
-- DO NOT ask aptitude/reasoning questions
+- **NEVER ask:** "Write code to...", "Implement...", "Design a system...", "If a train travels...", "Complete the series..."
+- **NEVER ask:** Coding, algorithms, data structures, system design, math calculations, percentage, number puzzles
+- **ONLY ask:** "Tell me about a time when...", "Describe a situation...", "How do you handle...", past experiences
 - Focus on soft skills, past experiences, and interpersonal situations
 """
         

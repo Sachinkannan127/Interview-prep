@@ -10,6 +10,8 @@ import QuestionPreview from './pages/QuestionPreview';
 import InterviewSession from './pages/InterviewSession';
 import InterviewResults from './pages/InterviewResults';
 import Practice from './pages/Practice';
+import CodePractice from './pages/CodePractice';
+import OnlineCompiler from './pages/OnlineCompiler';
 import AdminPanel from './pages/AdminPanel';
 import Settings from './pages/Settings';
 
@@ -36,6 +38,8 @@ function App() {
         <Route path="/interview/session/:id" element={user ? <InterviewSession /> : <Navigate to="/auth" />} />
         <Route path="/interview/results/:id" element={user ? <InterviewResults /> : <Navigate to="/auth" />} />
         <Route path="/practice" element={user ? <Practice /> : <Navigate to="/auth" />} />
+        <Route path="/practice/code" element={user ? <CodePractice /> : <Navigate to="/auth" />} />
+        <Route path="/compiler" element={<OnlineCompiler />} />
         <Route path="/admin" element={user ? <AdminPanel /> : <Navigate to="/auth" />} />
         <Route path="/settings" element={user ? <Settings /> : <Navigate to="/auth" />} />
       </Routes>

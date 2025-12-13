@@ -260,6 +260,14 @@ export default function Practice() {
                 View Practice History
               </button>
 
+              <button 
+                onClick={() => navigate('/practice/code')} 
+                className="btn-secondary w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0"
+              >
+                <Target className="w-5 h-5" />
+                Code Practice Editor
+              </button>
+
               <div className="text-center pt-4">
                 <button onClick={() => navigate('/interview/setup')} className="text-primary-600 hover:text-primary-700 text-sm">
                   Or start a full interview session →

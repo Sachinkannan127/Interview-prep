@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { interviewAPI, questionsAPI } from '../services/api';
-import { Brain, Play, TrendingUp, RefreshCw, Target, FileText, Download } from 'lucide-react';
+import { Brain, Play, TrendingUp, RefreshCw, Target, FileText, Download, Code, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -311,6 +311,43 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Code Compiler Highlight Card */}
+        <div className="card group hover:scale-105 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-teal-500/10 border-2 border-green-500/40 hover:border-green-500/60 transition-all cursor-pointer mb-8 fade-in" onClick={() => navigate('/practice/code')}>
+          <div className="flex flex-col md:flex-row items-center justify-between p-6 gap-6">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                <Code className="w-12 h-12 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent mb-2">Online Code Compiler</h2>
+                <p className="text-slate-300 text-base mb-2">Execute code in <span className="text-green-400 font-bold">17 programming languages</span> instantly</p>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">🐍 Python</span>
+                  <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">🟨 JavaScript</span>
+                  <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded">☕ Java</span>
+                  <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded">⚡ C++</span>
+                  <span className="px-2 py-1 bg-slate-500/20 text-slate-400 rounded">+13 more</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <button className="btn-primary px-8 py-4 text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 flex items-center gap-3 whitespace-nowrap">
+                <Zap className="w-5 h-5" />
+                Start Coding
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/compiler');
+                }}
+                className="btn-secondary text-sm px-4 py-2"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 fade-in">
           <div className="card group hover:scale-105">
             <div className="flex items-center justify-between">
@@ -369,7 +406,7 @@ export default function Dashboard() {
 
         {/* Interview History */}
         <div className="card mb-8 sm:mb-12 fade-in">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Interview History</h2>
             <button
               onClick={loadData}
