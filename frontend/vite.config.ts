@@ -14,8 +14,19 @@ export default defineConfig({
     host: true,
   },
   build: {
-    // Increase the chunk size warning limit to 4000 KiB for Vercel deployment
+    // Increase the chunk size warning limit to 5000 KiB for Vercel deployment
     // This prevents chunk size warnings during production builds
-    chunkSizeWarningLimit: 4000,
+    chunkSizeWarningLimit: 5000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks - separate large dependencies
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'react-firebase-hooks'],
+          'vendor-ui': ['lucide-react', 'react-hot-toast', 'react-helmet'],
+          'vendor-pdf': ['jspdf'],
+        },
+      },
+    },
   },
 })
