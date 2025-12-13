@@ -93,9 +93,21 @@ export default function Auth() {
       <div className="card max-w-md w-full relative z-10">
         {/* Firebase Setup Warning */}
         <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-          <p className="text-yellow-300 text-sm text-center">
-            ⚠️ <strong>Google Sign-In Setup Required:</strong> Add "localhost" to Firebase authorized domains, or use <strong>Email/Password</strong> below.
+          <p className="text-yellow-300 text-sm text-center mb-2">
+            ⚠️ <strong>Google Sign-In Setup Required:</strong> Add "localhost" to Firebase authorized domains.
           </p>
+          <div className="text-center">
+            <a 
+              href="https://console.firebase.google.com/project/seigai-a9256/authentication/providers" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-indigo-400 hover:text-indigo-300 underline"
+            >
+              → Open Firebase Console
+            </a>
+            <span className="text-slate-500 mx-2">or</span>
+            <span className="text-xs text-emerald-400">Use Email/Password below ↓</span>
+          </div>
         </div>
 
         <div className="text-center mb-8">
