@@ -4,8 +4,8 @@ services:
     env: python
     region: oregon
     plan: free
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120 --access-logfile - --error-logfile -
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && chmod +x start.sh
+    startCommand: ./start.sh
     envVars:
       - key: ENVIRONMENT
         value: production

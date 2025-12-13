@@ -80,13 +80,23 @@ app.include_router(code.router)
 
 @app.get("/")
 async def root():
-    return {
-        "message": "Interview Prep Simulator API",
-        "version": "1.0.0",
-        "status": "running",
-        "environment": ENVIRONMENT,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    """Root endpoint - API information"""
+    try:
+        return {
+            "message": "Interview Prep Simulator API",
+            "version": "1.0.0",
+            "status": "running",
+            "environment": ENVIRONMENT,
+            "timestamp": datetime.utcnow().isoformat(),
+            "endpoints": {
+                "docs": "/docs" if not IS_PRODUCTION else "disabled",
+                "health": "/health",
+                "api": "/api"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error in root endpoint: {str(e)}", exc_info=True)
+        raise
 
 @app.get("/health")
 async def health_check():
