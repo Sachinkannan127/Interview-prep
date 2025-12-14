@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './services/firebase';
+import { PWAInstallPrompt, PWAUpdatePrompt } from './components/PWAPrompt';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
@@ -29,6 +30,8 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
+      <PWAInstallPrompt />
+      <PWAUpdatePrompt />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />

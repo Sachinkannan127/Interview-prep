@@ -205,8 +205,13 @@ async def get_interview(interview_id: str, user: dict = Depends(get_current_user
 
 @router.get("")
 async def get_user_interviews(user: dict = Depends(get_current_user)):
-    interviews = firebase_service.get_user_interviews(user['uid'])
-    return {"interviews": interviews}
+    try:
+        interviews = firebase_service.get_user_interviews(user['uid'])
+        return {"interviews": interviews}
+    except Exception as e:
+        logger.error(f"Error fetching user interviews: {str(e)}")
+        # Return empty list instead of crashing
+        return {"interviews": []}
 
 @router.get("/{interview_id}/ai-feedback")
 async def get_ai_feedback(interview_id: str, user: dict = Depends(get_current_user)):
