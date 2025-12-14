@@ -7,7 +7,23 @@ import os
 import logging
 from datetime import datetime
 
-from app.api import interviews, questions, chat, code
+# Import core API modules
+from app.api import interviews, questions
+
+# Try to import optional modules
+try:
+    from app.api import chat
+    CHAT_ENABLED = True
+except Exception as e:
+    CHAT_ENABLED = False
+    logging.warning(f"Chat module disabled: {e}")
+
+try:
+    from app.api import code
+    CODE_ENABLED = True
+except Exception as e:
+    CODE_ENABLED = False
+    logging.warning(f"Code execution module disabled: {e}")
 
 # Load environment variables
 load_dotenv()
@@ -75,8 +91,10 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Include routers
 app.include_router(interviews.router)
 app.include_router(questions.router)
-app.include_router(chat.router)
-app.include_router(code.router)
+if CHAT_ENABLED:
+    app.include_router(chat.router)
+if CODE_ENABLED:
+    app.include_router(code.router)
 
 @app.get("/")
 async def root():

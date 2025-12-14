@@ -8,6 +8,12 @@ import time
 class CodeExecutor:
     """Service to execute code in various programming languages safely"""
     
+    def __init__(self):
+        """Initialize and check if we're in a serverless environment"""
+        self.is_serverless = os.getenv('VERCEL', '') or os.getenv('AWS_LAMBDA_FUNCTION_NAME', '')
+        if self.is_serverless:
+            print("WARNING: Code execution disabled in serverless environment")
+    
     # Language configurations
     LANGUAGES = {
         'python': {
@@ -117,6 +123,16 @@ class CodeExecutor:
         Returns:
             Dict with output, error, execution_time, and status
         """
+        # Check if in serverless environment
+        if self.is_serverless:
+            return {
+                'success': False,
+                'output': '',
+                'error': 'Code execution is not available in serverless deployment. Please use local development environment.',
+                'execution_time': 0,
+                'memory_used': 0
+            }
+        
         if language not in self.LANGUAGES:
             available_langs = ', '.join(sorted(self.LANGUAGES.keys()))
             return {

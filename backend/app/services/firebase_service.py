@@ -12,14 +12,26 @@ class FirebaseService:
         self.db = None
         
         try:
-            # Option 1: Try environment variable (for production deployment)
+            # Option 1: Try environment variable (for production deployment - Vercel/Render)
             firebase_creds_env = os.getenv('FIREBASE_CREDENTIALS')
             
-            # Option 2: Try credentials file path
+            # Option 2: Try individual credential environment variables (Vercel-friendly)
+            firebase_type = os.getenv('FIREBASE_TYPE')
+            firebase_project_id = os.getenv('FIREBASE_PROJECT_ID')
+            firebase_private_key_id = os.getenv('FIREBASE_PRIVATE_KEY_ID')
+            firebase_private_key = os.getenv('FIREBASE_PRIVATE_KEY')
+            firebase_client_email = os.getenv('FIREBASE_CLIENT_EMAIL')
+            firebase_client_id = os.getenv('FIREBASE_CLIENT_ID')
+            firebase_auth_uri = os.getenv('FIREBASE_AUTH_URI')
+            firebase_token_uri = os.getenv('FIREBASE_TOKEN_URI')
+            firebase_auth_provider_cert_url = os.getenv('FIREBASE_AUTH_PROVIDER_CERT_URL')
+            firebase_client_cert_url = os.getenv('FIREBASE_CLIENT_CERT_URL')
+            
+            # Option 3: Try credentials file path
             cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-credentials.json')
             
-            # Option 3: Check for project ID to determine if we should initialize
-            project_id = os.getenv('FIREBASE_PROJECT_ID')
+            # Option 4: Check for project ID to determine if we should initialize
+            project_id = firebase_project_id or os.getenv('FIREBASE_PROJECT_ID')
             
             cred = None
             
@@ -32,7 +44,31 @@ class FirebaseService:
                 except json.JSONDecodeError:
                     print("Warning: Invalid JSON in FIREBASE_CREDENTIALS environment variable")
             
-            # Priority 2: Credentials file (local development)
+            # Priority 2: Individual environment variables (Vercel-friendly approach)
+            elif all([firebase_type, firebase_project_id, firebase_private_key_id, 
+                     firebase_private_key, firebase_client_email]):
+                try:
+                    # Unescape the private key if needed
+                    private_key = firebase_private_key.replace('\\n', '\n')
+                    
+                    cred_dict = {
+                        "type": firebase_type,
+                        "project_id": firebase_project_id,
+                        "private_key_id": firebase_private_key_id,
+                        "private_key": private_key,
+                        "client_email": firebase_client_email,
+                        "client_id": firebase_client_id or "",
+                        "auth_uri": firebase_auth_uri or "https://accounts.google.com/o/oauth2/auth",
+                        "token_uri": firebase_token_uri or "https://oauth2.googleapis.com/token",
+                        "auth_provider_x509_cert_url": firebase_auth_provider_cert_url or "https://www.googleapis.com/oauth2/v1/certs",
+                        "client_x509_cert_url": firebase_client_cert_url or ""
+                    }
+                    cred = credentials.Certificate(cred_dict)
+                    print("✓ Firebase credentials loaded from individual environment variables")
+                except Exception as e:
+                    print(f"Warning: Failed to load credentials from environment variables: {str(e)}")
+            
+            # Priority 3: Credentials file (local development)
             elif cred_path and os.path.exists(cred_path):
                 # Check if it's a mock file
                 with open(cred_path, 'r') as f:
@@ -46,7 +82,7 @@ class FirebaseService:
                 cred = credentials.Certificate(cred_path)
                 print(f"✓ Firebase credentials loaded from file: {cred_path}")
             
-            # Priority 3: Application Default Credentials (Google Cloud)
+            # Priority 4: Application Default Credentials (Google Cloud)
             elif not cred and project_id and project_id != 'your_firebase_project_id':
                 try:
                     cred = credentials.ApplicationDefault()
