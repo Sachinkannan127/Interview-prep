@@ -192,12 +192,30 @@ class FirebaseService:
                 user_interviews = [v for v in self.mock_storage['interviews'].values() if v.get('userId') == user_id]
                 return sorted(user_interviews, key=lambda x: x.get('startedAt', ''), reverse=True)[:limit]
             return []
-        docs = self.db.collection('interviews')\
-            .where('userId', '==', user_id)\
-            .order_by('startedAt', direction=firestore.Query.DESCENDING)\
-            .limit(limit)\
-            .stream()
-        return [doc.to_dict() for doc in docs]
+        
+        try:
+            # Try with index-based query first
+            docs = self.db.collection('interviews')\
+                .where('userId', '==', user_id)\
+                .order_by('startedAt', direction=firestore.Query.DESCENDING)\
+                .limit(limit)\
+                .stream()
+            return [doc.to_dict() for doc in docs]
+        except Exception as e:
+            logger.warning(f"Index-based query failed, using fallback: {str(e)}")
+            # Fallback: Get all user's interviews without ordering
+            try:
+                docs = self.db.collection('interviews')\
+                    .where('userId', '==', user_id)\
+                    .limit(limit)\
+                    .stream()
+                interviews = [doc.to_dict() for doc in docs]
+                # Sort in Python instead
+                interviews.sort(key=lambda x: x.get('startedAt', ''), reverse=True)
+                return interviews
+            except Exception as fallback_error:
+                logger.error(f"Fallback query also failed: {str(fallback_error)}")
+                return []
     
     def create_practice_session(self, session_data: dict):
         if not self.initialized:
