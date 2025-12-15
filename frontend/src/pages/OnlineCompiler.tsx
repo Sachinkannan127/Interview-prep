@@ -73,8 +73,7 @@ export default function OnlineCompiler() {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/code/execute`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           code,

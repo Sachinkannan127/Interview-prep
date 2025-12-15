@@ -80,21 +80,21 @@ class FirebaseService:
                         return
                 
                 cred = credentials.Certificate(cred_path)
-                print(f"✓ Firebase credentials loaded from file: {cred_path}")
+                print(f"[OK] Firebase credentials loaded from file: {cred_path}")
             
             # Priority 4: Application Default Credentials (Google Cloud)
             elif not cred and project_id and project_id != 'your_firebase_project_id':
                 try:
                     cred = credentials.ApplicationDefault()
-                    print("✓ Firebase credentials loaded from Application Default")
+                    print("[OK] Firebase credentials loaded from Application Default")
                 except:
                     pass
             
             # If no credentials found, use mock storage
             if not cred:
-                print("⚠ No Firebase credentials found")
-                print("ℹ Backend will run with in-memory storage for development")
-                print("ℹ To enable Firebase:")
+                print("[WARNING] No Firebase credentials found")
+                print("[INFO] Backend will run with in-memory storage for development")
+                print("[INFO] To enable Firebase:")
                 print("  1. Place firebase-credentials.json in backend/ folder")
                 print("  2. Or set FIREBASE_CREDENTIALS environment variable")
                 print("  3. See FIREBASE_SETUP.md for detailed instructions")
@@ -111,8 +111,8 @@ class FirebaseService:
             self.initialized = True
             print("✅ Firebase initialized successfully - Database connected")
         except Exception as e:
-            print(f"⚠ Firebase initialization failed: {str(e)}")
-            print("ℹ Backend will run with in-memory storage for development")
+            print(f"[WARNING] Firebase initialization failed: {str(e)}")
+            print("[INFO] Backend will run with in-memory storage for development")
             self.mock_storage = {}
             self.initialized = False
     

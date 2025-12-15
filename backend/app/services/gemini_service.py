@@ -27,11 +27,11 @@ class GeminiService:
                 self.flash_model = genai.GenerativeModel(model_name)
                 self.pro_model = genai.GenerativeModel(model_name)
                 self.initialized = True
-                print("✅ SUCCESS: Gemini AI initialized successfully")
+                print("[SUCCESS] Gemini AI initialized successfully")
                 print(f"Flash Model: {self.flash_model._model_name}")
                 print(f"Pro Model: {self.pro_model._model_name}")
-                print(f"⚠️  Note: Using {model_name} for question generation")
-                print("⚠️  Rate limit depends on selected model")
+                print(f"[WARNING] Note: Using {model_name} for question generation")
+                print("[WARNING] Rate limit depends on selected model")
             except Exception as e:
                 print(f"❌ ERROR: Failed to initialize Gemini AI")
                 print(f"Error type: {type(e).__name__}")
@@ -77,7 +77,7 @@ class GeminiService:
             
             response = self.flash_model.generate_content(prompt)
             
-            print("\n✅ API Response received!")
+            print("\n[SUCCESS] API Response received!")
             print(f"Response type: {type(response)}")
             print(f"Response has text: {hasattr(response, 'text')}")
             
@@ -85,7 +85,7 @@ class GeminiService:
                 print(f"Response text length: {len(response.text)} chars")
                 print(f"Response preview: {response.text[:200]}...")
                 question = self._extract_question(response.text)
-                print(f"\n✅ SUCCESS: Question generated!")
+                print(f"\n[SUCCESS] Question generated!")
                 print(f"Final question: {question}")
                 print("="*60 + "\n")
                 return question
@@ -106,7 +106,7 @@ class GeminiService:
                 "rate limit" in error_str.lower() or
                 "exceeded your current quota" in error_str.lower() or
                 "free_tier" in error_str.lower()):
-                print("⚠️  QUOTA EXCEEDED: Using fallback questions")
+                print("[WARNING] QUOTA EXCEEDED: Using fallback questions")
                 print(f"Quota error detected: {error_str[:200]}...")
                 return self._get_fallback_first_question(config)
             
@@ -116,7 +116,7 @@ class GeminiService:
             print("="*60 + "\n")
             
             # For other errors, also use fallback
-            print("⚠️  Using fallback due to API error")
+            print("[WARNING] Using fallback due to API error")
             return self._get_fallback_first_question(config)
     
     def evaluate_and_generate_next(self, config: dict, qa_history: list, current_answer: str):
@@ -145,7 +145,7 @@ class GeminiService:
             
             response = self.pro_model.generate_content(prompt)
             
-            print("\n✅ API Response received!")
+            print("\n[SUCCESS] API Response received!")
             print(f"Response type: {type(response)}")
             print(f"Response has text: {hasattr(response, 'text')}")
             
@@ -153,7 +153,7 @@ class GeminiService:
                 print(f"Response text length: {len(response.text)} chars")
                 print(f"Response preview: {response.text[:300]}...")
                 result = self._parse_evaluation_response(response.text)
-                print(f"\n✅ SUCCESS: Evaluation complete!")
+                print(f"\n[SUCCESS] Evaluation complete!")
                 print(f"Score: {result.get('score')}")
                 print(f"Next question: {result.get('nextQuestion', 'N/A')[:80]}...")
                 print("="*60 + "\n")
@@ -175,7 +175,7 @@ class GeminiService:
                 "rate limit" in error_str.lower() or
                 "exceeded your current quota" in error_str.lower() or
                 "free_tier" in error_str.lower()):
-                print("⚠️  QUOTA EXCEEDED: Using fallback evaluation")
+                print("[WARNING] QUOTA EXCEEDED: Using fallback evaluation")
                 print(f"Quota error detected: {error_str[:200]}...")
                 return self._get_fallback_evaluation(qa_history, current_answer, config)
             
@@ -185,7 +185,7 @@ class GeminiService:
             print("="*60 + "\n")
             
             # For other errors, also use fallback
-            print("⚠️  Using fallback evaluation due to API error")
+            print("[WARNING] Using fallback evaluation due to API error")
             return self._get_fallback_evaluation(qa_history, current_answer, config)
     
     def _build_first_question_prompt(self, config: dict, user_profile: dict = None):

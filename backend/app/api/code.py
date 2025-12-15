@@ -11,7 +11,7 @@ class ExecuteCodeRequest(BaseModel):
     input: str = ""
 
 @router.post("/execute")
-async def execute_code(request: ExecuteCodeRequest, user: dict = Depends(get_current_user)):
+async def execute_code(request: ExecuteCodeRequest):
     """
     Execute code in specified language
     
@@ -35,7 +35,7 @@ async def execute_code(request: ExecuteCodeRequest, user: dict = Depends(get_cur
         raise HTTPException(status_code=500, detail=f"Code execution failed: {str(e)}")
 
 @router.get("/languages")
-async def get_supported_languages(user: dict = Depends(get_current_user)):
+async def get_supported_languages():
     """Get list of supported programming languages"""
     return {
         "languages": [

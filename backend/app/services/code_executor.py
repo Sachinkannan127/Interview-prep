@@ -8,12 +8,6 @@ import time
 class CodeExecutor:
     """Service to execute code in various programming languages safely"""
     
-    def __init__(self):
-        """Initialize and check if we're in a serverless environment"""
-        self.is_serverless = os.getenv('VERCEL', '') or os.getenv('AWS_LAMBDA_FUNCTION_NAME', '')
-        if self.is_serverless:
-            print("WARNING: Code execution disabled in serverless environment")
-    
     # Language configurations
     LANGUAGES = {
         'python': {
@@ -108,8 +102,12 @@ class CodeExecutor:
     }
     
     def __init__(self):
+        """Initialize and check if we're in a serverless environment"""
+        self.is_serverless = os.getenv('VERCEL', '') or os.getenv('AWS_LAMBDA_FUNCTION_NAME', '')
         self.timeout = 10  # seconds
         self.max_output_size = 10000  # characters
+        if self.is_serverless:
+            print("WARNING: Code execution disabled in serverless environment")
     
     def execute(self, code: str, language: str, input_data: str = "") -> Dict[str, Any]:
         """

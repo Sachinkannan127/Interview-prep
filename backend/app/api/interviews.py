@@ -61,7 +61,7 @@ async def start_interview(request: Request, req: StartInterviewRequest, user: di
         print("\n--- Creating interview document ---")
         interview = firebase_service.create_interview(interview_data)
         
-        print(f"\n✅ SUCCESS: Interview created with ID: {interview['id']}")
+        print(f"\n[SUCCESS] Interview created with ID: {interview['id']}")
         print("="*70 + "\n")
         
         return {
