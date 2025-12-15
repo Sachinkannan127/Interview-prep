@@ -31,6 +31,7 @@ export default function InterviewSession() {
     confidenceScore: 0,
     responseTime: 0,
   });
+  const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -358,13 +359,13 @@ export default function InterviewSession() {
       if (data.qa && data.qa.length > 0) {
         const lastQA = data.qa[data.qa.length - 1];
         setCurrentQuestion(lastQA.questionText);
+        setAskedQuestions(data.qa.map((qa: any) => qa.questionText));
         console.log('Resuming interview at question:', data.qa.length + 1);
       } else {
         const question = data.firstQuestion || 'Loading first question...';
         setCurrentQuestion(question);
+        setAskedQuestions([question]);
         console.log('Starting new interview with first question');
-        // Start timer for first question
-        setStartTime(Date.now());
       }
       
       // Show welcome message
@@ -402,6 +403,13 @@ export default function InterviewSession() {
       return;
     }
 
+    if (askedQuestions.length >= 10) {
+      toast.success('Interview completed! 🎉 Generating your results...');
+      await interviewAPI.finishInterview(id!);
+      navigate(`/interview/results/${id}`);
+      return;
+    }
+
     if (!startTime) {
       setStartTime(Date.now());
     }
@@ -426,11 +434,12 @@ export default function InterviewSession() {
       }
       
       if (response.nextQuestion) {
-        setCurrentQuestion(response.nextQuestion);
-        setAnswer('');
-        setStartTime(Date.now()); // Start timer for next question
-        setMetrics({ wordCount: 0, fillerCount: 0, confidenceScore: 0, responseTime: 0 });
-        console.log('Moving to next question');
+        if (!askedQuestions.includes(response.nextQuestion)) {
+          setCurrentQuestion(response.nextQuestion);
+          setAskedQuestions([...askedQuestions, response.nextQuestion]);
+        } else {
+          toast.error('Duplicate question detected. Skipping...');
+        }
       } else {
         // Stop camera when interview completes
         if (stream) {
@@ -493,12 +502,20 @@ export default function InterviewSession() {
             videoRef.current.srcObject = null;
           }
         }
-        
+
+        // Revoke camera permissions
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            stream.getTracks().forEach(track => track.stop());
+          }).catch(err => console.error('Error revoking camera permissions:', err));
+        }
+
         await interviewAPI.finishInterview(id!);
         toast.success('Interview completed! View your results below.');
         navigate(`/interview/results/${id}`);
       } catch (error) {
-        toast.error('Failed to end interview');
+        console.error('Error finishing interview:', error);
+        toast.error('Failed to finish interview. Please try again.');
       }
     }
   };

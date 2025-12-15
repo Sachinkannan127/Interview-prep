@@ -8,6 +8,10 @@ import Footer from '../components/Footer';
 export default function OnlineCompiler() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'features' | 'languages' | 'guide'>('features');
+  const [selectedLanguage, setSelectedLanguage] = useState('Python');
+  const [code, setCode] = useState('');
+  const [output, setOutput] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const languages = [
     { name: 'Python', version: '3.x', status: 'ready', icon: '🐍', category: 'Scripting' },
@@ -28,6 +32,27 @@ export default function OnlineCompiler() {
     { name: 'C#', version: '.NET 5+', status: 'optional', icon: '#️⃣', category: 'Enterprise' },
     { name: 'Scala', version: '2.13+', status: 'optional', icon: '⚖️', category: 'JVM' },
   ];
+
+  const executeCode = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: selectedLanguage, code }),
+      });
+
+      if (!response.ok) throw new Error('Execution failed');
+
+      const result = await response.json();
+      setOutput(result.output);
+    } catch (error) {
+      console.error('Execution error:', error);
+      setOutput('Error executing code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -311,6 +336,71 @@ export default function OnlineCompiler() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Code Execution Section */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="p-6 bg-slate-800/50 rounded-lg border border-slate-700">
+              <h3 className="text-2xl font-bold text-white mb-4">Online Compiler</h3>
+
+              <div className="mb-4">
+                <label htmlFor="language" className="block text-sm text-slate-400 mb-2">
+                  Select Language:
+                </label>
+                <select
+                  id="language"
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                >
+                  {languages.map((lang) => (
+                    <option key={lang.name} value={lang.name}>
+                      {lang.name} ({lang.version})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="code" className="block text-sm text-slate-400 mb-2">
+                  Code:
+                </label>
+                <textarea
+                  id="code"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 h-32 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  placeholder="Write your code here..."
+                />
+              </div>
+
+              <div className="flex gap-4 mb-4">
+                <button
+                  onClick={executeCode}
+                  disabled={loading}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v16a8 8 0 01-8-8z"></path>
+                    </svg>
+                  ) : (
+                    <>
+                      <Code className="w-5 h-5" />
+                      Run Code
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="p-4 bg-slate-900 rounded-lg border border-slate-700">
+                <h4 className="text-lg font-bold text-white mb-2">Output:</h4>
+                <pre className="text-slate-400 text-sm whitespace-pre-wrap">
+                  {output || 'Output will appear here...'}
+                </pre>
+              </div>
+            </div>
           </div>
 
           {/* CTA Section */}
