@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Code, CheckCircle, XCircle, Download, Terminal, Zap, Shield, Clock, Globe } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import toast from 'react-hot-toast';
 
 export default function OnlineCompiler() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'features' | 'languages' | 'guide'>('features');
-  const [selectedLanguage, setSelectedLanguage] = useState('Python');
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const starterCodes: { [key: string]: string } = {
+    'python': '# Write your Python code here\nprint("Hello, World!")',
+    'javascript': '// Write your JavaScript code here\nconsole.log("Hello, World!");',
+    'typescript': '// Write your TypeScript code here\nconst message: string = "Hello, World!";\nconsole.log(message);',
+    'java': 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}',
+    'cpp': '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}',
+    'c': '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}',
+    'go': 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}',
+    'rust': 'fn main() {\n    println!("Hello, World!");\n}',
+    'ruby': '# Write your Ruby code here\nputs "Hello, World!"',
+    'php': '<?php\n// Write your PHP code here\necho "Hello, World!\\n";',
+    'swift': '// Write your Swift code here\nprint("Hello, World!")',
+    'kotlin': 'fun main() {\n    println("Hello, World!")\n}',
+    'r': '# Write your R code here\nprint("Hello, World!")',
+    'perl': '#!/usr/bin/perl\n# Write your Perl code here\nprint "Hello, World!\\n";',
+    'bash': '#!/bin/bash\n# Write your Bash script here\necho "Hello, World!"',
+    'csharp': 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, World!");\n    }\n}',
+    'scala': 'object Main extends App {\n  println("Hello, World!")\n}'
+  };
 
   const languages = [
     { name: 'Python', version: '3.x', status: 'ready', icon: '🐍', category: 'Scripting' },
@@ -32,23 +53,62 @@ export default function OnlineCompiler() {
     { name: 'C#', version: '.NET 5+', status: 'optional', icon: '#️⃣', category: 'Enterprise' },
     { name: 'Scala', version: '2.13+', status: 'optional', icon: '⚖️', category: 'JVM' },
   ];
-
+  // Load starter code when language changes or on initial load
+  useEffect(() => {
+    const langId = selectedLanguage.toLowerCase();
+    if (!code || code === starterCodes[Object.keys(starterCodes).find(k => selectedLanguage.toLowerCase().includes(k)) || 'python']) {
+      setCode(starterCodes[langId] || starterCodes['python']);
+    }
+  }, [selectedLanguage]);
   const executeCode = async () => {
+    if (!code.trim()) {
+      toast.error('Please write some code first!');
+      return;
+    }
+
     setLoading(true);
+    setOutput('');
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/execute`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/code/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: selectedLanguage, code }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          code,
+          language: selectedLanguage.toLowerCase(),
+          input: ''
+        })
       });
 
-      if (!response.ok) throw new Error('Execution failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Failed to execute code');
+      }
 
       const result = await response.json();
-      setOutput(result.output);
-    } catch (error) {
+      
+      // Format the output
+      let outputText = '';
+      if (result.success) {
+        outputText = `✅ Execution successful\n\n`;
+        outputText += `Output:\n${result.output || '(no output)'}`;
+        outputText += `\n\nExecution time: ${result.execution_time?.toFixed(3)}s`;
+        toast.success('Code executed successfully!');
+      } else {
+        outputText = `❌ Execution failed\n\n`;
+        outputText += `Error:\n${result.error || 'Unknown error'}`;
+        toast.error('Code execution failed');
+      }
+      
+      setOutput(outputText);
+    } catch (error: any) {
       console.error('Execution error:', error);
-      setOutput('Error executing code. Please try again.');
+      const errorMsg = `❌ Error\n\n${error.message || 'Failed to execute code. Make sure the backend is running.'}`;
+      setOutput(errorMsg);
+      toast.error(error.message || 'Failed to execute code');
     } finally {
       setLoading(false);
     }
@@ -351,11 +411,11 @@ export default function OnlineCompiler() {
                   id="language"
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full p-3 bg-slate-700 text-white rounded-lg border border-slate-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 >
                   {languages.map((lang) => (
-                    <option key={lang.name} value={lang.name}>
-                      {lang.name} ({lang.version})
+                    <option key={lang.name} value={lang.name.toLowerCase()}>
+                      {lang.icon} {lang.name} ({lang.version})
                     </option>
                   ))}
                 </select>
@@ -369,22 +429,26 @@ export default function OnlineCompiler() {
                   id="code"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 h-32 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full p-3 bg-slate-900 text-white font-mono text-sm rounded-lg border border-slate-600 h-64 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   placeholder="Write your code here..."
+                  spellCheck={false}
                 />
               </div>
 
               <div className="flex gap-4 mb-4">
                 <button
                   onClick={executeCode}
-                  disabled={loading}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+                  disabled={loading || !code.trim()}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v16a8 8 0 01-8-8z"></path>
-                    </svg>
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v16a8 8 0 01-8-8z"></path>
+                      </svg>
+                      Executing...
+                    </>
                   ) : (
                     <>
                       <Code className="w-5 h-5" />
@@ -392,12 +456,26 @@ export default function OnlineCompiler() {
                     </>
                   )}
                 </button>
+                <button
+                  onClick={() => {
+                    const langId = selectedLanguage.toLowerCase();
+                    setCode(starterCodes[langId] || starterCodes['python']);
+                    setOutput('');
+                    toast.success('Code reset to starter template');
+                  }}
+                  className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-all"
+                >
+                  Reset
+                </button>
               </div>
 
               <div className="p-4 bg-slate-900 rounded-lg border border-slate-700">
-                <h4 className="text-lg font-bold text-white mb-2">Output:</h4>
-                <pre className="text-slate-400 text-sm whitespace-pre-wrap">
-                  {output || 'Output will appear here...'}
+                <h4 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                  <Terminal className="w-5 h-5" />
+                  Output:
+                </h4>
+                <pre className="text-slate-300 text-sm whitespace-pre-wrap font-mono">
+                  {output || 'Output will appear here after running your code...'}
                 </pre>
               </div>
             </div>
