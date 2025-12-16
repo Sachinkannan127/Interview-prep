@@ -345,26 +345,30 @@ export default function Dashboard() {
         <meta name="keywords" content="dashboard, analytics, interview history, progress tracking" />
       </Helmet>
       <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
+      {/* Animated Professional Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-900/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-700/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-20 -left-20 w-96 h-96 bg-gradient-to-br from-blue-600/15 to-cyan-600/15 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 -right-20 w-[500px] h-[500px] bg-gradient-to-tl from-amber-600/15 to-orange-600/15 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-slate-700/10 to-slate-800/10 rounded-full blur-3xl animate-pulse-slow" />
       </div>
 
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
-        <div className="mb-8 sm:mb-12">
+        <div className="mb-8 sm:mb-12 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 sm:mb-4">
-            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Welcome back!</span>
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-amber-400 bg-clip-text text-transparent animate-gradient">Welcome back!</span>
           </h1>
-          <p className="text-slate-300 text-base sm:text-lg">Ready to level up your interview skills? 🚀</p>
+          <p className="text-slate-300 text-base sm:text-lg flex items-center gap-2">
+            <span className="inline-block animate-wave">👋</span>
+            Ready to level up your interview skills?
+          </p>
         </div>
 
         {/* Main Action Cards - Three Equal Options */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 sm:mb-12 fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 sm:mb-12 animate-stagger">
           {/* Aptitude Test Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-[1.02] hover:-translate-y-2 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-400/60 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-blue-500/20" onClick={() => {
             navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
           }}>
             <div className="text-center p-6">
@@ -381,7 +385,7 @@ export default function Dashboard() {
           </div>
 
           {/* Behavioral Interview Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-2 border-teal-500/30 hover:border-teal-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-[1.02] hover:-translate-y-2 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-2 border-teal-500/30 hover:border-teal-400/60 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-teal-500/20" onClick={() => {
             toast.success('AI Avatar Mock Interview coming soon! 🚀');
             navigate('/interview/setup');
           }}>
@@ -399,7 +403,7 @@ export default function Dashboard() {
           </div>
 
           {/* Technical Interview Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-slate-500/10 to-gray-500/10 border-2 border-slate-500/30 hover:border-slate-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-[1.02] hover:-translate-y-2 bg-gradient-to-br from-slate-500/10 to-gray-500/10 border-2 border-slate-500/30 hover:border-slate-400/60 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-slate-500/20" onClick={() => {
             toast.success('AI Avatar Mock Interview coming soon! 🚀');
             navigate('/interview/setup');
           }}>
@@ -418,7 +422,7 @@ export default function Dashboard() {
         </div>
 
         {/* Code Compiler Highlight Card */}
-        <div className="card group hover:scale-105 bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-teal-500/40 hover:border-teal-500/60 transition-all cursor-pointer mb-8 fade-in" onClick={() => navigate('/practice/code')}>
+        <div className="card group hover:scale-[1.01] hover:-translate-y-1 bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-teal-500/40 hover:border-teal-400/70 transition-all duration-500 cursor-pointer mb-8 hover:shadow-2xl hover:shadow-teal-500/20 animate-fade-in-up" onClick={() => navigate('/practice/code')}>
           <div className="flex flex-col md:flex-row items-center justify-between p-6 gap-6">
             <div className="flex items-center gap-6">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-600 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
@@ -455,9 +459,9 @@ export default function Dashboard() {
         </div>
 
         {/* AI Tools Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 sm:mb-12 fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 sm:mb-12 animate-fade-in-up">
           {/* AI Assistant Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/40 hover:border-purple-500/60 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-[1.02] hover:-translate-y-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/40 hover:border-purple-400/70 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/20" onClick={() => {
             setShowAIAssistant(true);
           }}>
             <div className="p-6">
@@ -492,7 +496,7 @@ export default function Dashboard() {
           </div>
 
           {/* AI Resume Analyzer Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-2 border-amber-500/40 hover:border-amber-500/60 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-[1.02] hover:-translate-y-2 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-2 border-amber-500/40 hover:border-amber-400/70 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-amber-500/20" onClick={() => {
             setShowResumeModal(true);
           }}>
             <div className="p-6">

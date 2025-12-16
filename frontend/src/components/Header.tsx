@@ -26,45 +26,49 @@ export default function Header({ showAuthButton = false }: HeaderProps) {
           </span>
         </div>
         
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3 sm:gap-4">
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
+            className="p-2.5 rounded-xl bg-gradient-to-br from-slate-800/60 to-slate-900/60 hover:from-slate-700/70 hover:to-slate-800/70 border border-slate-600/40 hover:border-amber-500/50 transition-all duration-300 shadow-lg hover:shadow-amber-500/20"
             title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {isDarkMode ? (
-              <Sun className="w-5 h-5 text-amber-500" />
+              <Sun className="w-5 h-5 text-amber-400 drop-shadow-glow" />
             ) : (
-              <Moon className="w-5 h-5 text-blue-600" />
+              <Moon className="w-5 h-5 text-slate-300" />
             )}
           </button>
 
           {/* Contact Us */}
           <button
             onClick={() => setShowContact(true)}
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
+            className="p-2.5 rounded-xl bg-gradient-to-br from-slate-800/60 to-slate-900/60 hover:from-slate-700/70 hover:to-slate-800/70 border border-slate-600/40 hover:border-blue-500/50 transition-all duration-300 shadow-lg hover:shadow-blue-500/20"
             title="Contact Us"
           >
-            <Mail className="w-5 h-5 text-blue-500" />
+            <Mail className="w-5 h-5 text-blue-400 drop-shadow-glow" />
           </button>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-gradient-to-b from-transparent via-slate-600/50 to-transparent"></div>
 
           {/* Settings */}
           <button
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-amber-600/90 to-amber-700/90 hover:from-amber-500 hover:to-amber-600 border border-amber-500/50 hover:border-amber-400 transition-all duration-300 shadow-lg hover:shadow-amber-500/30 flex items-center gap-2 font-semibold"
             title="Settings"
             onClick={() => navigate('/settings')}
           >
-            <Settings className="w-5 h-5 text-blue-500" />
+            <Settings className="w-5 h-5 text-white" />
+            <span className="hidden sm:inline text-white text-sm">Settings</span>
           </button>
 
           {/* Menu */}
           <button
             onClick={() => setShowMenu(true)}
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-indigo-500/50 transition-all"
+            className="p-2.5 rounded-xl bg-gradient-to-br from-blue-600/90 to-blue-700/90 hover:from-blue-500 hover:to-blue-600 border border-blue-500/50 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-blue-500/30"
             title="Menu"
           >
-            <Menu className="w-5 h-5 text-indigo-400" />
+            <Menu className="w-5 h-5 text-white" />
           </button>
 
           {showAuthButton && (

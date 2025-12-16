@@ -39,6 +39,16 @@ export default {
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'float-delayed': 'float-delayed 8s ease-in-out infinite',
+        'wave': 'wave 2s ease-in-out infinite',
+        'fade-in': 'fade-in 0.6s ease-out',
+        'fade-in-up': 'fade-in-up 0.8s ease-out',
+        'stagger': 'stagger 0.5s ease-out',
+        'gradient': 'shimmer 3s linear infinite',
+      },
+      backgroundSize: {
+        '300%': '300%',
       },
     },
   },
