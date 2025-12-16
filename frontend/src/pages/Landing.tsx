@@ -17,9 +17,9 @@ export default function Landing() {
       <div className="min-h-screen relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-900/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-700/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-slate-800/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <Header showAuthButton={true} />
@@ -30,27 +30,27 @@ export default function Landing() {
           <div className="flex justify-center mb-8">
             <div className="relative w-32 h-32 sm:w-40 sm:h-40">
               {/* Animated AI Avatar */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-600 via-amber-500 to-purple-600 animate-spin-slow" style={{ animationDuration: '8s' }} />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-900 via-amber-700 to-blue-900 animate-spin-slow" style={{ animationDuration: '8s' }} />
               <div className="absolute inset-2 rounded-full bg-dark-50 flex items-center justify-center">
                 <div className="text-6xl sm:text-7xl animate-bounce" style={{ animationDuration: '2s' }}>
                   💼
                 </div>
               </div>
               {/* Pulse Rings */}
-              <div className="absolute -inset-4 rounded-full border-2 border-purple-400/30 animate-ping" style={{ animationDuration: '3s' }} />
-              <div className="absolute -inset-8 rounded-full border-2 border-amber-400/20 animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+              <div className="absolute -inset-4 rounded-full border-2 border-blue-800/30 animate-ping" style={{ animationDuration: '3s' }} />
+              <div className="absolute -inset-8 rounded-full border-2 border-amber-700/20 animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }} />
             </div>
           </div>
           
-          <div className="inline-block mb-4 sm:mb-6 px-4 sm:px-6 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm">
-            <span className="text-purple-300 text-xs sm:text-sm font-medium">🚀 Powered by Advanced AI Technology</span>
+          <div className="inline-block mb-4 sm:mb-6 px-4 sm:px-6 py-2 rounded-full border border-blue-800/30 bg-blue-900/10 backdrop-blur-sm">
+            <span className="text-blue-300 text-xs sm:text-sm font-medium">🚀 Powered by Advanced AI Technology</span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-tight px-2">
-            <span className="bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
+            <span className="bg-gradient-to-r from-blue-400 via-amber-500 to-blue-400 bg-clip-text text-transparent animate-gradient">
               Master Your Interviews
             </span>
             <br />
-            <span className="bg-gradient-to-r from-amber-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-600 to-blue-600 bg-clip-text text-transparent">
               with AI Precision
             </span>
           </h1>

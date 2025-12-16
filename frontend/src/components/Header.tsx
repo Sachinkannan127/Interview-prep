@@ -18,10 +18,10 @@ export default function Header({ showAuthButton = false }: HeaderProps) {
       <nav className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 flex justify-between items-center relative z-10">
         <div className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-bold cursor-pointer" onClick={() => navigate('/dashboard')}>
           <div className="relative">
-            <Brain className="w-8 sm:w-10 h-8 sm:h-10 text-purple-400 animate-pulse" />
-            <div className="absolute inset-0 w-8 sm:w-10 h-8 sm:h-10 bg-purple-500/30 rounded-full blur-xl" />
+            <Brain className="w-8 sm:w-10 h-8 sm:h-10 text-blue-500 animate-pulse" />
+            <div className="absolute inset-0 w-8 sm:w-10 h-8 sm:h-10 bg-blue-600/30 rounded-full blur-xl" />
           </div>
-          <span className="bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent font-extrabold hidden sm:inline">
+          <span className="bg-gradient-to-r from-blue-400 via-amber-500 to-blue-400 bg-clip-text text-transparent font-extrabold hidden sm:inline">
             InterviewAI
           </span>
         </div>
@@ -30,32 +30,32 @@ export default function Header({ showAuthButton = false }: HeaderProps) {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-purple-500/50 transition-all"
+            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
             title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {isDarkMode ? (
-              <Sun className="w-5 h-5 text-amber-400" />
+              <Sun className="w-5 h-5 text-amber-500" />
             ) : (
-              <Moon className="w-5 h-5 text-purple-400" />
+              <Moon className="w-5 h-5 text-blue-600" />
             )}
           </button>
 
           {/* Contact Us */}
           <button
             onClick={() => setShowContact(true)}
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-purple-500/50 transition-all"
+            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
             title="Contact Us"
           >
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="w-5 h-5 text-blue-500" />
           </button>
 
           {/* Settings */}
           <button
-            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-purple-500/50 transition-all"
+            className="p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700/50 border border-slate-700 hover:border-blue-700/50 transition-all"
             title="Settings"
             onClick={() => navigate('/settings')}
           >
-            <Settings className="w-5 h-5 text-purple-400" />
+            <Settings className="w-5 h-5 text-blue-500" />
           </button>
 
           {/* Menu */}
