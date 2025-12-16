@@ -17,6 +17,10 @@ export default function Dashboard() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role: string, content: string}[]>([]);
+  const [userInput, setUserInput] = useState('');
+  const [aiThinking, setAiThinking] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -273,15 +277,17 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze resume');
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('Resume analysis error:', errorData);
+        throw new Error(errorData.detail || 'Failed to analyze resume');
       }
 
       const data = await response.json();
       setResumeAnalysis(data);
       toast.success('Resume analyzed successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing resume:', error);
-      toast.error('Failed to analyze resume. Please try again.');
+      toast.error(error.message || 'Failed to analyze resume. Please try again.');
     } finally {
       setAnalyzing(false);
     }
@@ -291,6 +297,44 @@ export default function Dashboard() {
     setShowResumeModal(false);
     setResumeFile(null);
     setResumeAnalysis(null);
+  };
+
+  const sendAIMessage = async () => {
+    if (!userInput.trim()) return;
+
+    const userMessage = { role: 'user', content: userInput };
+    setChatMessages(prev => [...prev, userMessage]);
+    setUserInput('');
+    setAiThinking(true);
+
+    try {
+      const response = await fetch('http://localhost:8001/api/chat/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userInput }),
+      });
+
+      if (!response.ok) throw new Error('AI response failed');
+
+      const data = await response.json();
+      const aiMessage = { role: 'assistant', content: data.response };
+      setChatMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = { 
+        role: 'assistant', 
+        content: 'I apologize, but I encountered an error. Please try asking your question again.' 
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setAiThinking(false);
+    }
+  };
+
+  const closeAIAssistant = () => {
+    setShowAIAssistant(false);
+    setChatMessages([]);
+    setUserInput('');
   };
 
   return (
@@ -414,7 +458,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 sm:mb-12 fade-in">
           {/* AI Assistant Card */}
           <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/40 hover:border-purple-500/60 transition-all cursor-pointer" onClick={() => {
-            toast('AI Assistant feature coming soon! 🤖', { icon: '🤖' });
+            setShowAIAssistant(true);
           }}>
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4">
@@ -926,6 +970,137 @@ export default function Dashboard() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* AI Assistant Modal */}
+    {showAIAssistant && (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeAIAssistant}>
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-purple-500/30 rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 p-6 flex items-center justify-between border-b border-purple-500/30 rounded-t-2xl">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center animate-pulse">
+                <span className="text-2xl">🤖</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-extrabold text-white">AI Interview Assistant</h2>
+                <p className="text-purple-100 text-sm">Ask me anything about interviews!</p>
+              </div>
+            </div>
+            <button onClick={closeAIAssistant} className="p-2 hover:bg-white/20 rounded-lg transition-all">
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+
+          {/* Chat Messages Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {chatMessages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center mb-6 animate-bounce">
+                  <span className="text-5xl">🤖</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">How can I help you today?</h3>
+                <p className="text-slate-400 mb-6 max-w-lg">I can help you with interview questions, provide tips, suggest best practices, and give feedback on your answers.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+                  <button 
+                    onClick={() => setUserInput('What are common behavioral interview questions?')}
+                    className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl hover:bg-purple-500/20 transition-all text-left"
+                  >
+                    <p className="text-purple-400 font-medium mb-1">💬 Behavioral Questions</p>
+                    <p className="text-slate-400 text-sm">Common behavioral interview questions</p>
+                  </button>
+                  <button 
+                    onClick={() => setUserInput('How do I answer "Tell me about yourself"?')}
+                    className="p-4 bg-pink-500/10 border border-pink-500/30 rounded-xl hover:bg-pink-500/20 transition-all text-left"
+                  >
+                    <p className="text-pink-400 font-medium mb-1">🎯 Answer Tips</p>
+                    <p className="text-slate-400 text-sm">How to structure your answers</p>
+                  </button>
+                  <button 
+                    onClick={() => setUserInput('What should I prepare for a technical interview?')}
+                    className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl hover:bg-amber-500/20 transition-all text-left"
+                  >
+                    <p className="text-amber-400 font-medium mb-1">💻 Technical Prep</p>
+                    <p className="text-slate-400 text-sm">Technical interview preparation</p>
+                  </button>
+                  <button 
+                    onClick={() => setUserInput('What are STAR method examples?')}
+                    className="p-4 bg-teal-500/10 border border-teal-500/30 rounded-xl hover:bg-teal-500/20 transition-all text-left"
+                  >
+                    <p className="text-teal-400 font-medium mb-1">⭐ STAR Method</p>
+                    <p className="text-slate-400 text-sm">STAR method examples and tips</p>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {chatMessages.map((msg, idx) => (
+                  <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    {msg.role === 'assistant' && (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl">🤖</span>
+                      </div>
+                    )}
+                    <div className={`max-w-[70%] p-4 rounded-2xl ${
+                      msg.role === 'user' 
+                        ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white' 
+                        : 'bg-slate-700/50 border border-slate-600 text-slate-100'
+                    }`}>
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                    {msg.role === 'user' && (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl">👤</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {aiThinking && (
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">🤖</span>
+                    </div>
+                    <div className="bg-slate-700/50 border border-slate-600 p-4 rounded-2xl">
+                      <div className="flex gap-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-slate-700 p-4 bg-slate-800/50">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendAIMessage()}
+                placeholder="Ask me anything about interviews..."
+                className="flex-1 input bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
+                disabled={aiThinking}
+              />
+              <button
+                onClick={sendAIMessage}
+                disabled={!userInput.trim() || aiThinking}
+                className="btn-primary bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {aiThinking ? (
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                ) : (
+                  <span>Send</span>
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mt-2 text-center">Press Enter to send • Shift+Enter for new line</p>
           </div>
         </div>
       </div>

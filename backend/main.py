@@ -32,6 +32,13 @@ except Exception as e:
     RESUME_ENABLED = False
     logging.warning(f"Resume analyzer module disabled: {e}")
 
+try:
+    from app.api import chat_assistant
+    CHAT_ASSISTANT_ENABLED = True
+except Exception as e:
+    CHAT_ASSISTANT_ENABLED = False
+    logging.warning(f"Chat assistant module disabled: {e}")
+
 # Load environment variables
 load_dotenv()
 
@@ -104,6 +111,8 @@ if CODE_ENABLED:
     app.include_router(code.router)
 if RESUME_ENABLED:
     app.include_router(resume.router)
+if CHAT_ASSISTANT_ENABLED:
+    app.include_router(chat_assistant.router)
 
 @app.get("/")
 async def root():

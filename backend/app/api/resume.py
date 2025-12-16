@@ -8,7 +8,7 @@ import io
 import docx
 import re
 
-router = APIRouter()
+router = APIRouter(prefix="/api", tags=["resume"])
 
 # Configure Gemini API
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
@@ -107,30 +107,41 @@ async def analyze_resume(resume: UploadFile = File(...)):
     Analyze a resume and provide ATS score, strengths, improvements, and recommendations
     """
     try:
-        # Check file type
-        if resume.content_type not in [
+        # Get filename for extension check
+        filename = resume.filename or ""
+        file_ext = filename.lower().split('.')[-1] if '.' in filename else ''
+        
+        # Check file type - be flexible with content type
+        valid_extensions = ['pdf', 'doc', 'docx', 'txt']
+        valid_content_types = [
             'application/pdf',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain'
-        ]:
+            'text/plain',
+            'application/octet-stream'  # Some browsers send this for text files
+        ]
+        
+        if file_ext not in valid_extensions and resume.content_type not in valid_content_types:
             raise HTTPException(
                 status_code=400,
-                detail="Invalid file type. Please upload PDF, DOC, DOCX, or TXT file"
+                detail=f"Invalid file type. Please upload PDF, DOC, DOCX, or TXT file. Got: {resume.content_type}"
             )
         
         # Read file content
         file_content = await resume.read()
         
-        # Extract text based on file type
-        if resume.content_type == 'application/pdf':
+        # Extract text based on file extension (more reliable than content-type)
+        if file_ext == 'pdf' or resume.content_type == 'application/pdf':
             resume_text = extract_text_from_pdf(file_content)
-        elif resume.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        elif file_ext == 'docx' or resume.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             resume_text = extract_text_from_docx(file_content)
-        elif resume.content_type == 'text/plain':
+        elif file_ext == 'txt' or resume.content_type == 'text/plain' or resume.content_type == 'application/octet-stream':
+            resume_text = extract_text_from_txt(file_content)
+        elif file_ext == 'doc' or resume.content_type == 'application/msword':
+            # For .doc files, try to read as text
             resume_text = extract_text_from_txt(file_content)
         else:
-            # For .doc files, try to read as text
+            # Fallback: try to read as text
             resume_text = extract_text_from_txt(file_content)
         
         if not resume_text or len(resume_text) < 50:
@@ -143,7 +154,9 @@ async def analyze_resume(resume: UploadFile = File(...)):
         if not GEMINI_API_KEY:
             raise HTTPException(status_code=500, detail="AI service not configured")
         
-        model = genai.GenerativeModel('gemini-pro')
+        # Use same model configuration as gemini_service
+        model_name = os.getenv('GEMINI_MODEL', 'gemma-3-27b-it')
+        model = genai.GenerativeModel(model_name)
         
         prompt = f"""You are an expert resume analyzer and ATS (Applicant Tracking System) consultant. 
 Analyze the following resume and provide:

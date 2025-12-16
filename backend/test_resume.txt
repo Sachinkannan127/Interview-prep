@@ -1,0 +1,6 @@
+JOHN DOE
+Software Engineer
+john@email.com
+
+EXPERIENCE
+Senior Developer at Tech Corp
