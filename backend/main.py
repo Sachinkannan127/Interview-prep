@@ -25,6 +25,13 @@ except Exception as e:
     CODE_ENABLED = False
     logging.warning(f"Code execution module disabled: {e}")
 
+try:
+    from app.api import resume
+    RESUME_ENABLED = True
+except Exception as e:
+    RESUME_ENABLED = False
+    logging.warning(f"Resume analyzer module disabled: {e}")
+
 # Load environment variables
 load_dotenv()
 
@@ -95,6 +102,8 @@ if CHAT_ENABLED:
     app.include_router(chat.router)
 if CODE_ENABLED:
     app.include_router(code.router)
+if RESUME_ENABLED:
+    app.include_router(resume.router)
 
 @app.get("/")
 async def root():

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { interviewAPI, questionsAPI } from '../services/api';
-import { Brain, Play, TrendingUp, RefreshCw, Target, FileText, Download, Code, Zap } from 'lucide-react';
+import { Brain, Play, TrendingUp, RefreshCw, Target, FileText, Download, Code, Zap, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -13,6 +13,10 @@ export default function Dashboard() {
   const [interviews, setInterviews] = useState<any[]>([]);
   const [practiceSessions, setPracticeSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
 
   useEffect(() => {
     loadData();
@@ -231,6 +235,64 @@ export default function Dashboard() {
     toast.success(`Downloaded ${company} ${year} question paper PDF!`);
   };
 
+  const handleResumeUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please upload a PDF, DOC, DOCX, or TXT file');
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      
+      setResumeFile(file);
+      toast.success('Resume uploaded successfully!');
+    }
+  };
+
+  const analyzeResume = async () => {
+    if (!resumeFile) {
+      toast.error('Please upload a resume first');
+      return;
+    }
+
+    setAnalyzing(true);
+    const formData = new FormData();
+    formData.append('resume', resumeFile);
+
+    try {
+      const response = await fetch('http://localhost:8001/api/analyze-resume', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze resume');
+      }
+
+      const data = await response.json();
+      setResumeAnalysis(data);
+      toast.success('Resume analyzed successfully!');
+    } catch (error) {
+      console.error('Error analyzing resume:', error);
+      toast.error('Failed to analyze resume. Please try again.');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const closeResumeModal = () => {
+    setShowResumeModal(false);
+    setResumeFile(null);
+    setResumeAnalysis(null);
+  };
+
   return (
     <>
       <Helmet>
@@ -352,7 +414,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 sm:mb-12 fade-in">
           {/* AI Assistant Card */}
           <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/40 hover:border-purple-500/60 transition-all cursor-pointer" onClick={() => {
-            toast.info('AI Assistant feature coming soon! 🤖');
+            toast('AI Assistant feature coming soon! 🤖', { icon: '🤖' });
           }}>
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4">
@@ -387,7 +449,7 @@ export default function Dashboard() {
 
           {/* AI Resume Analyzer Card */}
           <div className="card group hover:scale-105 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-2 border-amber-500/40 hover:border-amber-500/60 transition-all cursor-pointer" onClick={() => {
-            toast.info('AI Resume Analyzer feature coming soon! 📄');
+            setShowResumeModal(true);
           }}>
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4">
@@ -668,6 +730,206 @@ export default function Dashboard() {
       
       <Footer />
     </div>
+
+    {/* Resume Analyzer Modal */}
+    {showResumeModal && (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeResumeModal}>
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-amber-500/30 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-amber-600 to-orange-600 p-6 flex items-center justify-between border-b border-amber-500/30">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <span className="text-2xl">📄</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-extrabold text-white">AI Resume Analyzer</h2>
+                <p className="text-amber-100 text-sm">Upload and analyze your resume</p>
+              </div>
+            </div>
+            <button onClick={closeResumeModal} className="p-2 hover:bg-white/20 rounded-lg transition-all">
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-6">
+            {!resumeAnalysis ? (
+              <>
+                {/* File Upload Section */}
+                <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-8 hover:border-amber-500/50 transition-all bg-amber-500/5">
+                  <div className="text-center">
+                    <Upload className="w-16 h-16 text-amber-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">Upload Your Resume</h3>
+                    <p className="text-slate-400 mb-4">Supported formats: PDF, DOC, DOCX, TXT (Max 5MB)</p>
+                    
+                    <input
+                      type="file"
+                      id="resume-upload"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleResumeUpload}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="resume-upload"
+                      className="inline-block btn-primary bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 cursor-pointer"
+                    >
+                      Choose File
+                    </label>
+                    
+                    {resumeFile && (
+                      <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                        <div className="flex items-center justify-center gap-2 text-green-400">
+                          <CheckCircle className="w-5 h-5" />
+                          <span className="font-medium">{resumeFile.name}</span>
+                          <span className="text-sm text-slate-400">({(resumeFile.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Analysis Button */}
+                {resumeFile && (
+                  <button
+                    onClick={analyzeResume}
+                    disabled={analyzing}
+                    className="w-full btn-primary bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                  >
+                    {analyzing ? (
+                      <>
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="w-5 h-5" />
+                        Analyze Resume
+                      </>
+                    )}
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Analysis Results */}
+                <div className="space-y-6">
+                  {/* Overall Score */}
+                  <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-500/40 rounded-xl p-6 text-center">
+                    <h3 className="text-xl font-bold text-white mb-4">Overall ATS Score</h3>
+                    <div className="relative w-40 h-40 mx-auto">
+                      <svg className="transform -rotate-90 w-40 h-40">
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="70"
+                          stroke="rgba(245, 158, 11, 0.2)"
+                          strokeWidth="12"
+                          fill="none"
+                        />
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="70"
+                          stroke="url(#gradient)"
+                          strokeWidth="12"
+                          fill="none"
+                          strokeDasharray={`${(resumeAnalysis.score / 100) * 440} 440`}
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#f59e0b" />
+                            <stop offset="100%" stopColor="#ea580c" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div>
+                          <p className="text-5xl font-extrabold text-amber-400">{resumeAnalysis.score}</p>
+                          <p className="text-sm text-slate-400">out of 100</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Strengths */}
+                  {resumeAnalysis.strengths && resumeAnalysis.strengths.length > 0 && (
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <CheckCircle className="w-6 h-6 text-green-400" />
+                        <h3 className="text-xl font-bold text-white">Strengths</h3>
+                      </div>
+                      <ul className="space-y-2">
+                        {resumeAnalysis.strengths.map((strength: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2 text-slate-300">
+                            <span className="text-green-400 mt-1">✓</span>
+                            <span>{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Areas for Improvement */}
+                  {resumeAnalysis.improvements && resumeAnalysis.improvements.length > 0 && (
+                    <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <AlertCircle className="w-6 h-6 text-amber-400" />
+                        <h3 className="text-xl font-bold text-white">Areas for Improvement</h3>
+                      </div>
+                      <ul className="space-y-2">
+                        {resumeAnalysis.improvements.map((improvement: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2 text-slate-300">
+                            <span className="text-amber-400 mt-1">→</span>
+                            <span>{improvement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Recommendations */}
+                  {resumeAnalysis.recommendations && resumeAnalysis.recommendations.length > 0 && (
+                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Brain className="w-6 h-6 text-purple-400" />
+                        <h3 className="text-xl font-bold text-white">AI Recommendations</h3>
+                      </div>
+                      <ul className="space-y-2">
+                        {resumeAnalysis.recommendations.map((recommendation: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2 text-slate-300">
+                            <span className="text-purple-400 mt-1">💡</span>
+                            <span>{recommendation}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setResumeFile(null);
+                        setResumeAnalysis(null);
+                      }}
+                      className="flex-1 btn-secondary py-3"
+                    >
+                      Analyze Another Resume
+                    </button>
+                    <button
+                      onClick={closeResumeModal}
+                      className="flex-1 btn-primary bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 py-3"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
