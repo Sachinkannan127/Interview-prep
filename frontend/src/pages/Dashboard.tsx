@@ -241,8 +241,8 @@ export default function Dashboard() {
       <div className="min-h-screen relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       <Header />
@@ -258,80 +258,80 @@ export default function Dashboard() {
         {/* Main Action Cards - Three Equal Options */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 sm:mb-12 fade-in">
           {/* Aptitude Test Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 hover:border-orange-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-105 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer" onClick={() => {
             navigate('/interview/setup', { state: { defaultType: 'aptitude', defaultDifficulty: 'mid' } });
           }}>
             <div className="text-center p-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🧮</div>
-              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-3">Aptitude & Reasoning</h2>
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🧮</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">Aptitude & Reasoning</h2>
               <p className="text-slate-300 text-sm mb-4">Quantitative, Logical & Verbal Reasoning</p>
               <div className="space-y-2 text-xs text-slate-400 mb-4">
                 <div>📊 Data Interpretation</div>
                 <div>🔢 Number Series</div>
                 <div>🧠 Logical Puzzles</div>
               </div>
-              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">Start Test →</button>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">Start Test →</button>
             </div>
           </div>
 
           {/* Behavioral Interview Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 hover:border-purple-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-105 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-2 border-teal-500/30 hover:border-teal-500/50 transition-all cursor-pointer" onClick={() => {
             toast.success('AI Avatar Mock Interview coming soon! 🚀');
             navigate('/interview/setup');
           }}>
             <div className="text-center p-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🎭</div>
-              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3">Behavioral Round</h2>
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">🎭</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent mb-3">Behavioral Round</h2>
               <p className="text-slate-300 text-sm mb-4">Soft Skills & Communication Practice</p>
               <div className="space-y-2 text-xs text-slate-400 mb-4">
                 <div>💬 AI Avatar Simulation</div>
                 <div>🎯 STAR Method</div>
                 <div>📹 Video Analysis</div>
               </div>
-              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">Start Interview →</button>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700">Start Interview →</button>
             </div>
           </div>
 
           {/* Technical Interview Card */}
-          <div className="card group hover:scale-105 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer" onClick={() => {
+          <div className="card group hover:scale-105 bg-gradient-to-br from-slate-500/10 to-gray-500/10 border-2 border-slate-500/30 hover:border-slate-500/50 transition-all cursor-pointer" onClick={() => {
             toast.success('AI Avatar Mock Interview coming soon! 🚀');
             navigate('/interview/setup');
           }}>
             <div className="text-center p-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">💼</div>
-              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">Technical Round</h2>
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-600 to-gray-600 flex items-center justify-center text-4xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform">💼</div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-slate-400 to-gray-400 bg-clip-text text-transparent mb-3">Technical Round</h2>
               <p className="text-slate-300 text-sm mb-4">DSA, System Design & Coding</p>
               <div className="space-y-2 text-xs text-slate-400 mb-4">
                 <div>⚡ Live Coding</div>
                 <div>🏗️ System Design</div>
                 <div>🤖 AI Evaluation</div>
               </div>
-              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">Start Interview →</button>
+              <button className="btn-primary w-full text-base py-3 bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700">Start Interview →</button>
             </div>
           </div>
         </div>
 
         {/* Code Compiler Highlight Card */}
-        <div className="card group hover:scale-105 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-teal-500/10 border-2 border-green-500/40 hover:border-green-500/60 transition-all cursor-pointer mb-8 fade-in" onClick={() => navigate('/practice/code')}>
+        <div className="card group hover:scale-105 bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-teal-500/40 hover:border-teal-500/60 transition-all cursor-pointer mb-8 fade-in" onClick={() => navigate('/practice/code')}>
           <div className="flex flex-col md:flex-row items-center justify-between p-6 gap-6">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-600 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
                 <Code className="w-12 h-12 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent mb-2">Online Code Compiler</h2>
-                <p className="text-slate-300 text-base mb-2">Execute code in <span className="text-green-400 font-bold">17 programming languages</span> instantly</p>
+                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent mb-2">Online Code Compiler</h2>
+                <p className="text-slate-300 text-base mb-2">Execute code in <span className="text-teal-400 font-bold">17 programming languages</span> instantly</p>
                 <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">🐍 Python</span>
+                  <span className="px-2 py-1 bg-teal-500/20 text-teal-400 rounded">🐍 Python</span>
                   <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">🟨 JavaScript</span>
                   <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded">☕ Java</span>
-                  <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded">⚡ C++</span>
+                  <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded">⚡ C++</span>
                   <span className="px-2 py-1 bg-slate-500/20 text-slate-400 rounded">+13 more</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <button className="btn-primary px-8 py-4 text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 flex items-center gap-3 whitespace-nowrap">
+              <button className="btn-primary px-8 py-4 text-lg bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 flex items-center gap-3 whitespace-nowrap">
                 <Zap className="w-5 h-5" />
                 Start Coding
               </button>
@@ -343,6 +343,79 @@ export default function Dashboard() {
                 className="btn-secondary text-sm px-4 py-2"
               >
                 View Details
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Tools Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 sm:mb-12 fade-in">
+          {/* AI Assistant Card */}
+          <div className="card group hover:scale-105 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/40 hover:border-purple-500/60 transition-all cursor-pointer" onClick={() => {
+            toast.info('AI Assistant feature coming soon! 🤖');
+          }}>
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <span className="text-3xl">🤖</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">AI Interview Assistant</h2>
+                  <p className="text-slate-400 text-sm">Get instant help & guidance</p>
+                </div>
+              </div>
+              <p className="text-slate-300 text-sm mb-4">Your personal AI companion for interview preparation. Ask questions, get tips, and receive instant feedback on your answers.</p>
+              <div className="space-y-2 text-xs text-slate-400 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-400">💡</span>
+                  <span>Smart answer suggestions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-400">🎯</span>
+                  <span>Real-time feedback</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-400">📚</span>
+                  <span>Interview tips & strategies</span>
+                </div>
+              </div>
+              <button className="btn-primary w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                Launch Assistant →
+              </button>
+            </div>
+          </div>
+
+          {/* AI Resume Analyzer Card */}
+          <div className="card group hover:scale-105 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-2 border-amber-500/40 hover:border-amber-500/60 transition-all cursor-pointer" onClick={() => {
+            toast.info('AI Resume Analyzer feature coming soon! 📄');
+          }}>
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <span className="text-3xl">📄</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">AI Resume Analyzer</h2>
+                  <p className="text-slate-400 text-sm">Optimize your resume</p>
+                </div>
+              </div>
+              <p className="text-slate-300 text-sm mb-4">Upload your resume and get AI-powered insights, ATS score, and personalized recommendations to improve your chances.</p>
+              <div className="space-y-2 text-xs text-slate-400 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400">📊</span>
+                  <span>ATS compatibility score</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400">🎯</span>
+                  <span>Keyword optimization</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400">✨</span>
+                  <span>Professional suggestions</span>
+                </div>
+              </div>
+              <button className="btn-primary w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                Analyze Resume →
               </button>
             </div>
           </div>
